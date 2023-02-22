@@ -1,4 +1,3 @@
-setup node server with websockets
 add pink trombone webpage
 add microphone page
 setup pocketPhoenix

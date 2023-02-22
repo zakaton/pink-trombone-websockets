@@ -22,6 +22,7 @@ wss.on("connection", (ws) => {
   console.log("new ws connection");
   ws.on("message", (data) => {
     console.log("ws message received");
+    const json = data.toJSON();
     // FILL
   });
   ws.on("close", () => {
