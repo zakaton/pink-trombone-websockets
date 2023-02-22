@@ -1,6 +1,7 @@
 setup node server with websockets
 add pink trombone webpage
 add microphone page
+setup pocketPhoenix
+test phonemes
 receive pink-trombone signals
 receive microphone signals
-figure out formant analysis

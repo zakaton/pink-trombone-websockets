@@ -1,0 +1,15 @@
+{
+  "name": "pink-trombone-vvvv",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/zakaton/pink-trombone-vvvv",
+  "author": "Zack <zack@ukaton.com>",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "lodash": "^4.17.21",
+    "ws": "^8.11.0"
+  }
+}
