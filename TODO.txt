@@ -1,0 +1,6 @@
+setup node server with websockets
+add pink trombone webpage
+add microphone page
+receive pink-trombone signals
+receive microphone signals
+figure out formant analysis
