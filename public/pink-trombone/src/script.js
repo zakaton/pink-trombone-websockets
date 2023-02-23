@@ -8,7 +8,7 @@ function setVoiceness(voiceness) {
   pinkTromboneElement.loudness.value = loudness;
 }
 
-const { socket, send } = setupWebsocket("pinkTrombone", (message) => {
+const { send } = setupWebsocket("pinkTrombone", (message) => {
   let didSetVoiceness = false;
   let canSetVoiceness = true;
   for (const key in message) {

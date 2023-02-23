@@ -1,5 +1,5 @@
 /* global setupWebsocket, Pitchy */
 
-const { socket, send } = setupWebsocket("pitch", (message) => {
+const { send } = setupWebsocket("pitch", (message) => {
   // FILL
 });

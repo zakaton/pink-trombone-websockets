@@ -1,5 +1,9 @@
-/* global setupWebsocket, Pitchy */
+/* global setupWebsocket, setupPocketSphinx */
 
-const { socket, send } = setupWebsocket("phoneme", (message) => {
+const { send } = setupWebsocket("phoneme", (message) => {
   // FILL
+});
+
+setupPocketSphinx((hyp) => {
+  //console.log(hyp);
 });

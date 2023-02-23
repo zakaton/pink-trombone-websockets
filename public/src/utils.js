@@ -20,5 +20,5 @@ function setupWebsocket(webpageName, onMessage) {
     onMessage(message);
   });
 
-  return { socket, send };
+  return { send };
 }
