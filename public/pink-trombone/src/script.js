@@ -1,4 +1,4 @@
-/* global pinkTromboneElement, myConstriction */
+/* global setupWebsocket, pinkTromboneElement, frontConstriction, rearConstriction */
 
 function setVoiceness(voiceness) {
   const tenseness = 1 - Math.cos(voiceness * Math.PI * 0.5);
@@ -8,29 +8,11 @@ function setVoiceness(voiceness) {
   pinkTromboneElement.loudness.value = loudness;
 }
 
-// Create WebSocket connection.
-const socket = new WebSocket("wss://localhost/");
-
-// Connection opened
-socket.addEventListener("open", function (event) {
-  send({
-    type: "connection",
-    webpage: "pinkTrombone",
-  });
-});
-
-function send(object) {
-  socket.send(JSON.stringify(object));
-}
-
-// Listen for messages
-socket.addEventListener("message", function (event) {
-  console.log("Message from server ", event.data);
-  const data = JSON.parse(event.data);
+const { socket, send } = setupWebsocket("pinkTrombone", (message) => {
   let didSetVoiceness = false;
   let canSetVoiceness = true;
-  for (const key in data) {
-    const value = Number(data[key]);
+  for (const key in message) {
+    const value = Number(message[key]);
     let node;
     switch (key) {
       case "tongue.index":

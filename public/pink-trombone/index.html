@@ -1,5 +1,6 @@
 <html>
   <head>
+    <script src="./../src/utils.js"></script>
     <script src="./src/pink-trombone.min.js" type="module"></script>
   </head>
 
@@ -8,7 +9,7 @@
 
     <script>
       const pinkTromboneElement = document.querySelector("pink-trombone");
-      var myConstriction;
+      let frontConstriction, rearConstriction;
 
       pinkTromboneElement.addEventListener("load", (event) => {
         pinkTromboneElement.setAudioContext().then((pinkTrombone) => {
@@ -18,7 +19,8 @@
             pinkTromboneElement.audioContext.destination
           );
           pinkTromboneElement.start();
-          myConstriction = pinkTromboneElement.newConstriction(43, 1.8);
+          frontConstriction = pinkTromboneElement.newConstriction(0, 1.8);
+          rearConstriction = pinkTromboneElement.newConstriction(43, 1.8);
         });
       });
     </script>

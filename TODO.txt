@@ -1,5 +1,8 @@
-add microphone page
-setup pocketPhoenix
-test phonemes
-receive pink-trombone signals
-receive microphone signals
+Pitch
+  websocket
+  get microphone
+  get Pitch
+  send pitch
+pocketPhoenix
+  install
+  test phonemes

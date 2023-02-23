@@ -20,7 +20,8 @@ httpsServer.listen(443);
 const clients = {
   vvvv: new Set(),
   pinkTrombone: new Set(),
-  microphone: new Set(),
+  pitch: new Set(),
+  phoneme: new Set(),
 };
 
 const wss = new WebSocket.Server({ server: httpsServer });
