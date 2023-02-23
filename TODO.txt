@@ -1,4 +1,3 @@
-add pink trombone webpage
 add microphone page
 setup pocketPhoenix
 test phonemes

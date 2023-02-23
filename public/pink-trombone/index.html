@@ -1,8 +1,27 @@
 <html>
   <head>
-    <title>Pink Trombone</title>
+    <script src="./src/pink-trombone.min.js" type="module"></script>
   </head>
+
   <body>
-    hello
+    <pink-trombone></pink-trombone>
+
+    <script>
+      const pinkTromboneElement = document.querySelector("pink-trombone");
+      var myConstriction;
+
+      pinkTromboneElement.addEventListener("load", (event) => {
+        pinkTromboneElement.setAudioContext().then((pinkTrombone) => {
+          pinkTromboneElement.enableUI();
+          pinkTromboneElement.startUI();
+          pinkTromboneElement.connect(
+            pinkTromboneElement.audioContext.destination
+          );
+          pinkTromboneElement.start();
+          myConstriction = pinkTromboneElement.newConstriction(43, 1.8);
+        });
+      });
+    </script>
+    <script src="./src/script.js"></script>
   </body>
 </html>

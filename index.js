@@ -17,15 +17,34 @@ httpServer.listen(80);
 const httpsServer = https.createServer(options, app);
 httpsServer.listen(443);
 
+const clients = {
+  vvvv: new Set(),
+  pinkTrombone: new Set(),
+  microphone: new Set(),
+};
+
 const wss = new WebSocket.Server({ server: httpsServer });
 wss.on("connection", (ws) => {
   console.log("new ws connection");
+  let webpageName;
   ws.on("message", (data) => {
     console.log("ws message received");
-    const json = data.toJSON();
-    // FILL
+    const json = JSON.parse(data.toString());
+    switch (json.type) {
+      case "connection":
+        webpageName = json.webpage;
+        console.log(
+          `received initial message from the "${webpageName}" webpage`
+        );
+        clients[webpageName]?.add(ws);
+        break;
+      default:
+        console.log(`uncaught message type ${type}`);
+        break;
+    }
   });
   ws.on("close", () => {
-    console.log("ws disconnected");
+    console.log(`"${webpageName}" webpage left`);
+    clients[webpageName]?.delete(ws);
   });
 });
