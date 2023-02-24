@@ -61,7 +61,11 @@ const { send } = setupWebsocket("pinkTrombone", (message) => {
         console.log("uncaught key", key);
     }
     if (node) {
-      node.value = value;
+      //node.value = value;
+      node.linearRampToValueAtTime(
+        value,
+        pinkTromboneElement.audioContext.currentTime + 0.01
+      );
     }
   }
 });

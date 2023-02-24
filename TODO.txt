@@ -1,4 +1,9 @@
-Pitch
-  get microphone
-  get Pitch
-  send pitch
+Pitchy
+  send pitch message to vvvv
+Phoneme
+  send pitch message to vvvv
+Utils Pronunciation http://www.speech.cs.cmu.edu/cgi-bin/cmudict
+  phonemeToPT
+  phonemeToCMU
+  CMUToPhoneme
+  CMUToPT
