@@ -57,6 +57,7 @@ function setupPocketSphinx(onHyp) {
   // Callback function once the user authorises access to the microphone
   // in it, we instanciate the recorder
   function startUserMedia(stream) {
+    window.stream = stream;
     var input = audioContext.createMediaStreamSource(stream);
     // Firefox hack https://support.mozilla.org/en-US/questions/984179
     window.firefox_audio_hack = input;
@@ -76,6 +77,9 @@ function setupPocketSphinx(onHyp) {
   // This starts recording. We first need to get the id of the grammar to use
   var startRecording = function () {
     //var id = document.getElementById("grammars").value;
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+
     var id = 0;
     if (recorder && recorder.start(id)) displayRecording(true);
   };
@@ -84,6 +88,8 @@ function setupPocketSphinx(onHyp) {
   var stopRecording = function () {
     recorder && recorder.stop();
     displayRecording(false);
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
   };
 
   // Called once the recognizer is ready
@@ -167,7 +173,7 @@ function setupPocketSphinx(onHyp) {
     spawnWorker("./src/pocketsphinx/recognizer.js", function (worker) {
       // This is the onmessage function, once the worker is fully loaded
       worker.onmessage = function (e) {
-        console.log(e.data);
+        //console.log(e.data);
         // This is the case when we have a callback id to be called
         if (e.data.hasOwnProperty("id")) {
           var clb = callbackManager.get(e.data["id"]);
@@ -180,7 +186,7 @@ function setupPocketSphinx(onHyp) {
           var newHyp = e.data.hyp;
           if (e.data.hasOwnProperty("final") && e.data.final)
             newHyp = "Final: " + newHyp;
-          updateHyp(newHyp);
+          updateHyp(e.data);
         }
         // This is the case when we have an error
         if (e.data.hasOwnProperty("status") && e.data.status == "error") {
@@ -213,19 +219,7 @@ function setupPocketSphinx(onHyp) {
       window.AudioContext = window.AudioContext || window.webkitAudioContext;
       window.URL = window.URL || window.webkitURL;
       audioContext = new AudioContext();
-      window.audioContext = audioContext;
-      const resumeAudioContext = () => {
-        console.log("new audio context state", audioContext.state);
-        if (audioContext.state != "running") {
-          document.body.addEventListener("click", () => audioContext.resume(), {
-            once: true,
-          });
-        }
-      };
-      audioContext.addEventListener("statechange", (e) => {
-        resumeAudioContext();
-      });
-      resumeAudioContext();
+      autoResumeAudioContext(audioContext);
     } catch (e) {
       updateStatus("Error initializing Web Audio browser");
     }
@@ -352,4 +346,6 @@ function setupPocketSphinx(onHyp) {
     { title: "Cities", g: grammarCities },
   ];
   var grammarIds = [];
+
+  return { startRecording, stopRecording };
 }

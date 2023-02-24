@@ -1,7 +1,4 @@
-pocketsphinx
-  test phonemes
 Pitch
-  websocket
   get microphone
   get Pitch
   send pitch
