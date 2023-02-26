@@ -227,9 +227,9 @@ function setupPocketSphinx(onHyp) {
       navigator.mediaDevices
         .getUserMedia({
           audio: {
-            //echoCancellation: false,
-            //autoGainControl: false,
-            //noiseSuppression: false,
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false,
           },
         })
         .then(startUserMedia)

@@ -27,10 +27,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const analyserNode = audioContext.createAnalyser();
   autoResumeAudioContext(audioContext);
 
-  navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-    audioContext.createMediaStreamSource(stream).connect(analyserNode);
-    const detector = PitchDetector.forFloat32Array(analyserNode.fftSize);
-    const input = new Float32Array(detector.inputLength);
-    updatePitch(analyserNode, detector, input, audioContext.sampleRate);
-  });
+  navigator.mediaDevices
+    .getUserMedia({
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false,
+      },
+    })
+    .then((stream) => {
+      audioContext.createMediaStreamSource(stream).connect(analyserNode);
+      const detector = PitchDetector.forFloat32Array(analyserNode.fftSize);
+      const input = new Float32Array(detector.inputLength);
+      updatePitch(analyserNode, detector, input, audioContext.sampleRate);
+    });
 });
