@@ -1,9 +1,8 @@
-Pitchy
-  send pitch message to vvvv
 Phoneme
+  convert word to phonemes
   send pitch message to vvvv
-Utils Pronunciation http://www.speech.cs.cmu.edu/cgi-bin/cmudict
-  phonemeToPT
-  phonemeToCMU
-  CMUToPhoneme
-  CMUToPT
+microphone
+  get volume
+  send pitch message to vvvv
+
+use http://127.0.0.1/phoneme/
