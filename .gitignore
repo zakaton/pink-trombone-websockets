@@ -106,3 +106,5 @@ dist
 sec
 .vscode
 .DS_Store
+
+public/phoneme/src/pocketsphinx/cmusphinx-en-us-8khz-5.2/*
