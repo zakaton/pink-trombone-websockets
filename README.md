@@ -1,4 +1,4 @@
-# pink-trombone-vvvv
+# pink-trombone-websockets
 
 for the security stuff, run the command in the terminal:
 `sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./selfsigned.key -out selfsigned.crt`
