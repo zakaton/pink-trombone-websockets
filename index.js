@@ -20,7 +20,7 @@ httpsServer.listen(443);
 const clients = {
   vvvv: new Set(),
   pinkTrombone: new Set(),
-  pitch: new Set(),
+  microphone: new Set(),
   phoneme: new Set(),
 };
 

@@ -2,7 +2,6 @@ Phoneme
   convert word to phonemes
   send pitch message to vvvv
 microphone
-  get volume
-  send pitch message to vvvv
+  send volume/pitch message to vvvv
 
 use http://127.0.0.1/phoneme/
