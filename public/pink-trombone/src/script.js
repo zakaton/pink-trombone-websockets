@@ -1,4 +1,18 @@
-/* global setupWebsocket, pinkTromboneElement, frontConstriction, rearConstriction */
+/* global setupWebsocket */
+
+const pinkTromboneElement = document.querySelector("pink-trombone");
+let frontConstriction, rearConstriction;
+
+pinkTromboneElement.addEventListener("load", (event) => {
+  pinkTromboneElement.setAudioContext().then((pinkTrombone) => {
+    pinkTromboneElement.enableUI();
+    pinkTromboneElement.startUI();
+    pinkTromboneElement.connect(pinkTromboneElement.audioContext.destination);
+    pinkTromboneElement.start();
+    frontConstriction = pinkTromboneElement.newConstriction(0, 1.8);
+    rearConstriction = pinkTromboneElement.newConstriction(43, 1.8);
+  });
+});
 
 function setVoiceness(voiceness) {
   const tenseness = 1 - Math.cos(voiceness * Math.PI * 0.5);
