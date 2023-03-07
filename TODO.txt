@@ -1,14 +1,11 @@
+Spectrum
+Phoneme
+  read mfcc_lipsync
 PT
   3 constrictions
   change from websockets
   IPA => I/D
   CMU => I/D
-PocketSphinx
-  clean up code
-  make it work please
-Phoneme
-  convert word to phonemes
-  send pitch message to vvvv
 microphone
   send volume/pitch message to vvvv
 

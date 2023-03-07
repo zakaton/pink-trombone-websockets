@@ -17,6 +17,7 @@ function setupPocketSphinx(onHyp) {
   // is ready so that onmessage can be properly set
   function spawnWorker(workerURL, onReady) {
     recognizer = new Worker(workerURL);
+    console.log(recognizer);
     recognizer.onmessage = function (event) {
       onReady(recognizer);
     };
