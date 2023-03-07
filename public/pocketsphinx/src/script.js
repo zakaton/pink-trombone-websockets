@@ -1,6 +1,6 @@
 /* global setupWebsocket, setupPocketSphinx */
 
-const { send } = setupWebsocket("phoneme", (message) => {
+const { send } = setupWebsocket("pocketsphinx", (message) => {
   // FILL
 });
 

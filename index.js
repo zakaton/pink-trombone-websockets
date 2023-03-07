@@ -21,7 +21,8 @@ const clients = {
   vvvv: new Set(),
   pinkTrombone: new Set(),
   microphone: new Set(),
-  phoneme: new Set(),
+  pocketsphinx: new Set(),
+  voice: new Set(),
 };
 
 const wss = new WebSocket.Server({ server: httpsServer });

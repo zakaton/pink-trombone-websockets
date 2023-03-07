@@ -1,6 +1,5 @@
-Spectrum
-Phoneme
-  read mfcc_lipsync
+Voice
+  get mfcc
 PT
   3 constrictions
   change from websockets
@@ -8,5 +7,3 @@ PT
   CMU => I/D
 microphone
   send volume/pitch message to vvvv
-
-use http://127.0.0.1/phoneme/
