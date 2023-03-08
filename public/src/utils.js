@@ -47,7 +47,8 @@ function autoResumeAudioContext(audioContext) {
   audioContext.addEventListener("statechange", (e) => {
     resumeAudioContext();
   });
-  resumeAudioContext();
+  audioContext.dispatchEvent(new Event("statechange"));
+  //resumeAudioContext();
 }
 
 /**

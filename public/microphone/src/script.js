@@ -41,10 +41,16 @@ function updateVolume() {
   volumeElement.textContent = `${Math.round(volume * 100)}%`;
 }
 
-let updateInterval = 100;
-let volumeThreshold = 0.3;
+let updateInterval = 50;
+let volumeThreshold = 0.1;
 const throttledSend = throttle(() => {
-  send({ type: "message", from: "microphone", to: ["vvvv"], pitch, volume });
+  send({
+    type: "message",
+    from: "microphone",
+    to: ["vvvv", "pinktrombone"],
+    frequency: pitch,
+    intensity: volume,
+  });
 }, updateInterval);
 function update() {
   updateVolume();
@@ -55,25 +61,29 @@ function update() {
   window.setTimeout(() => update(), updateInterval);
 }
 
-let analyserNode, audioContext, detector, pitchInput, volumeInput;
+let analyserNode, audioContext, detector, pitchInput, volumeInput, stream;
 document.addEventListener("DOMContentLoaded", () => {
   audioContext = new window.AudioContext();
   analyserNode = audioContext.createAnalyser();
+  audioContext.addEventListener("statechange", (event) => {
+    if (audioContext.state == "running" && !stream) {
+      navigator.mediaDevices
+        .getUserMedia({
+          audio: {
+            //echoCancellation: false,
+            //noiseSuppression: false,
+            //autoGainControl: false,
+          },
+        })
+        .then((_stream) => {
+          stream = _stream;
+          audioContext.createMediaStreamSource(stream).connect(analyserNode);
+          detector = PitchDetector.forFloat32Array(analyserNode.fftSize);
+          pitchInput = new Float32Array(detector.inputLength);
+          volumeInput = new Uint8Array(detector.inputLength);
+          update();
+        });
+    }
+  });
   autoResumeAudioContext(audioContext);
-
-  navigator.mediaDevices
-    .getUserMedia({
-      audio: {
-        echoCancellation: false,
-        noiseSuppression: false,
-        autoGainControl: false,
-      },
-    })
-    .then((stream) => {
-      audioContext.createMediaStreamSource(stream).connect(analyserNode);
-      detector = PitchDetector.forFloat32Array(analyserNode.fftSize);
-      pitchInput = new Float32Array(detector.inputLength);
-      volumeInput = new Uint8Array(detector.inputLength);
-      update();
-    });
 });

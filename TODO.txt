@@ -1,5 +1,7 @@
 debug
   dropdown menu for phonemes
+pinktrombone
+  phoneme message
 Voice
   ML5.js model
 microphone
