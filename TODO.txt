@@ -1,9 +1,7 @@
-Voice
-  get mfcc
 PT
-  3 constrictions
-  change from websockets
-  IPA => I/D
-  CMU => I/D
+  broadcast changes when done by the user
+Voice
+  receive change messages for ML usage
+  ML5.js model
 microphone
   send volume/pitch message to vvvv

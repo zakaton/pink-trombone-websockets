@@ -1,4 +1,4 @@
-/* global setupWebsocket, autoResumeAudioContext, Meyda */
+/* global setupWebsocket, autoResumeAudioContext, Meyda, ml5, throttle*/
 
 const { send } = setupWebsocket("voice", (message) => {
   // FILL
@@ -30,6 +30,8 @@ function drawMFCC(mfcc) {
 const audioContext = new AudioContext();
 autoResumeAudioContext(audioContext);
 
+const numberOfMFCCCoefficients = 13;
+
 let analyzer;
 navigator.mediaDevices
   .getUserMedia({
@@ -49,7 +51,7 @@ navigator.mediaDevices
       featureExtractors: ["mfcc"],
       bufferSize: 2 ** 10,
       //hopSize: 2 ** 8,
-      //numberOfMFCCCoefficients: 10,
+      numberOfMFCCCoefficients,
       callback: ({ mfcc }) => {
         //console.log(mfcc);
         drawMFCC(mfcc);
@@ -59,3 +61,49 @@ navigator.mediaDevices
     // Start the analyzer to begin processing audio data
     analyzer.start();
   });
+
+const neuralNetwork = ml5.neuralNetwork({
+  inputs: numberOfMFCCCoefficients,
+  outputs: [
+    "tongueIndex",
+    "tongueDiameter",
+    "frontConstrictionDiameter",
+    "frontConstrictionIndex",
+    "backConstrictionDiameter",
+    "backConstrictionIndex",
+  ],
+
+  task: "regression",
+  debug: "true",
+
+  epochs: 80,
+  batchSize: 20,
+});
+
+function getOutputs() {
+  return {
+    tongueIndex: pinkTromboneElement.tongue.index.value,
+    tongueDiameter: pinkTromboneElement.tongue.diameter.value,
+
+    frontConstrictionDiameter: constrictions.front.diameter.value,
+    frontConstrictionIndex: constrictions.front.index.value,
+
+    backConstrictionDiameter: constrictions.back.diameter.value,
+    backConstrictionIndex: constrictions.back.index.value,
+  };
+}
+function setOutputs({
+  tongueIndex,
+  tongueDiameter,
+  //frontConstrictionIndex, frontConstrictionDiameter,
+  //backConstrictionIndex, backConstrictionDiameter,
+}) {
+  pinkTromboneElement.tongue.index.value = tongueIndex;
+  pinkTromboneElement.tongue.diameter.value = tongueDiameter;
+
+  //constrictions.front.index.value = frontConstrictionIndex;
+  //constrictions.front.diameter.value = frontConstrictionDiameter;
+
+  //constrictions.back.index.value = backConstrictionIndex;
+  //constrictions.back.diameter.value = backConstrictionDiameter;
+}
