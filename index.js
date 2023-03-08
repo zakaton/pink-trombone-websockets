@@ -18,8 +18,9 @@ const httpsServer = https.createServer(options, app);
 httpsServer.listen(443);
 
 const clients = {
+  debug: new Set(),
   vvvv: new Set(),
-  pinkTrombone: new Set(),
+  pinktrombone: new Set(),
   microphone: new Set(),
   pocketsphinx: new Set(),
   voice: new Set(),
@@ -30,15 +31,22 @@ wss.on("connection", (ws) => {
   console.log("new ws connection");
   let webpageName;
   ws.on("message", (data) => {
-    console.log("ws message received");
-    const json = JSON.parse(data.toString());
-    switch (json.type) {
+    //console.log("ws message received");
+    const string = data.toString();
+    const message = JSON.parse(string);
+    const { to, type } = message;
+    switch (type) {
       case "connection":
-        webpageName = json.webpage;
+        webpageName = message.webpage;
         console.log(
           `received initial message from the "${webpageName}" webpage`
         );
         clients[webpageName]?.add(ws);
+        break;
+      case "message":
+        to.forEach((receiver) => {
+          clients[receiver].forEach((client) => client.send(string));
+        });
         break;
       default:
         console.log(`uncaught message type ${type}`);

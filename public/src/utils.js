@@ -17,11 +17,12 @@ function setupWebsocket(webpageName, onMessage) {
   });
 
   function send(object) {
+    object.from = webpageName;
     socket.send(JSON.stringify(object));
   }
 
   socket.addEventListener("message", (event) => {
-    console.log("Message from server ", event.data);
+    //console.log("Message from server ", event.data);
     const message = JSON.parse(event.data);
     onMessage(message);
   });
@@ -75,3 +76,22 @@ function throttle(functionToThrottle, minimumInterval, optionalContext) {
     }
   };
 }
+
+const phonemes = {
+  // FILL - maps IPA to constrictions
+  b: {
+    voiced: true,
+    tongue: {
+      index: null,
+      diameter: null,
+    },
+    front: {
+      index: null,
+      diameter: null,
+    },
+    back: {
+      index: null,
+      diameter: null,
+    },
+  },
+};

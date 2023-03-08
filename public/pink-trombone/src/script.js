@@ -25,20 +25,57 @@ document.body.addEventListener("mousedown", (event) => {
 document.body.addEventListener("mouseup", (event) => {
   isMouseDown = false;
 });
-let indexThreshold = 30;
-const updateConstriction = throttle(() => {
-  const constriction =
-    pinkTromboneElement.pinkTrombone._pinkTromboneNode._constrictions[2];
+
+function deconstructConstriction(constriction) {
   const index = constriction.index.value;
   const diameter = constriction.diameter.value;
-  const targetConstriction =
-    index < indexThreshold ? backConstriction : frontConstriction;
-  targetConstriction.diameter.value = diameter;
-  targetConstriction.index.value = index;
+  return { index, diameter };
+}
+function setConstriction(constriction, index, diameter) {
+  constriction.index.value = index;
+  constriction.diameter.value = diameter;
+}
+
+let indexThreshold = 28;
+const updateConstriction = throttle((event) => {
+  const message = {
+    to: ["voice", "debug"],
+    type: "message",
+    constrictions: {},
+  };
+
+  const constrictionIndex =
+    pinkTromboneElement.UI._tractUI._touchConstrictionIndices[-1];
+  const isTongue = constrictionIndex == -1;
+  if (isTongue) {
+    const { index, diameter } = deconstructConstriction(
+      pinkTromboneElement.tongue
+    );
+    message.constrictions.tongue = {
+      index,
+      diameter,
+    };
+  } else {
+    const { index, diameter } = deconstructConstriction(
+      pinkTromboneElement.pinkTrombone._pinkTromboneNode._constrictions[2]
+    );
+    const isBackConstriction = index < indexThreshold;
+    const targetConstriction = isBackConstriction
+      ? backConstriction
+      : frontConstriction;
+    setConstriction(targetConstriction, index, diameter);
+    message.constrictions[
+      isBackConstriction ? "backConstriction" : "frontConstriction"
+    ] = {
+      index,
+      diameter,
+    };
+  }
+  send(message);
 }, 100);
 document.body.addEventListener("mousemove", (event) => {
   if (isMouseDown) {
-    updateConstriction();
+    updateConstriction(event);
   }
 });
 
@@ -50,12 +87,13 @@ function setVoiceness(voiceness) {
   pinkTromboneElement.loudness.value = loudness;
 }
 
-const { send } = setupWebsocket("pinkTrombone", (message) => {
+const { send } = setupWebsocket("pinktrombone", (message) => {
   let didSetVoiceness = false;
   let canSetVoiceness = true;
   for (const key in message) {
     const value = Number(message[key]);
     let node;
+    let nodes = [];
     switch (key) {
       case "tongue.index":
         node = pinkTromboneElement.tongue.index;
@@ -89,6 +127,9 @@ const { send } = setupWebsocket("pinkTrombone", (message) => {
         node = pinkTromboneElement.loudness;
         canSetVoiceness = false;
         break;
+      case "intensity":
+        node = pinkTromboneElement.intensity;
+        break;
       case "frequency":
         node = pinkTromboneElement.frequency;
         break;
@@ -108,18 +149,28 @@ const { send } = setupWebsocket("pinkTrombone", (message) => {
         setVoiceness(value);
         didSetVoiceness = true;
         break;
+      case "phoneme":
+        // FILL - set constrictions based on phoneme
+
+        break;
       case "mouth":
         node = myConstriction.diameter;
         break;
       default:
-        console.log("uncaught key", key);
+      //console.log("uncaught key", key);
     }
+
     if (node) {
-      //node.value = value;
-      node.linearRampToValueAtTime(
-        value,
-        pinkTromboneElement.audioContext.currentTime + 0.01
-      );
+      nodes.push(node);
+    }
+    if (nodes.length > 0) {
+      nodes.forEach((node) => {
+        //node.value = value;
+        node.linearRampToValueAtTime(
+          value,
+          pinkTromboneElement.audioContext.currentTime + 0.01
+        );
+      });
     }
   }
 });

@@ -41,11 +41,18 @@ function updateVolume() {
   volumeElement.textContent = `${Math.round(volume * 100)}%`;
 }
 
+let updateInterval = 100;
+let volumeThreshold = 0.3;
+const throttledSend = throttle(() => {
+  send({ type: "message", from: "microphone", to: ["vvvv"], pitch, volume });
+}, updateInterval);
 function update() {
   updateVolume();
   updatePitch();
-  //send({pitch, volume});
-  window.setTimeout(() => update(), 100);
+  if (volume > volumeThreshold) {
+    throttledSend();
+  }
+  window.setTimeout(() => update(), updateInterval);
 }
 
 let analyserNode, audioContext, detector, pitchInput, volumeInput;

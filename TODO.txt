@@ -1,7 +1,6 @@
-PT
-  broadcast changes when done by the user
+debug
+  dropdown menu for phonemes
 Voice
-  receive change messages for ML usage
   ML5.js model
 microphone
   send volume/pitch message to vvvv

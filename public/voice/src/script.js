@@ -2,6 +2,7 @@
 
 const { send } = setupWebsocket("voice", (message) => {
   // FILL
+  console.log(message);
 });
 
 /** @type {HTMLCanvasElement} */
