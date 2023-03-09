@@ -150,8 +150,13 @@ const { send } = setupWebsocket("pinktrombone", (message) => {
         didSetVoiceness = true;
         break;
       case "phoneme":
-        // FILL - set constrictions based on phoneme
-
+        const { constrictions } = phonemes[message.phoneme];
+        if (constrictions) {
+          console.log(constrictions);
+          constrictions.forEach((constriction, index) => {
+            // FILL - play sequence
+          });
+        }
         break;
       case "mouth":
         node = myConstriction.diameter;

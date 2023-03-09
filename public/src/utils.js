@@ -79,20 +79,669 @@ function throttle(functionToThrottle, minimumInterval, optionalContext) {
 }
 
 const phonemes = {
-  // FILL - maps IPA to constrictions
+  // CONSONANTS
   b: {
     voiced: true,
-    tongue: {
-      index: null,
-      diameter: null,
-    },
-    front: {
-      index: null,
-      diameter: null,
-    },
-    back: {
-      index: null,
-      diameter: null,
+    graphemes: ["b", "bb"],
+    example: "bug",
+    constrictions: {
+      front: {
+        index: 40.989383697509766,
+        diameter: -0.4094715118408203,
+      },
+      tongue: {
+        index: 27.188875198364258,
+        diameter: 3.7335827350616455,
+      },
     },
   },
+  d: {
+    voiced: true,
+    graphemes: ["d", "dd", "ed"],
+    example: "dad",
+    constrictions: {
+      front: {
+        index: 35.89909744262695,
+        diameter: -0.4234344959259033,
+      },
+      tongue: {
+        index: 13.135254859924316,
+        diameter: 2.8327841758728027,
+      },
+    },
+  },
+  f: {
+    voiced: false,
+    graphemes: ["f", "ff", "ph", "gh", "lf", "ft"],
+    example: "fat",
+    constrictions: {
+      front: {
+        index: 41.34956359863281,
+        diameter: 0.5388981103897095,
+      },
+      tongue: {
+        index: 21.017623901367188,
+        diameter: 3.6824817657470703,
+      },
+    },
+  },
+  g: {
+    voiced: true,
+    graphemes: ["g", "gg", "gh", "gu", "gue"],
+    example: "gun",
+    constrictions: {
+      back: {
+        index: 22.009140014648438,
+        diameter: 0.17730380594730377,
+      },
+      tongue: {
+        index: 14.824607849121094,
+        diameter: 2.7940967082977295,
+      },
+    },
+  },
+  h: {
+    voiced: false,
+    graphemes: ["h", "wh"],
+    example: "hop",
+    constrictions: {
+      back: {
+        index: 10.536121368408203,
+        diameter: 0.4411369264125824,
+      },
+      tongue: {
+        index: 19.82225227355957,
+        diameter: 3.5797972679138184,
+      },
+    },
+  },
+  dʒ: {
+    voiced: true,
+    graphemes: ["j", "ge", "g", "dge", "di", "gg"],
+    example: "jam",
+    constrictions: {
+      front: {
+        index: 31.48894500732422,
+        diameter: 0.5175557136535645,
+      },
+      tongue: {
+        index: 28.93478775024414,
+        diameter: 2.8312392234802246,
+      },
+    },
+  },
+  k: {
+    voiced: false,
+    graphemes: ["k", "c", "ch", "cc", "lk", "qu", "q(u)", "ck", "x"],
+    example: "kit",
+    alternative: "g",
+  },
+  l: {
+    voiced: true,
+    graphemes: ["l", "ll"],
+    example: "live",
+    constrictions: {
+      tongue: {
+        index: 9.636259078979492,
+        diameter: 1.903935194015503,
+      },
+      front: {
+        index: 37.93798828125,
+        diameter: 1.1625759601593018,
+      },
+    },
+  },
+  m: {
+    voiced: true,
+    graphemes: ["m", "mm", "mb", "mn", "lm"],
+    example: "man",
+    constrictions: {
+      front: {
+        index: 41.09548568725586,
+        diameter: -1.1418479681015015,
+      },
+      tongue: {
+        index: 12.213376998901367,
+        diameter: 2.8788487911224365,
+      },
+    },
+  },
+  n: {
+    voiced: true,
+    graphemes: ["n", "nn", "kn", "gn", "pn", "mn"],
+    example: "net",
+    constrictions: {
+      front: {
+        index: 35.88129806518555,
+        diameter: -1.2149009704589844,
+      },
+      tongue: {
+        index: 12.213376998901367,
+        diameter: 2.8788487911224365,
+      },
+    },
+  },
+  p: {
+    voiced: false,
+    graphemes: ["p", "pp"],
+    example: "pin",
+    alternative: "b",
+  },
+  r: {
+    voiced: true,
+    graphemes: ["r", "rr", "wr", "rh"],
+    example: "run",
+    constrictions: {
+      front: {
+        index: 28.316896438598633,
+        diameter: 0.8469864130020142,
+      },
+      tongue: {
+        index: 17.867565155029297,
+        diameter: 1.7726432085037231,
+      },
+    },
+  },
+  s: {
+    voiced: false,
+    graphemes: ["s", "ss", "c", "sc", "ps", "st", "ce", "se"],
+    example: "sit",
+    constrictions: {
+      front: {
+        index: 35.67124557495117,
+        diameter: 0.5797462463378906,
+      },
+      tongue: {
+        index: 26.09954261779785,
+        diameter: 3.57755708694458,
+      },
+    },
+  },
+  t: {
+    voiced: false,
+    graphemes: ["t", "tt", "th", "ed"],
+    example: "tip",
+    alternative: "d",
+  },
+  v: {
+    voiced: true,
+    graphemes: ["v", "f", "ph", "ve"],
+    example: "vine",
+    alternative: "f",
+  },
+  w: {
+    voiced: true,
+    graphemes: ["w", "wh", "u", "o"],
+    example: "wit",
+    constrictions: {
+      front: {
+        index: 43.10062789916992,
+        diameter: 1.1798259019851685,
+      },
+      tongue: {
+        index: 8.366361618041992,
+        diameter: 1.740299105644226,
+      },
+    },
+  },
+  z: {
+    voiced: true,
+    graphemes: ["z", "zz", "s", "ss", "x", "ze", "se"],
+    example: "buzz",
+    alternative: "s",
+  },
+  ʒ: {
+    voiced: true,
+    graphemes: ["s", "si", "z"],
+    example: "treasure",
+    constrictions: {
+      tongue: {
+        index: 11.399920463562012,
+        diameter: 3.995708703994751,
+      },
+      front: {
+        index: 14.105496406555176,
+        diameter: 2.840425491333008,
+      },
+    },
+  },
+  tʃ: {
+    voiced: false,
+    graphemes: ["ch", "tch", "tu", "te"],
+    example: "chip",
+    constrictions: {
+      tongue: {
+        index: 21.251113891601562,
+        diameter: 2.770223617553711,
+      },
+      front: {
+        index: 31.51334571838379,
+        diameter: 0.48040685057640076,
+      },
+    },
+  },
+  ʃ: {
+    voiced: false,
+    graphemes: ["sh", "ce", "s", "ci", "si", "ch", "sci", "ti"],
+    example: "sham",
+    alternative: "ʒ",
+  },
+  θ: {
+    voiced: false,
+    graphemes: ["th"],
+    example: "thongs",
+    constrictions: {
+      tongue: {
+        index: 28.22434425354004,
+        diameter: 2.309201240539551,
+      },
+      front: {
+        index: 38.21797561645508,
+        diameter: 0.49921420216560364,
+      },
+    },
+  },
+  ð: {
+    voiced: true,
+    graphemes: ["th"],
+    example: "leather",
+    alternative: "θ",
+  },
+  ŋ: {
+    voiced: true,
+    graphemes: ["ng", "n", "ngue"],
+    example: "ring",
+    constrictions: {
+      tongue: {
+        index: 11.262357711791992,
+        diameter: 1.9802567958831787,
+      },
+      back: {
+        index: 11.893214225769043,
+        diameter: 0.4043289124965668,
+      },
+    },
+  },
+  j: {
+    voiced: true,
+    graphemes: ["y", "i", "j"],
+    example: "you",
+    constrictions: {
+      tongue: {
+        index: 29.349863052368164,
+        diameter: 2.376814365386963,
+      },
+    },
+  },
+
+  // VOWELS
+  æ: {
+    graphemes: ["a", "ai", "au"],
+    example: "cat",
+    constrictions: {
+      tongue: {
+        index: 22.44707489013672,
+        diameter: 3.6174707412719727,
+      },
+    },
+  },
+  eɪ: {
+    graphemes: [
+      "a",
+      "ai",
+      "eigh",
+      "aigh",
+      "ay",
+      "er",
+      "et",
+      "ei",
+      "au",
+      "a_e",
+      "ea",
+      "ey",
+    ],
+    example: "bay",
+    constrictions: [
+      {
+        tongue: {
+          index: 26.89008140563965,
+          diameter: 3.052640914916992,
+        },
+      },
+      {
+        tongue: {
+          index: 31.231204986572266,
+          diameter: 2.109241247177124,
+        },
+      },
+    ],
+  },
+  ɛ: {
+    graphemes: ["e", "ea", "u", "ie", "ai", "a", "eo", "ei", "ae"],
+    example: "end",
+    constrictions: {
+      tongue: {
+        index: 26.440641403198242,
+        diameter: 2.970951557159424,
+      },
+    },
+  },
+  "i:": {
+    graphemes: ["e", "ee", "ea", "y", "ey", "oe", "ie", "i", "ei", "eo", "ay"],
+    example: "be",
+    constrictions: {
+      tongue: {
+        index: 33.49000549316406,
+        diameter: 2.0898075103759766,
+      },
+    },
+  },
+  ɪ: {
+    graphemes: ["i", "e", "o", "u", "ui", "y", "ie"],
+    example: "it",
+    constrictions: {
+      tongue: {
+        index: 27.176782608032227,
+        diameter: 2.5782177448272705,
+      },
+    },
+  },
+  aɪ: {
+    graphemes: ["i", "y", "igh", "ie", "uy", "ye", "ai", "is", "eigh", "i_e"],
+    example: "sky",
+    constrictions: [
+      {
+        tongue: {
+          index: 12.763235092163086,
+          diameter: 2.8315868377685547,
+        },
+      },
+      {
+        tongue: {
+          index: 27.904165267944336,
+          diameter: 1.9339886903762817,
+        },
+      },
+    ],
+  },
+  ɒ: {
+    graphemes: ["a", "ho", "au", "aw", "ough"],
+    example: "swan",
+    constrictions: {
+      tongue: {
+        index: 10.080545425415039,
+        diameter: 2.3536839485168457,
+      },
+    },
+  },
+  oʊ: {
+    graphemes: ["o", "oa", "o_e", "oe", "ow", "ough", "eau", "oo", "ew"],
+    example: "open",
+    constrictions: [
+      {
+        tongue: {
+          index: 10.080545425415039,
+          diameter: 2.3536839485168457,
+        },
+        front: {
+          index: 43.77931213378906,
+          diameter: 2.0207254886627197,
+        },
+      },
+      {
+        tongue: {
+          index: 10.080545425415039,
+          diameter: 2.3536839485168457,
+        },
+        front: {
+          index: 41.27277374267578,
+          diameter: 0.9680185914039612,
+        },
+      },
+    ],
+  },
+  ʊ: {
+    graphemes: ["o", "oo", "u", "ou"],
+    example: "look",
+    constrictions: {
+      tongue: {
+        index: 42.022186279296875,
+        diameter: 1.82303786277771,
+      },
+    },
+  },
+  ʌ: {
+    graphemes: ["u", "o", "oo", "ou"],
+    example: "lug",
+    constrictions: {
+      tongue: {
+        index: 43.5145378112793,
+        diameter: 2.063793659210205,
+      },
+    },
+  },
+  "u:": {
+    graphemes: ["o", "oo", "ew", "ue", "u_e", "oe", "ough", "ui", "oew", "ou"],
+    example: "who",
+    constrictions: {
+      tongue: {
+        index: 20.89373207092285,
+        diameter: 2.8037023544311523,
+      },
+      front: {
+        index: 42.04319763183594,
+        diameter: 0.922162652015686,
+      },
+    },
+  },
+  ɔɪ: {
+    graphemes: ["oi", "oy", "uoy"],
+    example: "boy",
+    constrictions: [
+      {
+        tongue: {
+          index: 7.477081298828125,
+          diameter: 0.968207061290741,
+        },
+      },
+      {
+        tongue: {
+          index: 34.00770568847656,
+          diameter: 1.9233624935150146,
+        },
+      },
+    ],
+  },
+  aʊ: {
+    graphemes: ["ow", "ou", "ough"],
+    example: "now",
+    constrictions: [
+      {
+        tongue: {
+          index: 13.432427406311035,
+          diameter: 2.858365058898926,
+        },
+        front: {
+          index: 41.25259780883789,
+          diameter: 2.1377410888671875,
+        },
+      },
+      {
+        tongue: {
+          index: 8.994352340698242,
+          diameter: 1.6210113763809204,
+        },
+        front: {
+          index: 41.25259780883789,
+          diameter: 1.009834885597229,
+        },
+      },
+    ],
+  },
+  ə: {
+    graphemes: ["a", "er", "i", "ar", "our", "ur"],
+    example: "about",
+    constrictions: [
+      {
+        tongue: {
+          index: 20.785303115844727,
+          diameter: 2.817857027053833,
+        },
+      },
+    ],
+  },
+  eəʳ: {
+    graphemes: ["air", "are", "ear", "ere", "eir", "ayer"],
+    example: "chair",
+    constrictions: [
+      {
+        tongue: {
+          index: 25.172393798828125,
+          diameter: 2.946836471557617,
+        },
+        front: {
+          index: 31.584619522094727,
+          diameter: 2.7641139030456543,
+        },
+      },
+      {
+        tongue: {
+          index: 11.465752601623535,
+          diameter: 2.389702320098877,
+        },
+        front: {
+          index: 31.87163543701172,
+          diameter: 0.8341416120529175,
+        },
+      },
+    ],
+  },
+  "ɑ:": {
+    graphemes: ["a"],
+    example: "arm",
+    constrictions: [
+      {
+        tongue: {
+          index: 10.557442665100098,
+          diameter: 2.313770055770874,
+        },
+        front: {
+          index: 29.416595458984375,
+          diameter: 2.8466663360595703,
+        },
+      },
+      {
+        tongue: {
+          index: 10.557442665100098,
+          diameter: 2.313770055770874,
+        },
+        front: {
+          index: 30.795530319213867,
+          diameter: 0.9675944447517395,
+        },
+      },
+    ],
+  },
+  "ɜ:ʳ": {
+    graphemes: ["ir", "er", "ur", "ear", "or", "our", "yr"],
+    example: "bird",
+    constrictions: {
+      tongue: {
+        index: 10.411890983581543,
+        diameter: 2.438276529312134,
+      },
+      front: {
+        index: 31.35202980041504,
+        diameter: 1.0647456645965576,
+      },
+    },
+  },
+  "ɔ:": {
+    graphemes: [
+      "aw",
+      "a",
+      "or",
+      "oor",
+      "ore",
+      "oar",
+      "our",
+      "augh",
+      "ar",
+      "ough",
+      "au",
+    ],
+    example: "paw",
+    constrictions: {
+      tongue: {
+        index: 8.689467430114746,
+        diameter: 1.7290281057357788,
+      },
+    },
+  },
+  ɪəʳ: {
+    graphemes: ["ear", "eer", "ere", "ier"],
+    example: "ear",
+    constrictions: [
+      {
+        tongue: {
+          index: 35.939178466796875,
+          diameter: 1.3483505249023438,
+        },
+        front: {
+          index: 31.535709381103516,
+          diameter: 2.8012807369232178,
+        },
+      },
+      {
+        tongue: {
+          index: 12.261784553527832,
+          diameter: 2.4074597358703613,
+        },
+        front: {
+          index: 32.213191986083984,
+          diameter: 0.8435457944869995,
+        },
+      },
+    ],
+  },
+  ʊəʳ: {
+    graphemes: ["ure", "our"],
+    example: "poor",
+    constrictions: [
+      {
+        tongue: {
+          index: 10.540653228759766,
+          diameter: 2.058115243911743,
+        },
+        front: {
+          index: 41.00702667236328,
+          diameter: 0.8688546419143677,
+        },
+      },
+      {
+        tongue: {
+          index: 14.251797676086426,
+          diameter: 2.8314104080200195,
+        },
+        front: {
+          index: 30.037519454956055,
+          diameter: 0.913703441619873,
+        },
+      },
+    ],
+  },
 };
+
+for (const phoneme in phonemes) {
+  const phonemeInfo = phonemes[phoneme];
+  if ("alternative" in phonemeInfo) {
+    const alternative = phonemes[phonemeInfo.alternative];
+    alternative.alternative = phoneme;
+    phonemeInfo.constrictions = alternative.constrictions;
+  }
+  phonemeInfo.type = "voiced" in phonemeInfo ? "consonant" : "vowel";
+
+  if (!Array.isArray(phonemeInfo.constrictions)) {
+    phonemeInfo.constrictions = [phonemeInfo.constrictions];
+  }
+}

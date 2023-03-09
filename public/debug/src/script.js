@@ -80,7 +80,14 @@ for (const type in trackElements) {
 }
 
 const phonemeSelect = document.getElementById("phoneme");
+for (const phoneme in phonemes) {
+  const { example } = phonemes[phoneme];
+  const option = new Option(`${phoneme} (${example})`, phoneme);
+  phonemeSelect.appendChild(option);
+}
 phonemeSelect.addEventListener("input", (event) => {
   const phoneme = event.target.value;
-  throttledSend({ phoneme });
+  if (phoneme.length > 0) {
+    throttledSend({ phoneme });
+  }
 });
