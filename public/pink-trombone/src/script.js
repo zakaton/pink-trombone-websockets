@@ -79,12 +79,23 @@ document.body.addEventListener("mousemove", (event) => {
   }
 });
 
-function setVoiceness(voiceness) {
+function setVoiceness(voiceness, offset) {
   const tenseness = 1 - Math.cos(voiceness * Math.PI * 0.5);
   const loudness = Math.pow(tenseness, 0.25);
 
-  pinkTromboneElement.tenseness.value = tenseness;
-  pinkTromboneElement.loudness.value = loudness;
+  const nodes = [
+    {
+      node: pinkTromboneElement.tenseness,
+      value: tenseness,
+    },
+    {
+      node: pinkTromboneElement.loudness,
+      value: loudness,
+    },
+  ];
+  nodes.forEach(({ node, value }) => {
+    exponentialRampToValueAtTime(node, value, offset);
+  });
 }
 
 const { send } = setupWebsocket("pinktrombone", (message) => {
@@ -150,16 +161,58 @@ const { send } = setupWebsocket("pinktrombone", (message) => {
         didSetVoiceness = true;
         break;
       case "phoneme":
-        const { constrictions } = phonemes[message.phoneme];
+        const { constrictions, voiced, type } = phonemes[message.phoneme];
         if (constrictions) {
           console.log(constrictions);
+          let voiceness = 0.8;
+          if (type == "consonant") {
+            voiceness = voiced ? 0.8 : 0.0;
+          }
+          setVoiceness(voiceness);
           constrictions.forEach((constriction, index) => {
-            // FILL - play sequence
+            const { tongue, front, back } = constriction;
+            const nodes = [];
+            const features = ["index", "diameter"];
+            if (tongue) {
+              features.forEach((feature) => {
+                nodes.push({
+                  node: pinkTromboneElement.tongue[feature],
+                  value: tongue[feature],
+                });
+              });
+            }
+            if (front) {
+              features.forEach((feature) => {
+                nodes.push({
+                  node: frontConstriction[feature],
+                  value: front[feature],
+                });
+              });
+            } else {
+              exponentialRampToValueAtTime(
+                frontConstriction.diameter,
+                frontConstriction.diameter.maxValue
+              );
+            }
+            if (back) {
+              features.forEach((feature) => {
+                nodes.push({
+                  node: backConstriction[feature],
+                  value: back[feature],
+                });
+              });
+            } else {
+              exponentialRampToValueAtTime(
+                backConstriction.diameter,
+                backConstriction.diameter.maxValue
+              );
+            }
+            nodes.forEach(({ node, value }) => {
+              // FIX timing
+              exponentialRampToValueAtTime(node, value, 0.01 + index * 0.3);
+            });
           });
         }
-        break;
-      case "mouth":
-        node = myConstriction.diameter;
         break;
       default:
       //console.log("uncaught key", key);
@@ -170,12 +223,19 @@ const { send } = setupWebsocket("pinktrombone", (message) => {
     }
     if (nodes.length > 0) {
       nodes.forEach((node) => {
-        //node.value = value;
-        node.linearRampToValueAtTime(
-          value,
-          pinkTromboneElement.audioContext.currentTime + 0.01
-        );
+        exponentialRampToValueAtTime(node, value, 2);
       });
     }
   }
 });
+
+function exponentialRampToValueAtTime(node, value, offset = 0.01) {
+  if (value == 0) {
+    value = 0.0001;
+  }
+  node.cancelAndHoldAtTime(pinkTromboneElement.audioContext.currentTime);
+  node.exponentialRampToValueAtTime(
+    value,
+    pinkTromboneElement.audioContext.currentTime + offset
+  );
+}

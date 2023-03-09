@@ -86,12 +86,8 @@ const phonemes = {
     example: "bug",
     constrictions: {
       front: {
-        index: 40.989383697509766,
-        diameter: -0.4094715118408203,
-      },
-      tongue: {
-        index: 27.188875198364258,
-        diameter: 3.7335827350616455,
+        index: 41.10761642456055,
+        diameter: -0.38074052333831787,
       },
     },
   },
@@ -101,12 +97,8 @@ const phonemes = {
     example: "dad",
     constrictions: {
       front: {
-        index: 35.89909744262695,
-        diameter: -0.4234344959259033,
-      },
-      tongue: {
-        index: 13.135254859924316,
-        diameter: 2.8327841758728027,
+        index: 35.8536376953125,
+        diameter: -0.4679551422595978,
       },
     },
   },
@@ -182,8 +174,8 @@ const phonemes = {
     example: "live",
     constrictions: {
       tongue: {
-        index: 9.636259078979492,
-        diameter: 1.903935194015503,
+        index: 12.359664916992188,
+        diameter: 2.251485586166382,
       },
       front: {
         index: 37.93798828125,
@@ -237,8 +229,8 @@ const phonemes = {
         diameter: 0.8469864130020142,
       },
       tongue: {
-        index: 17.867565155029297,
-        diameter: 1.7726432085037231,
+        index: 14.571993827819824,
+        diameter: 1.7225748300552368,
       },
     },
   },
@@ -275,8 +267,8 @@ const phonemes = {
     example: "wit",
     constrictions: {
       front: {
-        index: 43.10062789916992,
-        diameter: 1.1798259019851685,
+        index: 40.623783111572266,
+        diameter: 0.9160601496696472,
       },
       tongue: {
         index: 8.366361618041992,
@@ -296,12 +288,12 @@ const phonemes = {
     example: "treasure",
     constrictions: {
       tongue: {
-        index: 11.399920463562012,
-        diameter: 3.995708703994751,
+        index: 38.1162223815918,
+        diameter: 4.172404766082764,
       },
       front: {
-        index: 14.105496406555176,
-        diameter: 2.840425491333008,
+        index: 31.5826358795166,
+        diameter: 0.5940179824829102,
       },
     },
   },
@@ -311,12 +303,12 @@ const phonemes = {
     example: "chip",
     constrictions: {
       tongue: {
-        index: 21.251113891601562,
-        diameter: 2.770223617553711,
+        index: 21.067941665649414,
+        diameter: 2.72188401222229,
       },
       front: {
-        index: 31.51334571838379,
-        diameter: 0.48040685057640076,
+        index: 31.402315139770508,
+        diameter: -0.054616913199424744,
       },
     },
   },
@@ -329,11 +321,11 @@ const phonemes = {
   θ: {
     voiced: false,
     graphemes: ["th"],
-    example: "thongs",
+    example: "thong",
     constrictions: {
       tongue: {
-        index: 28.22434425354004,
-        diameter: 2.309201240539551,
+        index: 27.66069793701172,
+        diameter: 2.6893649101257324,
       },
       front: {
         index: 38.21797561645508,
@@ -357,8 +349,8 @@ const phonemes = {
         diameter: 1.9802567958831787,
       },
       back: {
-        index: 11.893214225769043,
-        diameter: 0.4043289124965668,
+        index: 11.977778434753418,
+        diameter: 0.19189877808094025,
       },
     },
   },
@@ -380,8 +372,8 @@ const phonemes = {
     example: "cat",
     constrictions: {
       tongue: {
-        index: 22.44707489013672,
-        diameter: 3.6174707412719727,
+        index: 14.0070161819458,
+        diameter: 2.887047290802002,
       },
     },
   },
@@ -452,8 +444,8 @@ const phonemes = {
     constrictions: [
       {
         tongue: {
-          index: 12.763235092163086,
-          diameter: 2.8315868377685547,
+          index: 11.638107299804688,
+          diameter: 2.3857390880584717,
         },
       },
       {
@@ -484,7 +476,7 @@ const phonemes = {
           diameter: 2.3536839485168457,
         },
         front: {
-          index: 43.77931213378906,
+          index: 39.3746337890625,
           diameter: 2.0207254886627197,
         },
       },
@@ -494,8 +486,8 @@ const phonemes = {
           diameter: 2.3536839485168457,
         },
         front: {
-          index: 41.27277374267578,
-          diameter: 0.9680185914039612,
+          index: 39.3746337890625,
+          diameter: 0.8177579045295715,
         },
       },
     ],
@@ -505,8 +497,12 @@ const phonemes = {
     example: "look",
     constrictions: {
       tongue: {
-        index: 42.022186279296875,
-        diameter: 1.82303786277771,
+        index: 19.63079833984375,
+        diameter: 2.4873642921447754,
+      },
+      front: {
+        index: 40.496360778808594,
+        diameter: 1.107533574104309,
       },
     },
   },
@@ -515,8 +511,8 @@ const phonemes = {
     example: "lug",
     constrictions: {
       tongue: {
-        index: 43.5145378112793,
-        diameter: 2.063793659210205,
+        index: 17.742313385009766,
+        diameter: 2.5167031288146973,
       },
     },
   },
@@ -529,8 +525,8 @@ const phonemes = {
         diameter: 2.8037023544311523,
       },
       front: {
-        index: 42.04319763183594,
-        diameter: 0.922162652015686,
+        index: 39.59186553955078,
+        diameter: 0.7746905088424683,
       },
     },
   },
@@ -540,8 +536,8 @@ const phonemes = {
     constrictions: [
       {
         tongue: {
-          index: 7.477081298828125,
-          diameter: 0.968207061290741,
+          index: 15.181169509887695,
+          diameter: 2.1677639484405518,
         },
       },
       {
@@ -596,22 +592,22 @@ const phonemes = {
     constrictions: [
       {
         tongue: {
-          index: 25.172393798828125,
-          diameter: 2.946836471557617,
+          index: 25.950639724731445,
+          diameter: 2.7277371883392334,
         },
         front: {
-          index: 31.584619522094727,
+          index: 30.626760482788086,
           diameter: 2.7641139030456543,
         },
       },
       {
         tongue: {
-          index: 11.465752601623535,
-          diameter: 2.389702320098877,
+          index: 18.080486297607422,
+          diameter: 2.4796719551086426,
         },
         front: {
-          index: 31.87163543701172,
-          diameter: 0.8341416120529175,
+          index: 30.626760482788086,
+          diameter: 0.8193863034248352,
         },
       },
     ],
@@ -745,3 +741,10 @@ for (const phoneme in phonemes) {
     phonemeInfo.constrictions = [phonemeInfo.constrictions];
   }
 }
+
+const getInterpolation = (from, to, value) => {
+  return (value - from) / (to - from);
+};
+const clamp = (value, min = 0, max = 1) => {
+  return Math.max(min, Math.min(max, value));
+};

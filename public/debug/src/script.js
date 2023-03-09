@@ -80,14 +80,18 @@ for (const type in trackElements) {
 }
 
 const phonemeSelect = document.getElementById("phoneme");
+const consonantsOptgroup = document.getElementById("consonants");
+const vowelsOptgroup = document.getElementById("vowels");
 for (const phoneme in phonemes) {
-  const { example } = phonemes[phoneme];
+  const { example, type } = phonemes[phoneme];
   const option = new Option(`${phoneme} (${example})`, phoneme);
-  phonemeSelect.appendChild(option);
+  const optgroup = type == "consonant" ? consonantsOptgroup : vowelsOptgroup;
+  optgroup.appendChild(option);
 }
 phonemeSelect.addEventListener("input", (event) => {
   const phoneme = event.target.value;
   if (phoneme.length > 0) {
     throttledSend({ phoneme });
+    event.target.value = "";
   }
 });

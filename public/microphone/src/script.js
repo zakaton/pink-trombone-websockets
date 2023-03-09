@@ -17,13 +17,6 @@ function updatePitch() {
   clarityElement.textContent = `${Math.round(clarity * 100)} %`;
 }
 
-const getInterpolation = (from, to, value) => {
-  return (value - from) / (to - from);
-};
-const clamp = (value, min = 0, max = 1) => {
-  return Math.max(min, Math.min(max, value));
-};
-
 let volume;
 const volumeElement = document.getElementById("volume");
 function updateVolume() {
