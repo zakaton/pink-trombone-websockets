@@ -80,18 +80,19 @@ navigator.mediaDevices
     analyzer = Meyda.createMeydaAnalyzer({
       audioContext: audioContext,
       source: sourceNode,
-      featureExtractors: ["mfcc"],
+      featureExtractors: ["mfcc", "rms"],
       bufferSize: 2 ** 10,
       //hopSize: 2 ** 8,
       numberOfMFCCCoefficients,
-      callback: ({ mfcc }) => {
-        //console.log(mfcc);
+      callback: ({ mfcc, rms }) => {
         drawMFCC(mfcc);
-        if (isCollectingData) {
-          addData(mfcc);
-        }
-        if (finishedTraining) {
-          predictThrottled(mfcc);
+        if (rms > rmsThreshold) {
+          if (isCollectingData) {
+            addData(mfcc);
+          }
+          if (finishedTraining) {
+            predictThrottled(mfcc);
+          }
         }
       },
     });
@@ -99,6 +100,8 @@ navigator.mediaDevices
     // Start the analyzer to begin processing audio data
     analyzer.start();
   });
+
+let rmsThreshold = 0.01;
 
 const neuralNetwork = ml5.neuralNetwork({
   inputs: numberOfMFCCCoefficients,
@@ -130,8 +133,20 @@ function toggleDataCollection() {
 }
 
 function addData(mfcc) {
-  neuralNetwork.addData(mfcc, constrictions.getData());
+  const inputs = mfcc;
+  const outputs = constrictions.getData();
+  neuralNetwork.addData(inputs, outputs);
+  localStorage[localStorage.length] = JSON.stringify({ inputs, outputs });
+  if (clearLocalStorageButton.disabled) {
+    clearLocalStorageButton.disabled = false;
+  }
 }
+window.addEventListener("load", (event) => {
+  if (localStorage.length > 0) {
+    clearLocalStorageButton.disabled = false;
+    loadDataFromLocalStorageButton.disabled = false;
+  }
+});
 
 const trainButton = document.getElementById("train");
 trainButton.addEventListener("click", (event) => {
@@ -179,13 +194,31 @@ downloadButton.addEventListener("click", (event) => {
   });
 });
 
-const loadInput = document.getElementById("load");
-loadInput.addEventListener("input", (event) => {
-  neuralNetwork.load(loadInput.files, () => {
+const uploadInput = document.getElementById("upload");
+uploadInput.addEventListener("input", (event) => {
+  neuralNetwork.load(event.target.files, () => {
     console.log("loaded");
-    loadInput.disabled = true;
+    event.target.disabled = true;
     trainButton.disabled = true;
     addDataButton.disabled = true;
     finishedTraining = true;
   });
+});
+
+const clearLocalStorageButton = document.getElementById("clearLocalstorage");
+clearLocalStorageButton.addEventListener("click", (event) => {
+  localStorage.clear();
+  clearLocalStorageButton.disabled = true;
+  loadDataFromLocalStorageButton.disabled = true;
+});
+
+const loadDataFromLocalStorageButton = document.getElementById(
+  "loadDataFromLocalstorage"
+);
+loadDataFromLocalStorageButton.addEventListener("click", (event) => {
+  for (let index = 0; index < localStorage.length; index++) {
+    const { inputs, outputs } = JSON.parse(localStorage[index]);
+    neuralNetwork.addData(inputs, outputs);
+  }
+  loadDataFromLocalStorageButton.disabled = true;
 });
