@@ -87,7 +87,7 @@ const phonemes = {
     constrictions: {
       front: {
         index: 41.10761642456055,
-        diameter: -0.38074052333831787,
+        diameter: 0.088,
       },
     },
   },
@@ -98,7 +98,7 @@ const phonemes = {
     constrictions: {
       front: {
         index: 35.8536376953125,
-        diameter: -0.4679551422595978,
+        diameter: 0.088,
       },
     },
   },
