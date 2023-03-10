@@ -39,7 +39,7 @@ function setConstriction(constriction, index, diameter) {
 let indexThreshold = 28;
 const updateConstriction = throttle((event) => {
   const message = {
-    to: ["voice", "debug"],
+    to: ["machine-learning", "debug"],
     type: "message",
     constrictions: {},
   };
@@ -98,7 +98,7 @@ function setVoiceness(voiceness, offset) {
   });
 }
 
-const { send } = setupWebsocket("pinktrombone", (message) => {
+const { send } = setupWebsocket("pink-trombone", (message) => {
   let didSetVoiceness = false;
   let canSetVoiceness = true;
   for (const key in message) {
@@ -163,7 +163,6 @@ const { send } = setupWebsocket("pinktrombone", (message) => {
       case "phoneme":
         const { constrictions, voiced, type } = phonemes[message.phoneme];
         if (constrictions) {
-          console.log(constrictions);
           let voiceness = 0.8;
           if (type == "consonant") {
             voiceness = voiced ? 0.8 : 0.0;
@@ -223,8 +222,22 @@ const { send } = setupWebsocket("pinktrombone", (message) => {
     }
     if (nodes.length > 0) {
       nodes.forEach((node) => {
-        exponentialRampToValueAtTime(node, value, 2);
+        exponentialRampToValueAtTime(node, value, 0.1);
       });
+    }
+
+    if (message.command == "getConstraints") {
+      const message = {
+        to: ["machine-learning", "debug"],
+        type: "message",
+        constrictions: {
+          tongue: deconstructConstriction(pinkTromboneElement.tongue),
+          frontConstriction: deconstructConstriction(frontConstriction),
+          backConstriction: deconstructConstriction(backConstriction),
+        },
+      };
+
+      send(message);
     }
   }
 });

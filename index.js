@@ -20,10 +20,10 @@ httpsServer.listen(443);
 const clients = {
   debug: new Set(),
   vvvv: new Set(),
-  pinktrombone: new Set(),
+  "pink-trombone": new Set(),
   microphone: new Set(),
-  pocketsphinx: new Set(),
-  voice: new Set(),
+  "pocket-sphinx": new Set(),
+  "machine-learning": new Set(),
 };
 
 const wss = new WebSocket.Server({ server: httpsServer });

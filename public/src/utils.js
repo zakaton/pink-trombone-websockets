@@ -4,7 +4,7 @@
  * @param {function} onMessage is called when the webpage receives websocket messages from the server
  * @returns {object} a send function to send websocket messages to the server
  */
-function setupWebsocket(webpageName, onMessage) {
+function setupWebsocket(webpageName, onMessage, onConnect) {
   // Create WebSocket connection.
   const socket = new WebSocket("wss://localhost/");
 
@@ -14,6 +14,9 @@ function setupWebsocket(webpageName, onMessage) {
       type: "connection",
       webpage: webpageName,
     });
+    if (onConnect) {
+      onConnect();
+    }
   });
 
   function send(object) {
@@ -78,6 +81,7 @@ function throttle(functionToThrottle, minimumInterval, optionalContext) {
   };
 }
 
+// https://www.dyslexia-reading-well.com/44-phonemes-in-english.html
 const phonemes = {
   // CONSONANTS
   b: {

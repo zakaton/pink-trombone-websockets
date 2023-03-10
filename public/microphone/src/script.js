@@ -40,7 +40,7 @@ const throttledSend = throttle(() => {
   send({
     type: "message",
     from: "microphone",
-    to: ["vvvv", "pinktrombone"],
+    to: ["vvvv", "pink-trombone"],
     frequency: pitch,
     intensity: volume,
   });

@@ -1,13 +1,13 @@
 /* global setupWebsocket */
 
 const { send } = setupWebsocket("debug", (message) => {
-  if (message.from == "pinktrombone") {
+  if (message.from == "pink-trombone") {
     updateUI(message);
   }
 });
 
 const throttledSend = throttle((message) => {
-  send({ to: ["pinktrombone"], type: "message", ...message });
+  send({ to: ["pink-trombone"], type: "message", ...message });
 }, 100);
 
 const tongueElements = {
@@ -22,8 +22,8 @@ for (const type in tongueElements) {
   });
 }
 const frontConstrictionElements = {
-  index: document.getElementById("frontConstrictionIndex"),
-  diameter: document.getElementById("frontConstrictionDiameter"),
+  index: document.getElementById("frontConstriction.index"),
+  diameter: document.getElementById("frontConstriction.diameter"),
 };
 for (const type in frontConstrictionElements) {
   const element = frontConstrictionElements[type];
@@ -33,8 +33,8 @@ for (const type in frontConstrictionElements) {
   });
 }
 const backConstrictionElements = {
-  index: document.getElementById("backConstrictionIndex"),
-  diameter: document.getElementById("backConstrictionDiameter"),
+  index: document.getElementById("backConstriction.index"),
+  diameter: document.getElementById("backConstriction.diameter"),
 };
 for (const type in backConstrictionElements) {
   const element = backConstrictionElements[type];
