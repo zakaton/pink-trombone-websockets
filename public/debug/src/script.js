@@ -7,7 +7,11 @@ const { send } = setupWebsocket("debug", (message) => {
 });
 
 const throttledSend = throttle((message) => {
-  send({ to: ["pink-trombone"], type: "message", ...message });
+  send({
+    to: ["pink-trombone", "machine-learning"],
+    type: "message",
+    ...message,
+  });
 }, 100);
 
 const tongueElements = {

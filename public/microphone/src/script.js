@@ -36,6 +36,7 @@ function updateVolume() {
 
 let updateInterval = 50;
 let volumeThreshold = 0.1;
+let clarityThreshold = 0.9;
 const throttledSend = throttle(() => {
   send({
     type: "message",
@@ -48,7 +49,7 @@ const throttledSend = throttle(() => {
 function update() {
   updateVolume();
   updatePitch();
-  if (volume > volumeThreshold) {
+  if (volume > volumeThreshold && clarity > clarityThreshold) {
     throttledSend();
   }
   window.setTimeout(() => update(), updateInterval);

@@ -20,11 +20,16 @@ const constrictions = {
     );
   },
 };
+let voiceness = 0.7;
 const { send } = setupWebsocket(
   "machine-learning",
   (message) => {
     if (message.from == "pink-trombone") {
       Object.assign(constrictions, message.constrictions);
+      if ("voiceness" in message) {
+        voiceness = message.voiceness;
+      }
+      console.log(constrictions.getData(), voiceness);
       if (addDataButton.disabled) {
         addDataButton.disabled = false;
         trainButton.disabled = false;
@@ -32,7 +37,11 @@ const { send } = setupWebsocket(
     }
   },
   () => {
-    send({ to: ["pink-trombone"], type: "message", command: "getConstraints" });
+    send({
+      to: ["pink-trombone"],
+      type: "message",
+      command: "getConstrictions",
+    });
   }
 );
 
@@ -62,13 +71,13 @@ function drawMFCC(mfcc) {
 const audioContext = new AudioContext();
 autoResumeAudioContext(audioContext);
 
-const numberOfMFCCCoefficients = 13;
+const numberOfMFCCCoefficients = 14;
 
 let analyzer;
 navigator.mediaDevices
   .getUserMedia({
     audio: {
-      //noiseSuppression: false,
+      noiseSuppression: false,
       //autoGainControl: false,
       //echoCancellation: false,
     },
@@ -108,17 +117,16 @@ const neuralNetwork = ml5.neuralNetwork({
   outputs: [
     "tongue.index",
     "tongue.diameter",
-    "frontConstriction.diameter",
-    "frontConstriction.index",
-    "backConstriction.diameter",
-    "backConstriction.index",
+    //"frontConstriction.diameter",
+    //"frontConstriction.index",
+    //"backConstriction.diameter",
+    //"backConstriction.index",
+    //"voiceness",
   ],
 
   task: "regression",
   debug: "true",
-
-  epochs: 80,
-  batchSize: 20,
+  //learningRate: 0.1,
 });
 
 const addDataButton = document.getElementById("addData");
@@ -135,6 +143,11 @@ function toggleDataCollection() {
 function addData(mfcc) {
   const inputs = mfcc;
   const outputs = constrictions.getData();
+  //Object.assign(outputs, { voiceness });
+  delete outputs["backConstriction.index"];
+  delete outputs["backConstriction.diameter"];
+  delete outputs["frontConstriction.index"];
+  delete outputs["frontConstriction.diameter"];
   neuralNetwork.addData(inputs, outputs);
   localStorage[localStorage.length] = JSON.stringify({ inputs, outputs });
   if (clearLocalStorageButton.disabled) {
@@ -157,7 +170,11 @@ function train() {
   addDataButton.disabled = true;
   trainButton.disabled = true;
   neuralNetwork.normalizeData();
-  neuralNetwork.train({}, whileTraining, onFinishedTraining);
+  neuralNetwork.train(
+    { epochs: 80, batchSize: 100 },
+    whileTraining,
+    onFinishedTraining
+  );
 }
 
 function whileTraining(epoch, loss) {
@@ -181,9 +198,17 @@ function getPrediction(error, results) {
     console.error(error);
   } else {
     console.log(results);
-    // FILL - SEND
+    const message = {};
+    results.forEach(({ label, value }) => {
+      message[label] = value;
+    });
+    throttledSend(message);
   }
 }
+
+const throttledSend = throttle((message) => {
+  send({ to: ["pink-trombone"], type: "message", ...message });
+}, 100);
 
 const downloadButton = document.getElementById("download");
 downloadButton.addEventListener("click", (event) => {
@@ -218,7 +243,12 @@ const loadDataFromLocalStorageButton = document.getElementById(
 loadDataFromLocalStorageButton.addEventListener("click", (event) => {
   for (let index = 0; index < localStorage.length; index++) {
     const { inputs, outputs } = JSON.parse(localStorage[index]);
+    delete outputs["backConstriction.index"];
+    delete outputs["backConstriction.diameter"];
+    delete outputs["frontConstriction.index"];
+    delete outputs["frontConstriction.diameter"];
     neuralNetwork.addData(inputs, outputs);
   }
   loadDataFromLocalStorageButton.disabled = true;
+  trainButton.disabled = false;
 });

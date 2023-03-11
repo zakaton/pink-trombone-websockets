@@ -79,7 +79,10 @@ document.body.addEventListener("mousemove", (event) => {
   }
 });
 
+let _voiceness = 0.7;
 function setVoiceness(voiceness, offset) {
+  _voiceness = voiceness;
+
   const tenseness = 1 - Math.cos(voiceness * Math.PI * 0.5);
   const loudness = Math.pow(tenseness, 0.25);
 
@@ -211,6 +214,9 @@ const { send } = setupWebsocket("pink-trombone", (message) => {
               exponentialRampToValueAtTime(node, value, 0.01 + index * 0.3);
             });
           });
+          setTimeout(() => {
+            sendConstrictions();
+          }, 10);
         }
         break;
       default:
@@ -226,21 +232,26 @@ const { send } = setupWebsocket("pink-trombone", (message) => {
       });
     }
 
-    if (message.command == "getConstraints") {
-      const message = {
-        to: ["machine-learning", "debug"],
-        type: "message",
-        constrictions: {
-          tongue: deconstructConstriction(pinkTromboneElement.tongue),
-          frontConstriction: deconstructConstriction(frontConstriction),
-          backConstriction: deconstructConstriction(backConstriction),
-        },
-      };
-
-      send(message);
+    if (message.command == "getConstrictions") {
+      sendConstrictions();
     }
   }
 });
+
+function sendConstrictions() {
+  const message = {
+    to: ["machine-learning", "debug"],
+    type: "message",
+    constrictions: {
+      tongue: deconstructConstriction(pinkTromboneElement.tongue),
+      frontConstriction: deconstructConstriction(frontConstriction),
+      backConstriction: deconstructConstriction(backConstriction),
+    },
+    voiceness: _voiceness,
+  };
+
+  send(message);
+}
 
 function exponentialRampToValueAtTime(node, value, offset = 0.01) {
   if (value == 0) {
