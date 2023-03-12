@@ -1,3 +1,7 @@
+utils
+  set strings
+  add dropdown menu in debug for strings
+  send string message
+  play string function
 machine-learning
-  add "voiced"
-  test
+  improve model

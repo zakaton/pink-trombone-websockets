@@ -99,3 +99,16 @@ phonemeSelect.addEventListener("input", (event) => {
     event.target.value = "";
   }
 });
+
+const utteranceSelect = document.getElementById("utterance");
+utterances.forEach(({ name }, index) => {
+  const option = new Option(name, index);
+  utteranceSelect.appendChild(option);
+});
+utteranceSelect.addEventListener("input", (event) => {
+  const utterance = event.target.value;
+  if (utterance.length > 0) {
+    throttledSend({ utterance });
+    event.target.value = "";
+  }
+});

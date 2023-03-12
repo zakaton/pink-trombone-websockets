@@ -71,7 +71,7 @@ function drawMFCC(mfcc) {
 const audioContext = new AudioContext();
 autoResumeAudioContext(audioContext);
 
-const numberOfMFCCCoefficients = 14;
+const numberOfMFCCCoefficients = 12;
 
 let analyzer;
 navigator.mediaDevices
@@ -126,7 +126,8 @@ const neuralNetwork = ml5.neuralNetwork({
 
   task: "regression",
   debug: "true",
-  //learningRate: 0.1,
+  learningRate: 0.2,
+  hiddenUnity: 16,
 });
 
 const addDataButton = document.getElementById("addData");
@@ -171,7 +172,10 @@ function train() {
   trainButton.disabled = true;
   neuralNetwork.normalizeData();
   neuralNetwork.train(
-    { epochs: 80, batchSize: 100 },
+    {
+      epochs: 50,
+      batchSize: 60,
+    },
     whileTraining,
     onFinishedTraining
   );

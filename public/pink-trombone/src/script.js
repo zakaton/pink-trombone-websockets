@@ -13,14 +13,17 @@ pinkTromboneElement.addEventListener("load", (event) => {
     pinkTromboneElement.connect(pinkTromboneElement.audioContext.destination);
     pinkTromboneElement.start();
     frontConstriction = pinkTromboneElement.newConstriction(43, 1.8);
+    pinkTromboneElement.frontConstriction = frontConstriction;
     frontConstriction._isEnabled = true;
     backConstriction = pinkTromboneElement.newConstriction(10.5, 1.8);
+    pinkTromboneElement.backConstriction = backConstriction;
   });
 });
 
 let isMouseDown = false;
 document.body.addEventListener("mousedown", (event) => {
   isMouseDown = true;
+  updateConstriction();
 });
 document.body.addEventListener("mouseup", (event) => {
   isMouseDown = false;
@@ -37,7 +40,7 @@ function setConstriction(constriction, index, diameter) {
 }
 
 let indexThreshold = 28;
-const updateConstriction = throttle((event) => {
+const updateConstriction = throttle(() => {
   const message = {
     to: ["machine-learning", "debug"],
     type: "message",
@@ -73,9 +76,9 @@ const updateConstriction = throttle((event) => {
   }
   send(message);
 }, 100);
-document.body.addEventListener("mousemove", (event) => {
+document.body.addEventListener("mousemove", () => {
   if (isMouseDown) {
-    updateConstriction(event);
+    updateConstriction();
   }
 });
 
@@ -219,6 +222,12 @@ const { send } = setupWebsocket("pink-trombone", (message) => {
           }, 10);
         }
         break;
+      case "utterance":
+        const { keyframes } = utterances[message.utterance];
+        if (keyframes?.length > 0) {
+          playKeyframes(keyframes);
+        }
+        break;
       default:
       //console.log("uncaught key", key);
     }
@@ -262,4 +271,36 @@ function exponentialRampToValueAtTime(node, value, offset = 0.01) {
     value,
     pinkTromboneElement.audioContext.currentTime + offset
   );
+}
+
+const keyframeStrings = [
+  "frequency",
+
+  "tongue.index",
+  "tongue.diameter",
+
+  "frontConstriction.index",
+  "frontConstriction.diameter",
+
+  "tenseness",
+  "loudness",
+
+  "intensity",
+];
+
+function playKeyframes(keyframes) {
+  keyframes.forEach((keyframe) => {
+    keyframeStrings.forEach((keyframeString) => {
+      const path = keyframeString.split(".");
+      let value = pinkTromboneElement;
+      while (path.length) {
+        value = value[path.shift()];
+      }
+      const offset = keyframe.time;
+      value.linearRampToValueAtTime(
+        keyframe[keyframeString],
+        pinkTromboneElement.audioContext.currentTime + offset
+      );
+    });
+  });
 }
