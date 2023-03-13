@@ -24,6 +24,7 @@ const clients = {
   microphone: new Set(),
   "pocket-sphinx": new Set(),
   "machine-learning": new Set(),
+  mfcc: new Set(),
 };
 
 const wss = new WebSocket.Server({ server: httpsServer });

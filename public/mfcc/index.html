@@ -1,23 +1,19 @@
 <html>
   <head>
-    <title>Machine Learning</title>
+    <title>MFCC</title>
     <script src="./../src/utils.js"></script>
     <script src="./../src/meyda.min.js"></script>
-    <script src="src/ml5.min.js"></script>
   </head>
 
   <body>
     <canvas id="mfcc"></canvas>
     <br />
     <button id="addData" disabled>add data</button>
-    <button id="train" disabled>train</button>
-    <button id="download" disabled>download model</button>
+    <button id="predict" disabled>predict</button>
     <button id="loadDataFromLocalstorage" disabled>
       load data from localstorage
     </button>
     <button id="clearLocalstorage" disabled>clear localstorage</button>
-    <label>load model <input type="file" multiple id="upload" /></label>
-    <br />
     <script src="./src/script.js"></script>
   </body>
 </html>

@@ -1,7 +1,5 @@
-utils
-  set strings
-  add dropdown menu in debug for strings
-  send string message
-  play string function
-machine-learning
-  improve model
+mfcc
+  predict
+    difference for all vectors
+    sort by closest
+    get weighted average of top 2
