@@ -143,6 +143,7 @@ window.addEventListener("load", (event) => {
   }
 });
 
+let angleThreshold = 0.4;
 function predict(mfcc) {
   mfcc = normalizeArray(mfcc);
   const dotProducts = data.map((datum) => {
@@ -163,18 +164,47 @@ function predict(mfcc) {
   });
 
   const sortedAngles = sortedData.map((datum) => angles[datum.index]);
-  const interpolation = sortedAngles[0] / (sortedAngles[0] + sortedAngles[1]);
-  const message = interpolateConstrictions(
-    sortedData[0],
-    sortedData[1],
-    interpolation
-  );
-  throttledSend(message);
+
+  let message;
+  if (true) {
+    const filteredSortedDatum = sortedData.filter(
+      (datum, index) => sortedAngles[index] < angleThreshold
+    );
+    if (filteredSortedDatum.length > 0) {
+      if (filteredSortedDatum.length == 1) {
+        message = interpolateAllConstrictions(filteredSortedDatum, [1]);
+      } else {
+        const largestAngle = sortedAngles[filteredSortedDatum.length - 1];
+        const inverseAngles = filteredSortedDatum.map(
+          (_, index) => largestAngle - sortedAngles[index]
+        );
+        let inverseAngleSum = 0;
+        inverseAngles.forEach(
+          (inverseAngle) => (inverseAngleSum += inverseAngle)
+        );
+        const weights = inverseAngles.map(
+          (inverseAngle) => inverseAngle / inverseAngleSum
+        );
+
+        message = interpolateAllConstrictions(filteredSortedDatum, weights);
+      }
+    }
+  } else {
+    const interpolation = sortedAngles[0] / (sortedAngles[0] + sortedAngles[1]);
+    message = interpolateConstrictions(
+      sortedData[0],
+      sortedData[1],
+      interpolation
+    );
+  }
+  if (message) {
+    throttledSend(message);
+  }
 }
 const predictThrottled = throttle(predict, 100);
 
 function interpolateConstrictions(a, b, interpolation) {
-  //interpolation = 0;
+  interpolation = 0;
   const constriction = {};
   for (const type in a.outputs) {
     const aValue = a.outputs[type];
@@ -182,6 +212,21 @@ function interpolateConstrictions(a, b, interpolation) {
     const value = interpolate(aValue, bValue, interpolation);
     constriction[type] = value;
   }
+  return constriction;
+}
+function interpolateAllConstrictions(data, weights) {
+  const constriction = {};
+  data.forEach((datum, index) => {
+    const weight = weights[index];
+    for (const type in datum.outputs) {
+      const value = weight * datum.outputs[type];
+      if (!(type in constriction)) {
+        constriction[type] = value;
+      } else {
+        constriction[type] += value;
+      }
+    }
+  });
   return constriction;
 }
 
@@ -214,7 +259,9 @@ loadDataFromLocalStorageButton.addEventListener("click", (event) => {
 let data = [];
 function appendData({ inputs, outputs }) {
   inputs = normalizeArray(inputs);
-  data.push({ inputs, outputs, index: data.length });
+  const datum = { inputs, outputs, index: data.length };
+  data.push(datum);
+  console.log("added datum", datum);
 }
 
 function getMagntude(array) {
