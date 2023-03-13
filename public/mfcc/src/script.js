@@ -73,6 +73,9 @@ autoResumeAudioContext(audioContext);
 
 const numberOfMFCCCoefficients = 12;
 
+let numberOfMFCCsToAverage = 5;
+const lastNMFCCs = [];
+
 let analyzer;
 navigator.mediaDevices
   .getUserMedia({
@@ -94,6 +97,18 @@ navigator.mediaDevices
       //hopSize: 2 ** 8,
       numberOfMFCCCoefficients,
       callback: ({ mfcc, rms }) => {
+        lastNMFCCs.push(mfcc);
+        while (lastNMFCCs.length > numberOfMFCCsToAverage) {
+          lastNMFCCs.shift();
+        }
+        mfcc = mfcc.map((_, index) => {
+          let sum = 0;
+          lastNMFCCs.forEach((_mfcc) => {
+            sum += _mfcc[index];
+          });
+          return sum / lastNMFCCs.length;
+        });
+
         drawMFCC(mfcc);
         if (rms > rmsThreshold) {
           if (collectDataFlag) {
@@ -143,7 +158,7 @@ window.addEventListener("load", (event) => {
   }
 });
 
-let angleThreshold = 0.4;
+let angleThreshold = 0.3;
 function predict(mfcc) {
   mfcc = normalizeArray(mfcc);
   const dotProducts = data.map((datum) => {

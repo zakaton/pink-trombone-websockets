@@ -1,5 +1,2 @@
 mfcc
-  predict
-    difference for all vectors
-    sort by closest
-    get weighted average of top 2
+  tweak
