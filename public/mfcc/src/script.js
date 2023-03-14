@@ -53,18 +53,27 @@ mfccContext.strokeStyle = "black";
 /**
  * @param {number[]} mfcc
  */
-function drawMFCC(mfcc) {
-  const { width: w, height: h } = mfccCanvas;
-  mfccContext.clearRect(0, 0, w, h);
+function drawMFCC(mfcc, canvas, context, otherMMFC) {
+  const { width: w, height: h } = canvas;
+  context.clearRect(0, 0, w, h);
+  if (otherMMFC) {
+    _drawMFCC(otherMMFC, "blue", canvas, context);
+  }
+  _drawMFCC(mfcc, "black", canvas, context);
+}
+
+function _drawMFCC(mfcc, color = "black", canvas, context) {
+  const { width: w, height: h } = canvas;
   const segmentLength = w / mfcc.length;
+  context.strokeStyle = color;
   mfcc.forEach((value, index) => {
     let height = 1 - value / mfccDrawRange;
     height *= h;
     height -= h / 2;
-    mfccContext.beginPath();
-    mfccContext.moveTo(index * segmentLength, height);
-    mfccContext.lineTo((index + 1) * segmentLength, height);
-    mfccContext.stroke();
+    context.beginPath();
+    context.moveTo(index * segmentLength, height);
+    context.lineTo((index + 1) * segmentLength, height);
+    context.stroke();
   });
 }
 
@@ -76,13 +85,14 @@ const numberOfMFCCCoefficients = 12;
 let numberOfMFCCsToAverage = 5;
 const lastNMFCCs = [];
 
+let _mfcc;
 let analyzer;
 navigator.mediaDevices
   .getUserMedia({
     audio: {
       noiseSuppression: false,
-      //autoGainControl: false,
-      //echoCancellation: false,
+      autoGainControl: false,
+      echoCancellation: false,
     },
   })
   .then((stream) => {
@@ -109,7 +119,7 @@ navigator.mediaDevices
           return sum / lastNMFCCs.length;
         });
 
-        drawMFCC(mfcc);
+        drawMFCC(mfcc, mfccCanvas, mfccContext, selectedData?.inputs);
         if (rms > rmsThreshold) {
           if (collectDataFlag) {
             addData(mfcc);
@@ -117,7 +127,17 @@ navigator.mediaDevices
           }
           if (predictFlag) {
             predictThrottled(mfcc);
+            _drawMFCC(sortedData[0].inputs, "green", mfccCanvas, mfccContext);
+            dataContainer.querySelectorAll(".datum").forEach((div) => {
+              const { datum } = div;
+              if (sortedData[0] == datum) {
+                div.classList.add("prediction");
+              } else {
+                div.classList.remove("prediction");
+              }
+            });
           }
+          _mfcc = mfcc;
         }
       },
     });
@@ -130,6 +150,11 @@ let predictFlag = false;
 const predictButton = document.getElementById("predict");
 predictButton.addEventListener("click", (event) => {
   predictFlag = !predictFlag;
+  if (!predictFlag) {
+    dataContainer.querySelectorAll(".datum").forEach((div) => {
+      div.classList.remove("prediction");
+    });
+  }
   predictButton.innerText = predictFlag ? "stop predicting" : "predict";
 });
 
@@ -159,10 +184,11 @@ window.addEventListener("load", (event) => {
 });
 
 let angleThreshold = 0.3;
+let sortedData;
 function predict(mfcc) {
   mfcc = normalizeArray(mfcc);
   const dotProducts = data.map((datum) => {
-    const _mfcc = datum.inputs;
+    const _mfcc = datum.normalizedInputs;
     let dotProduct = 0;
     _mfcc.forEach((value, index) => {
       dotProduct += value * mfcc[index];
@@ -174,7 +200,7 @@ function predict(mfcc) {
     return Math.abs(Math.acos(dotProduct));
   });
 
-  const sortedData = data.toSorted((a, b) => {
+  sortedData = data.toSorted((a, b) => {
     return angles[a.index] - angles[b.index];
   });
 
@@ -258,6 +284,7 @@ clearLocalStorageButton.addEventListener("click", (event) => {
   localStorage.clear();
   clearLocalStorageButton.disabled = true;
   loadDataFromLocalStorageButton.disabled = true;
+  dataContainer.querySelectorAll(".datum").forEach((div) => div.remove());
 });
 
 const loadDataFromLocalStorageButton = document.getElementById(
@@ -265,16 +292,17 @@ const loadDataFromLocalStorageButton = document.getElementById(
 );
 loadDataFromLocalStorageButton.addEventListener("click", (event) => {
   for (let index = 0; index < localStorage.length; index++) {
-    const { inputs, outputs } = JSON.parse(localStorage[index]);
-    appendData({ inputs, outputs });
+    const { inputs, outputs, name } = JSON.parse(localStorage[index]);
+    appendData({ inputs, outputs, name });
   }
   loadDataFromLocalStorageButton.disabled = true;
 });
 
 let data = [];
-function appendData({ inputs, outputs }) {
-  inputs = normalizeArray(inputs);
-  const datum = { inputs, outputs, index: data.length };
+function appendData({ inputs, outputs, name }) {
+  const normalizedInputs = normalizeArray(inputs);
+  const datum = { inputs, normalizedInputs, outputs, index: data.length, name };
+  appendDataView(datum);
   data.push(datum);
   console.log("added datum", datum);
 }
@@ -291,4 +319,92 @@ function normalizeArray(array) {
   const magnitude = getMagntude(array);
   const normalizedArray = array.map((value) => value / magnitude);
   return normalizedArray;
+}
+
+let selectedData, selectedDataContainer;
+const dataContainer = document.getElementById("data");
+const datumContainerTemplate = dataContainer.querySelector("template");
+function appendDataView(datum) {
+  const container = datumContainerTemplate.content
+    .cloneNode(true)
+    .querySelector("div");
+
+  container.datum = datum;
+
+  const nameInput = container.querySelector(".name");
+  nameInput.value = datum.name || "";
+  nameInput.addEventListener("input", (event) => {
+    datum.name = event.target.value;
+    save();
+  });
+  const ptButton = container.querySelector(".pt");
+  ptButton.addEventListener("click", () => {
+    throttledSend(datum.outputs);
+  });
+  const canvas = container.querySelector("canvas");
+  const context = canvas.getContext("2d");
+  const drawCanvas = () => {
+    drawMFCC(datum.inputs, canvas, context);
+  };
+  drawCanvas();
+  const save = () => {
+    const { inputs, outputs, name } = datum;
+    localStorage[datum.index] = JSON.stringify({ inputs, outputs, name });
+  };
+  const resampleButton = container.querySelector(".resample");
+  resampleButton.addEventListener("click", (event) => {
+    datum.inputs = _mfcc.slice();
+    datum.normalizedInputs = normalizeArray(datum.inputs);
+    save();
+    drawCanvas();
+  });
+  const rePTButton = container.querySelector(".rePT");
+  rePTButton.addEventListener("click", () => {
+    datum.outputs = constrictions.getData();
+    datum.outputs.voiceness = voiceness;
+    save();
+  });
+  const deleteButton = container.querySelector(".delete");
+  deleteButton.addEventListener("click", (event) => {
+    container.remove();
+    data.splice(data.indexOf(datum), 1);
+    refreshLocalstorage();
+    deselect();
+    event.stopPropagation();
+  });
+
+  container.addEventListener("click", (event) => {
+    if (selectedData != datum) {
+      if (selectedDataContainer) {
+        selectedDataContainer.classList.remove("selected");
+      }
+      selectedData = datum;
+      console.log("selected data", selectedData);
+      selectedDataContainer = container;
+      selectedDataContainer.classList.add("selected");
+    }
+    event.stopPropagation();
+  });
+  dataContainer.appendChild(container);
+}
+
+document.body.addEventListener("click", (e) => {
+  deselect();
+});
+
+function refreshLocalstorage() {
+  localStorage.clear();
+  data.forEach((datum, index) => {
+    const { inputs, outputs, name } = datum;
+    datum.index = index;
+    localStorage[index] = JSON.stringify({ inputs, outputs, name });
+  });
+}
+
+function deselect() {
+  if (selectedDataContainer) {
+    selectedDataContainer.classList.remove("selected");
+  }
+  selectedData = selectedDataContainer = null;
+  console.log("deselected");
 }

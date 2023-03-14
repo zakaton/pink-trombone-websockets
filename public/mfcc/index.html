@@ -5,6 +5,15 @@
     <script src="./../src/meyda.min.js"></script>
   </head>
 
+  <style>
+    .selected {
+      background-color: lightblue;
+    }
+    .prediction {
+      background-color: lightgreen;
+    }
+  </style>
+
   <body>
     <canvas id="mfcc"></canvas>
     <br />
@@ -14,6 +23,20 @@
       load data from localstorage
     </button>
     <button id="clearLocalstorage" disabled>clear localstorage</button>
+    <br />
+    <br />
+    <div id="data">
+      <template>
+        <div class="datum" style="display: flex; align-items: center">
+          <input type="text" size="5" class="name" />
+          <canvas width="200" height="50" class="mfcc"></canvas>
+          <button class="pt">pt</button>
+          <button class="resample">resample</button>
+          <button class="rePT">re-pt</button>
+          <button class="delete">delete</button>
+        </div>
+      </template>
+    </div>
     <script src="./src/script.js"></script>
   </body>
 </html>
