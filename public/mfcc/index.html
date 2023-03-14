@@ -23,6 +23,12 @@
       load data from localstorage
     </button>
     <button id="clearLocalstorage" disabled>clear localstorage</button>
+    <button id="downloadLocalstorage" disabled>download data</button>
+    <a id="downloadLink" hidden></a>
+    <br />
+    <label
+      >upload data <input type="file" accept="application/JSON" id="uploadData"
+    /></label>
     <br />
     <br />
     <div id="data">
@@ -34,6 +40,8 @@
           <button class="resample">resample</button>
           <button class="rePT">re-pt</button>
           <button class="delete">delete</button>
+          <span class="ranking" style="width: 2em; padding-left: 10px"></span>
+          <span class="percentage" style="width: 3em"></span>
         </div>
       </template>
     </div>

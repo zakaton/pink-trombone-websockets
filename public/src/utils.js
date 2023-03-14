@@ -9,7 +9,7 @@ function setupWebsocket(webpageName, onMessage, onConnect) {
   const socket = new WebSocket("wss://localhost/");
 
   // Connection opened
-  socket.addEventListener("open", function () {
+  socket.addEventListener("open", () => {
     send({
       type: "connection",
       webpage: webpageName,
@@ -17,6 +17,10 @@ function setupWebsocket(webpageName, onMessage, onConnect) {
     if (onConnect) {
       onConnect();
     }
+  });
+  socket.addEventListener("close", (event) => {
+    console.log("CLOSED!");
+    // FIX
   });
 
   function send(object) {

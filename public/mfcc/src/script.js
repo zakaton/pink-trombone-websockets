@@ -138,6 +138,7 @@ navigator.mediaDevices
             });
           }
           _mfcc = mfcc;
+          throttledSend({ mfcc, to: ["vvvv"] });
         }
       },
     });
@@ -153,6 +154,7 @@ predictButton.addEventListener("click", (event) => {
   if (!predictFlag) {
     dataContainer.querySelectorAll(".datum").forEach((div) => {
       div.classList.remove("prediction");
+      div.updateSpans();
     });
   }
   predictButton.innerText = predictFlag ? "stop predicting" : "predict";
@@ -174,17 +176,19 @@ function addData(mfcc) {
   localStorage[localStorage.length] = JSON.stringify({ inputs, outputs });
   if (clearLocalStorageButton.disabled) {
     clearLocalStorageButton.disabled = false;
+    downloadLocalstorageButton.disabled = false;
   }
 }
 window.addEventListener("load", (event) => {
   if (localStorage.length > 0) {
     clearLocalStorageButton.disabled = false;
     loadDataFromLocalStorageButton.disabled = false;
+    downloadLocalstorageButton.disabled = false;
   }
 });
 
 let angleThreshold = 0.8; // was 0.3
-let sortedData;
+let sortedData, filteredSortedDatum, weights;
 function predict(mfcc) {
   mfcc = normalizeArray(mfcc);
   const dotProducts = data.map((datum) => {
@@ -208,7 +212,7 @@ function predict(mfcc) {
 
   let message;
   if (true) {
-    const filteredSortedDatum = sortedData.filter(
+    filteredSortedDatum = sortedData.filter(
       (datum, index) => sortedAngles[index] < angleThreshold
     );
     if (filteredSortedDatum.length > 0) {
@@ -223,9 +227,13 @@ function predict(mfcc) {
         inverseAngles.forEach(
           (inverseAngle) => (inverseAngleSum += inverseAngle)
         );
-        const weights = inverseAngles.map(
+        weights = inverseAngles.map(
           (inverseAngle) => inverseAngle / inverseAngleSum
         );
+
+        dataContainer.querySelectorAll(".datum").forEach((div) => {
+          div.updateSpans();
+        });
 
         message = interpolateAllConstrictions(filteredSortedDatum, weights);
       }
@@ -277,13 +285,14 @@ function interpolate(from, to, interpolation) {
 
 const throttledSend = throttle((message) => {
   send({ to: ["pink-trombone"], type: "message", ...message });
-}, 100);
+}, 20);
 
 const clearLocalStorageButton = document.getElementById("clearLocalstorage");
 clearLocalStorageButton.addEventListener("click", (event) => {
   localStorage.clear();
   clearLocalStorageButton.disabled = true;
   loadDataFromLocalStorageButton.disabled = true;
+  downloadLocalstorageButton.disabled = true;
   dataContainer.querySelectorAll(".datum").forEach((div) => div.remove());
 });
 
@@ -304,7 +313,7 @@ function appendData({ inputs, outputs, name }) {
   const datum = { inputs, normalizedInputs, outputs, index: data.length, name };
   appendDataView(datum);
   data.push(datum);
-  console.log("added datum", datum);
+  //console.log("added datum", datum);
 }
 
 function getMagntude(array) {
@@ -337,6 +346,19 @@ function appendDataView(datum) {
     datum.name = event.target.value;
     save();
   });
+  const rankingSpan = container.querySelector(".ranking");
+  const percentageSpan = container.querySelector(".percentage");
+  container.updateSpans = () => {
+    if (predictFlag && filteredSortedDatum.includes(datum)) {
+      const index = filteredSortedDatum.indexOf(datum);
+      percentageSpan.innerText = weights[index].toFixed(3);
+      rankingSpan.innerText = index;
+    } else {
+      percentageSpan.innerText = "";
+      rankingSpan.innerText = "";
+    }
+  };
+
   const ptButton = container.querySelector(".pt");
   ptButton.addEventListener("click", () => {
     throttledSend(datum.outputs);
@@ -406,4 +428,64 @@ function deselect() {
     selectedDataContainer.classList.remove("selected");
   }
   selectedData = selectedDataContainer = null;
+}
+
+const uploadDataInput = document.getElementById("uploadData");
+uploadDataInput.addEventListener("input", (event) => uploadData(event));
+function uploadData(event) {
+  const { files } = event.target;
+  const jsons = [];
+  const onLoadedJSONS = () => {
+    loadJSON(...jsons);
+  };
+  const readNextFile = (index = 0) => {
+    const file = files[index];
+    if (file) {
+      const fileReader = new FileReader();
+      fileReader.onload = (event) => {
+        jsons[index] = JSON.parse(event.target.result);
+        readNextFile(index + 1);
+      };
+      fileReader.readAsText(file);
+    } else {
+      onLoadedJSONS();
+    }
+  };
+  readNextFile();
+}
+
+const loadJSON = (...jsons) => {
+  jsons.forEach((data) => {
+    console.log(data);
+    data.forEach((datum) => {
+      appendData(datum);
+      localStorage[localStorage.length] = JSON.stringify(datum);
+      if (clearLocalStorageButton.disabled) {
+        clearLocalStorageButton.disabled = false;
+        downloadLocalstorageButton.disabled = false;
+      }
+    });
+  });
+};
+
+const downloadLocalstorageButton = document.getElementById(
+  "downloadLocalstorage"
+);
+downloadLocalstorageButton.addEventListener("click", (event) =>
+  downloadLocalstorage()
+);
+const downloadLink = document.getElementById("downloadLink");
+function downloadLocalstorage() {
+  const json = [];
+  for (let index = 0; index < localStorage.length; index++) {
+    json.push(JSON.parse(localStorage[index]));
+  }
+  var dataString =
+    "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json));
+  downloadLink.setAttribute("href", dataString);
+  downloadLink.setAttribute(
+    "download",
+    `mfcc-${new Date().toLocaleString()}.json`
+  );
+  downloadLink.click();
 }

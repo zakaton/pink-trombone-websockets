@@ -1,0 +1,3 @@
+fiddle with algorithm
+add front/back constriction for editor
+fix websocket

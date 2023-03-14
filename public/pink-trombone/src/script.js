@@ -304,3 +304,25 @@ function playKeyframes(keyframes) {
     });
   });
 }
+
+const darkModeButton = document.getElementById("darkMode");
+let isDarkMode = false;
+darkModeButton.addEventListener("click", (event) => {
+  isDarkMode = !isDarkMode;
+  if (isDarkMode) {
+    pinkTromboneElement.UI._container.style.gridTemplateRows = "auto 200px";
+    pinkTromboneElement.UI._container.style.gridTemplateColumns = "auto";
+    pinkTromboneElement.UI._buttonsUI._container.style.display = "none";
+    pinkTromboneElement.UI._glottisUI._container.style.display = "none";
+    document.body.style.margin = "0px";
+    document.body.style.filter = "grayscale(1)";
+  } else {
+    pinkTromboneElement.UI._container.style.gridTemplateRows =
+      "auto 200px 100px";
+    pinkTromboneElement.UI._container.style.gridTemplateColumns = "auto 100px";
+    pinkTromboneElement.UI._buttonsUI._container.style.display = "flex";
+    pinkTromboneElement.UI._glottisUI._container.style.display = "";
+    document.body.style.margin = "";
+    document.body.style.filter = "";
+  }
+});
