@@ -28,12 +28,12 @@ const { send } = setupWebsocket(
       Object.assign(constrictions, message.constrictions);
       if ("voiceness" in message) {
         voiceness = message.voiceness;
+        if (addDataButton.disabled) {
+          addDataButton.disabled = false;
+          predictButton.disabled = false;
+        }
       }
       //console.log(constrictions.getData(), voiceness);
-      if (addDataButton.disabled) {
-        addDataButton.disabled = false;
-        predictButton.disabled = false;
-      }
     }
   },
   () => {
@@ -406,5 +406,4 @@ function deselect() {
     selectedDataContainer.classList.remove("selected");
   }
   selectedData = selectedDataContainer = null;
-  console.log("deselected");
 }
