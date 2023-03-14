@@ -187,7 +187,7 @@ window.addEventListener("load", (event) => {
   }
 });
 
-let angleThreshold = 0.8; // was 0.3
+let angleThreshold = 1; // was 0.3
 let sortedData, filteredSortedDatum, weights;
 function predict(mfcc) {
   mfcc = normalizeArray(mfcc);
@@ -212,31 +212,56 @@ function predict(mfcc) {
 
   let message;
   if (true) {
+    // FIX
     filteredSortedDatum = sortedData.filter(
-      (datum, index) => sortedAngles[index] < angleThreshold
+      (_, index) => sortedAngles[index] < angleThreshold
     );
     if (filteredSortedDatum.length > 0) {
       if (filteredSortedDatum.length == 1) {
         message = interpolateAllConstrictions(filteredSortedDatum, [1]);
+        weights = [1];
       } else {
-        const largestAngle = sortedAngles[filteredSortedDatum.length - 1];
-        const inverseAngles = filteredSortedDatum.map(
-          (_, index) => largestAngle - sortedAngles[index]
-        );
-        let inverseAngleSum = 0;
-        inverseAngles.forEach(
-          (inverseAngle) => (inverseAngleSum += inverseAngle)
-        );
-        weights = inverseAngles.map(
-          (inverseAngle) => inverseAngle / inverseAngleSum
-        );
+        if (true) {
+          const largestAngle = sortedAngles[filteredSortedDatum.length - 1];
+          const inverseAngles = filteredSortedDatum.map(
+            (_, index) => largestAngle - sortedAngles[index]
+          );
+          let inverseAngleSum = 0;
+          inverseAngles.forEach(
+            (inverseAngle) => (inverseAngleSum += inverseAngle)
+          );
+          weights = inverseAngles.map(
+            (inverseAngle) => inverseAngle / inverseAngleSum
+          );
+        } else {
+          let angleSum = 0;
+          filteredSortedDatum.forEach((_, index) => {
+            angleSum += sortedAngles[index];
+          });
+          weights = filteredSortedDatum.map(
+            (_, index) => (angleSum - sortedAngles[index]) / angleSum
+          );
+        }
+        if (true) {
+          for (let i = 0; i < weights.length; i++) {
+            const weight = weights[i];
+            weights[i] = 1 - (1 - weight ** 6);
+          }
+        }
 
-        dataContainer.querySelectorAll(".datum").forEach((div) => {
-          div.updateSpans();
-        });
+        let weightSum = 0;
+        for (let i = 0; i < weights.length; i++) {
+          weightSum += weights[i];
+        }
+        for (let i = 0; i < weights.length; i++) {
+          weights[i] = weights[i] / weightSum;
+        }
 
         message = interpolateAllConstrictions(filteredSortedDatum, weights);
       }
+      dataContainer.querySelectorAll(".datum").forEach((div) => {
+        div.updateSpans();
+      });
     }
   } else {
     const interpolation = sortedAngles[0] / (sortedAngles[0] + sortedAngles[1]);
