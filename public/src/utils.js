@@ -6,33 +6,37 @@
  */
 function setupWebsocket(webpageName, onMessage, onConnect) {
   // Create WebSocket connection.
-  const socket = new WebSocket("wss://localhost/");
+  let socket;
 
-  // Connection opened
-  socket.addEventListener("open", () => {
-    send({
-      type: "connection",
-      webpage: webpageName,
+  const createSocket = () => {
+    socket = new WebSocket("wss://localhost/");
+
+    socket.addEventListener("open", () => {
+      console.log("connection opened");
+      send({
+        type: "connection",
+        webpage: webpageName,
+      });
+      if (onConnect) {
+        onConnect();
+      }
     });
-    if (onConnect) {
-      onConnect();
-    }
-  });
-  socket.addEventListener("close", (event) => {
-    console.log("CLOSED!");
-    // FIX
-  });
+    socket.addEventListener("message", (event) => {
+      //console.log("Message from server ", event.data);
+      const message = JSON.parse(event.data);
+      onMessage(message);
+    });
+    socket.addEventListener("close", (event) => {
+      console.log("connection closed");
+      createSocket();
+    });
+  };
+  createSocket();
 
   function send(object) {
     object.from = webpageName;
     socket.send(JSON.stringify(object));
   }
-
-  socket.addEventListener("message", (event) => {
-    //console.log("Message from server ", event.data);
-    const message = JSON.parse(event.data);
-    onMessage(message);
-  });
 
   return { send };
 }
