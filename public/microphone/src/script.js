@@ -34,9 +34,9 @@ function updateVolume() {
   volumeElement.textContent = `${Math.round(volume * 100)}%`;
 }
 
-let updateInterval = 50;
-let volumeThreshold = 0.1;
-let clarityThreshold = 0.9;
+let updateInterval = 50; //x ms update intervall
+let volumeThreshold = 0.2; //% volume triggering change
+let clarityThreshold = 0.9; // 0<1 clarity
 const throttledSend = throttle(() => {
   send({
     type: "message",

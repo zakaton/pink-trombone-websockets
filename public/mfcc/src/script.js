@@ -183,7 +183,7 @@ window.addEventListener("load", (event) => {
   }
 });
 
-let angleThreshold = 0.3;
+let angleThreshold = 0.8; // was 0.3
 let sortedData;
 function predict(mfcc) {
   mfcc = normalizeArray(mfcc);
@@ -242,7 +242,7 @@ function predict(mfcc) {
     throttledSend(message);
   }
 }
-const predictThrottled = throttle(predict, 100);
+const predictThrottled = throttle(predict, 10); //ms of prediction time
 
 function interpolateConstrictions(a, b, interpolation) {
   interpolation = 0;
