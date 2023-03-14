@@ -12,6 +12,7 @@ install https://code.visualstudio.com/ & https://nodejs.org/en/
 install npm in terminal: sudo npm install
 install yarn in VS Code terminal: yarn install 
 start localhost: yarn start
+open https://localhost/ in chrome
 
 for auto-playing audio, close all chrome windows and open chrome using this command in the terminal:
 `/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --autoplay-policy=no-user-gesture-required`
