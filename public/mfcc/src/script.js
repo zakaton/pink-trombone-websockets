@@ -187,23 +187,34 @@ window.addEventListener("load", (event) => {
   }
 });
 
-let angleThreshold = 1; // was 0.3
+let useAngles = false;
+let angleThreshold = useAngles ? 0.3 : 100; // was 0.3
 let sortedData, filteredSortedDatum, weights;
 function predict(mfcc) {
-  mfcc = normalizeArray(mfcc);
-  const dotProducts = data.map((datum) => {
-    const _mfcc = datum.normalizedInputs;
-    let dotProduct = 0;
-    _mfcc.forEach((value, index) => {
-      dotProduct += value * mfcc[index];
+  const normalizedMFCC = normalizeArray(mfcc);
+  let angles;
+  if (useAngles) {
+    const dotProducts = data.map((datum) => {
+      const _mfcc = datum.normalizedInputs;
+      let dotProduct = 0;
+      _mfcc.forEach((value, index) => {
+        dotProduct += value * normalizedMFCC[index];
+      });
+      return dotProduct;
     });
-    return dotProduct;
-  });
-
-  // FILL - change "angles" to "distance"
-  const angles = dotProducts.map((dotProduct) => {
-    return Math.abs(Math.acos(dotProduct));
-  });
+    dotProducts.map((dotProduct) => {
+      return Math.abs(Math.acos(dotProduct));
+    });
+  } else {
+    const distances = data.map((datum) => {
+      let sum = 0;
+      datum.inputs.forEach((value, index) => {
+        sum += (mfcc[index] - value) ** 2;
+      });
+      return Math.sqrt(sum);
+    });
+    angles = distances;
+  }
 
   sortedData = data.toSorted((a, b) => {
     return angles[a.index] - angles[b.index];
@@ -236,7 +247,7 @@ function predict(mfcc) {
         message = interpolateAllConstrictions(filteredSortedDatum, [1]);
         weights = [1];
       } else {
-        if (true) {
+        if (false) {
           const largestAngle = sortedAngles[filteredSortedDatum.length - 1];
           const inverseAngles = filteredSortedDatum.map(
             (_, index) => largestAngle - sortedAngles[index]
@@ -260,7 +271,7 @@ function predict(mfcc) {
         if (true) {
           for (let i = 0; i < weights.length; i++) {
             const weight = weights[i];
-            weights[i] = 1 - (1 - weight ** 6);
+            weights[i] = 1 - (1 - weight ** 4);
           }
         }
 
