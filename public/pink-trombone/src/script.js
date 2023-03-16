@@ -237,7 +237,7 @@ const { send } = setupWebsocket("pink-trombone", (message) => {
     }
     if (nodes.length > 0) {
       nodes.forEach((node) => {
-        exponentialRampToValueAtTime(node, value, 0.1);
+        exponentialRampToValueAtTime(node, value, 0.01);
       });
     }
 

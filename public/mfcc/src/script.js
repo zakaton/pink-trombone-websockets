@@ -200,6 +200,7 @@ function predict(mfcc) {
     return dotProduct;
   });
 
+  // FILL - change "angles" to "distance"
   const angles = dotProducts.map((dotProduct) => {
     return Math.abs(Math.acos(dotProduct));
   });
@@ -212,10 +213,24 @@ function predict(mfcc) {
 
   let message;
   if (true) {
-    // FIX
-    filteredSortedDatum = sortedData.filter(
-      (_, index) => sortedAngles[index] < angleThreshold
-    );
+    let firstFrontConstrictionDiameterSign;
+    filteredSortedDatum = sortedData.filter((datum, index) => {
+      const _frontConstrictionDiameterSign = Math.sign(
+        datum.outputs["frontConstriction.diameter"]
+      );
+      let didFrontConstrictionDiameterCross0 = false;
+      if (index == 0) {
+        firstFrontConstrictionDiameterSign = _frontConstrictionDiameterSign;
+      } else {
+        didFrontConstrictionDiameterCross0 =
+          firstFrontConstrictionDiameterSign != _frontConstrictionDiameterSign;
+      }
+      return (
+        !didFrontConstrictionDiameterCross0 &&
+        sortedAngles[index] < angleThreshold
+      );
+    });
+
     if (filteredSortedDatum.length > 0) {
       if (filteredSortedDatum.length == 1) {
         message = interpolateAllConstrictions(filteredSortedDatum, [1]);
@@ -259,6 +274,7 @@ function predict(mfcc) {
 
         message = interpolateAllConstrictions(filteredSortedDatum, weights);
       }
+
       dataContainer.querySelectorAll(".datum").forEach((div) => {
         div.updateSpans();
       });
@@ -275,6 +291,7 @@ function predict(mfcc) {
     throttledSend(message);
   }
 }
+
 const predictThrottled = throttle(predict, 10); //ms of prediction time
 
 function interpolateConstrictions(a, b, interpolation) {
@@ -426,7 +443,7 @@ function appendDataView(datum) {
         selectedDataContainer.classList.remove("selected");
       }
       selectedData = datum;
-      console.log("selected data", selectedData);
+      //console.log("selected data", selectedData);
       selectedDataContainer = container;
       selectedDataContainer.classList.add("selected");
     }
