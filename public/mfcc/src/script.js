@@ -381,6 +381,7 @@ function appendDataView(datum) {
     .querySelector("div");
 
   container.datum = datum;
+  datum.container = container;
 
   const nameInput = container.querySelector(".name");
   nameInput.value = datum.name || "";
@@ -531,3 +532,49 @@ function downloadLocalstorage() {
   );
   downloadLink.click();
 }
+
+document.addEventListener("keydown", (event) => {
+  if (selectedData && data.length > 1) {
+    const index = data.indexOf(selectedData);
+    let shouldPreventDefault = true;
+    let indicesToSwap;
+    switch (event.key) {
+      case "ArrowDown":
+        const isFirst = index == 0;
+        if (!isFirst) {
+          indicesToSwap = [index, index - 1];
+        }
+        event.preventDefault();
+        break;
+      case "ArrowUp":
+        const isLast = index == data.length - 1;
+        if (!isLast) {
+          indicesToSwap = [index, index + 1];
+        }
+        event.preventDefault();
+        break;
+      default:
+        shouldPreventDefault = false;
+        break;
+    }
+    if (shouldPreventDefault) {
+      event.preventDefault();
+    }
+    if (indicesToSwap) {
+      const [fromIndex, toIndex] = indicesToSwap;
+      [data[fromIndex], data[toIndex]] = [data[toIndex], data[fromIndex]];
+      const fromDatum = data[fromIndex];
+      const toDatum = data[toIndex];
+      fromDatum.index = fromIndex;
+      toDatum.index = toIndex;
+      const fromContainer = fromDatum.container;
+      const toContainer = toDatum.container;
+      if (fromIndex < toIndex) {
+        fromContainer.parentNode.insertBefore(fromContainer, toContainer);
+      } else {
+        toContainer.parentNode.insertBefore(toContainer, fromContainer);
+      }
+      refreshLocalstorage();
+    }
+  }
+});
