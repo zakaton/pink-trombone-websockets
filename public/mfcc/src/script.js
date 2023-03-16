@@ -225,19 +225,28 @@ function predict(mfcc) {
   let message;
   if (true) {
     let firstFrontConstrictionDiameterSign;
+    let firstBackConstrictionDiameterSign;
     filteredSortedDatum = sortedData.filter((datum, index) => {
       const _frontConstrictionDiameterSign = Math.sign(
         datum.outputs["frontConstriction.diameter"]
       );
+      const _backConstrictionDiameterSign = Math.sign(
+        datum.outputs["backConstriction.diameter"]
+      );
       let didFrontConstrictionDiameterCross0 = false;
+      let didBackConstrictionDiameterCross0 = false;
       if (index == 0) {
         firstFrontConstrictionDiameterSign = _frontConstrictionDiameterSign;
+        firstBackConstrictionDiameterSign = _backConstrictionDiameterSign;
       } else {
         didFrontConstrictionDiameterCross0 =
           firstFrontConstrictionDiameterSign != _frontConstrictionDiameterSign;
+        didBackConstrictionDiameterCross0 =
+          firstBackConstrictionDiameterSign != _backConstrictionDiameterSign;
       }
       return (
         !didFrontConstrictionDiameterCross0 &&
+        !didBackConstrictionDiameterCross0 &&
         sortedAngles[index] < angleThreshold
       );
     });
