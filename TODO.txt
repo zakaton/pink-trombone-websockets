@@ -1,2 +1,3 @@
+try all
 option to just send the top result (for games)
 add game to move object around screen

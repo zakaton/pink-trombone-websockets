@@ -96,6 +96,7 @@ navigator.mediaDevices
     },
   })
   .then((stream) => {
+    window.stream = stream;
     const sourceNode = audioContext.createMediaStreamSource(stream);
 
     // Create a Meyda analyzer node to calculate MFCCs
@@ -188,7 +189,7 @@ window.addEventListener("load", (event) => {
 });
 
 let useAngles = false;
-let angleThreshold = useAngles ? 0.3 : 100; // was 0.3
+let angleThreshold = useAngles ? 0.3 : 30; // was 0.3
 let sortedData, filteredSortedDatum, weights;
 function predict(mfcc) {
   const normalizedMFCC = normalizeArray(mfcc);
@@ -280,7 +281,7 @@ function predict(mfcc) {
         if (true) {
           for (let i = 0; i < weights.length; i++) {
             const weight = weights[i];
-            weights[i] = 1 - (1 - weight ** 4);
+            weights[i] = 1 - (1 - weight ** 6);
           }
         }
 
