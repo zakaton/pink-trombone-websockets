@@ -80,7 +80,7 @@ function _drawMFCC(mfcc, color = "black", canvas, context) {
 const audioContext = new AudioContext();
 autoResumeAudioContext(audioContext);
 
-const numberOfMFCCCoefficients = 12;
+const numberOfMFCCCoefficients = 21;
 
 let numberOfMFCCsToAverage = 5;
 const lastNMFCCs = [];
@@ -248,7 +248,7 @@ function predict(mfcc) {
       return (
         !didFrontConstrictionDiameterCross0 &&
         !didBackConstrictionDiameterCross0 &&
-        sortedAngles[index] < angleThreshold
+        (index == 0 || sortedAngles[index] < angleThreshold)
       );
     });
 
