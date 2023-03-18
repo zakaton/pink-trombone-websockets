@@ -20,13 +20,65 @@ pinkTromboneElement.addEventListener("load", (event) => {
   });
 });
 
+pinkTromboneElement.addEventListener("setConstriction", (event) => {
+  const constrictionIndex = Number(event.detail.constrictionIndex);
+
+  if (constrictionIndex > 1) {
+    const { index, diameter } = event.detail;
+
+    const constriction = index > 28 ? frontConstriction : backConstriction;
+
+    const indexValue = index || constriction.index.value;
+    const diameterValue = diameter || constriction.diameter.value;
+
+    switch (event.detail.type) {
+      case "linear":
+        constriction.index.linearRampToValueAtTime(
+          indexValue,
+          event.detail.endTime
+        );
+        constriction.diameter.linearRampToValueAtTime(
+          diameterValue,
+          event.detail.endTime
+        );
+        break;
+      default:
+        constriction.index.value = indexValue;
+        constriction.diameter.value = diameterValue;
+    }
+
+    event.target.dispatchEvent(new CustomEvent("didSetConstriction"));
+    shouldSendConstrictions = true;
+  }
+});
+
+let shouldSendConstrictions = false;
+pinkTromboneElement.addEventListener("setParameter", (event) => {
+  const { newValue, parameterName } = event.detail;
+  const [type, subtype] = parameterName.split(".");
+  shouldSendConstrictions = true;
+});
+
 let isMouseDown = false;
 document.body.addEventListener("mousedown", (event) => {
   isMouseDown = true;
-  updateConstriction();
+  if (shouldSendConstrictions) {
+    updateConstriction();
+    shouldSendConstrictions = false;
+  }
+});
+document.body.addEventListener("mousemove", () => {
+  if (isMouseDown && shouldSendConstrictions) {
+    updateConstriction();
+    shouldSendConstrictions = false;
+  }
 });
 document.body.addEventListener("mouseup", (event) => {
   isMouseDown = false;
+  if (shouldSendConstrictions) {
+    updateConstriction();
+    shouldSendConstrictions = false;
+  }
 });
 
 function deconstructConstriction(constriction) {
@@ -62,6 +114,9 @@ const updateConstriction = throttle(() => {
     const { index, diameter } = deconstructConstriction(
       pinkTromboneElement.pinkTrombone._pinkTromboneNode._constrictions[2]
     );
+    if (index == 0 && diameter == 0) {
+      return;
+    }
     const isBackConstriction = index < indexThreshold;
     const targetConstriction = isBackConstriction
       ? backConstriction
@@ -76,11 +131,6 @@ const updateConstriction = throttle(() => {
   }
   send(message);
 }, 100);
-document.body.addEventListener("mousemove", () => {
-  if (isMouseDown) {
-    updateConstriction();
-  }
-});
 
 let _voiceness = 0.7;
 function setVoiceness(voiceness, offset) {

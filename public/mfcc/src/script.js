@@ -14,6 +14,18 @@ const constrictions = {
       return data;
     }
   },
+  tongue: {
+    index: 12.89,
+    diameter: 2.43,
+  },
+  frontConstriction: {
+    index: 43,
+    diameter: 1.8,
+  },
+  backConstriction: {
+    diameter: 1.8,
+    index: 10.5,
+  },
   hasAllConstrictions() {
     return Boolean(
       this.tongue && this.backConstriction && this.frontConstriction
@@ -77,16 +89,19 @@ function _drawMFCC(mfcc, color = "black", canvas, context) {
   });
 }
 
-const audioContext = new AudioContext();
+const sampleRate = 44100;
+const audioContext = new AudioContext({ sampleRate });
+const gainNode = audioContext.createGain();
 autoResumeAudioContext(audioContext);
 
-const numberOfMFCCCoefficients = 21;
+const numberOfMFCCCoefficients = 28;
 
-let numberOfMFCCsToAverage = 5;
+let numberOfMFCCsToAverage = 4;
 const lastNMFCCs = [];
 
-let _mfcc;
+let _mfcc, _rms;
 let analyzer;
+const audio = new Audio();
 navigator.mediaDevices
   .getUserMedia({
     audio: {
@@ -98,16 +113,23 @@ navigator.mediaDevices
   .then((stream) => {
     window.stream = stream;
     const sourceNode = audioContext.createMediaStreamSource(stream);
+    sourceNode.connect(gainNode);
+    audio.srcObject = stream;
 
     // Create a Meyda analyzer node to calculate MFCCs
     analyzer = Meyda.createMeydaAnalyzer({
       audioContext: audioContext,
-      source: sourceNode,
+      sampleRate,
+      //melBands: 26,
+      //windowingFunction: "sine",
+      //inputs: 2,
+      source: gainNode,
       featureExtractors: ["mfcc", "rms"],
       bufferSize: 2 ** 10,
-      //hopSize: 2 ** 8,
+      //hopSize: 2 ** 10,
       numberOfMFCCCoefficients,
       callback: ({ mfcc, rms }) => {
+        _rms = rms;
         lastNMFCCs.push(mfcc);
         while (lastNMFCCs.length > numberOfMFCCsToAverage) {
           lastNMFCCs.shift();
@@ -139,7 +161,7 @@ navigator.mediaDevices
             });
           }
           _mfcc = mfcc;
-          throttledSend({ mfcc, to: ["vvvv"] });
+          throttledSendToVVVV({ mfcc, to: ["vvvv"] });
         }
       },
     });
@@ -309,10 +331,10 @@ function predict(mfcc) {
     );
   }
   if (message) {
-    throttledSend(message);
+    throttledSendToPinkTrombone(message);
+    throttledSendToGame();
   }
 }
-
 const predictThrottled = throttle(predict, 10); //ms of prediction time
 
 function interpolateConstrictions(a, b, interpolation) {
@@ -346,8 +368,27 @@ function interpolate(from, to, interpolation) {
   return (1 - interpolation) * from + interpolation * to;
 }
 
-const throttledSend = throttle((message) => {
-  send({ to: ["pink-trombone"], type: "message", ...message });
+let shouldSendToPinkTrombone = false;
+let shouldSendToGame = true;
+let shouldSendToVVVV = false;
+const throttledSendToPinkTrombone = throttle((message) => {
+  if (shouldSendToPinkTrombone) {
+    send({ to: ["pink-trombone"], type: "message", ...message });
+  }
+}, 20);
+const throttledSendToVVVV = throttle((message) => {
+  if (shouldSendToVVVV) {
+    send({ to: ["vvvv"], type: "message", ...message });
+  }
+}, 20);
+const throttledSendToGame = throttle(() => {
+  if (shouldSendToGame) {
+    const results = [];
+    filteredSortedDatum.forEach(({ name }, index) => {
+      results.push({ name, weight: weights[index] });
+    });
+    send({ to: ["game"], type: "message", results, rms: _rms });
+  }
 }, 20);
 
 const clearLocalStorageButton = document.getElementById("clearLocalstorage");
@@ -363,11 +404,16 @@ const loadDataFromLocalStorageButton = document.getElementById(
   "loadDataFromLocalstorage"
 );
 loadDataFromLocalStorageButton.addEventListener("click", (event) => {
-  for (let index = 0; index < localStorage.length; index++) {
+  for (
+    let index = 0;
+    index < localStorage.length && localStorage[index];
+    index++
+  ) {
     const { inputs, outputs, name } = JSON.parse(localStorage[index]);
     appendData({ inputs, outputs, name });
   }
   loadDataFromLocalStorageButton.disabled = true;
+  predictButton.disabled = false;
 });
 
 let data = [];
@@ -425,7 +471,7 @@ function appendDataView(datum) {
 
   const ptButton = container.querySelector(".pt");
   ptButton.addEventListener("click", () => {
-    throttledSend(datum.outputs);
+    throttledSendToPinkTrombone(datum.outputs);
   });
   const canvas = container.querySelector("canvas");
   const context = canvas.getContext("2d");
@@ -541,7 +587,11 @@ downloadLocalstorageButton.addEventListener("click", (event) =>
 const downloadLink = document.getElementById("downloadLink");
 function downloadLocalstorage() {
   const json = [];
-  for (let index = 0; index < localStorage.length; index++) {
+  for (
+    let index = 0;
+    index < localStorage.length && localStorage[index];
+    index++
+  ) {
     json.push(JSON.parse(localStorage[index]));
   }
   var dataString =

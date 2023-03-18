@@ -29,7 +29,7 @@ const { send } = setupWebsocket(
       if ("voiceness" in message) {
         voiceness = message.voiceness;
       }
-      console.log(constrictions.getData(), voiceness);
+      //console.log(constrictions.getData(), voiceness);
       if (addDataButton.disabled) {
         addDataButton.disabled = false;
         trainButton.disabled = false;
@@ -69,26 +69,31 @@ function drawMFCC(mfcc) {
 }
 
 const audioContext = new AudioContext();
+const gainNode = audioContext.createGain();
 autoResumeAudioContext(audioContext);
 
-const numberOfMFCCCoefficients = 12;
+const numberOfMFCCCoefficients = 21;
 
 let analyzer;
+const audio = new Audio();
 navigator.mediaDevices
   .getUserMedia({
     audio: {
       noiseSuppression: false,
-      //autoGainControl: false,
-      //echoCancellation: false,
+      autoGainControl: false,
+      echoCancellation: false,
     },
   })
   .then((stream) => {
+    window.stream = stream;
     const sourceNode = audioContext.createMediaStreamSource(stream);
+    sourceNode.connect(gainNode);
+    audio.srcObject = stream;
 
     // Create a Meyda analyzer node to calculate MFCCs
     analyzer = Meyda.createMeydaAnalyzer({
       audioContext: audioContext,
-      source: sourceNode,
+      source: gainNode,
       featureExtractors: ["mfcc", "rms"],
       bufferSize: 2 ** 10,
       //hopSize: 2 ** 8,
@@ -98,6 +103,10 @@ navigator.mediaDevices
         if (rms > rmsThreshold) {
           if (isCollectingData) {
             addData(mfcc);
+            numberOfSamplesCollected++;
+            if (numberOfSamplesCollected >= numberOfSamplesToCollect) {
+              toggleDataCollection();
+            }
           }
           if (finishedTraining) {
             predictThrottled(mfcc);
@@ -117,17 +126,17 @@ const neuralNetwork = ml5.neuralNetwork({
   outputs: [
     "tongue.index",
     "tongue.diameter",
-    //"frontConstriction.diameter",
-    //"frontConstriction.index",
-    //"backConstriction.diameter",
-    //"backConstriction.index",
-    //"voiceness",
+    "frontConstriction.diameter",
+    "frontConstriction.index",
+    "backConstriction.diameter",
+    "backConstriction.index",
+    "voiceness",
   ],
 
   task: "regression",
   debug: "true",
-  learningRate: 0.2,
-  hiddenUnity: 16,
+  //learningRate: 0.2,
+  //hiddenUnity: 16,
 });
 
 const addDataButton = document.getElementById("addData");
@@ -136,7 +145,10 @@ addDataButton.addEventListener("click", (event) => {
 });
 
 let isCollectingData = false;
+let numberOfSamplesCollected = 0;
+let numberOfSamplesToCollect = 40;
 function toggleDataCollection() {
+  numberOfSamplesCollected = 0;
   isCollectingData = !isCollectingData;
   addDataButton.innerText = isCollectingData ? "stop adding data" : "add data";
 }
@@ -144,7 +156,7 @@ function toggleDataCollection() {
 function addData(mfcc) {
   const inputs = mfcc;
   const outputs = constrictions.getData();
-  //Object.assign(outputs, { voiceness });
+  Object.assign(outputs, { voiceness });
   delete outputs["backConstriction.index"];
   delete outputs["backConstriction.diameter"];
   delete outputs["frontConstriction.index"];
@@ -174,7 +186,7 @@ function train() {
   neuralNetwork.train(
     {
       epochs: 50,
-      batchSize: 60,
+      batchSize: 64,
     },
     whileTraining,
     onFinishedTraining
