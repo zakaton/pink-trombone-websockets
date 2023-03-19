@@ -72,7 +72,9 @@ const audioContext = new AudioContext();
 const gainNode = audioContext.createGain();
 autoResumeAudioContext(audioContext);
 
-const numberOfMFCCCoefficients = 21;
+const numberOfMFCCCoefficients = 13;
+let numberOfMFCCsToAverage = 3;
+const lastNMFCCs = [];
 
 let analyzer;
 const audio = new Audio();
@@ -99,6 +101,18 @@ navigator.mediaDevices
       //hopSize: 2 ** 8,
       numberOfMFCCCoefficients,
       callback: ({ mfcc, rms }) => {
+        lastNMFCCs.push(mfcc);
+        while (lastNMFCCs.length > numberOfMFCCsToAverage) {
+          lastNMFCCs.shift();
+        }
+        mfcc = mfcc.map((_, index) => {
+          let sum = 0;
+          lastNMFCCs.forEach((_mfcc) => {
+            sum += _mfcc[index];
+          });
+          return sum / lastNMFCCs.length;
+        });
+
         drawMFCC(mfcc);
         if (rms > rmsThreshold) {
           if (isCollectingData) {
@@ -121,21 +135,27 @@ navigator.mediaDevices
 
 let rmsThreshold = 0.01;
 
+let includeBackConstriction = false;
+let includeFrontConstriction = false;
+let includeVoiceness = false;
+const outputs = ["tongue.index", "tongue.diameter"];
+if (includeFrontConstriction) {
+  outputs.push("frontConstriction.diameter", "frontConstriction.index");
+}
+if (includeBackConstriction) {
+  outputs.push("backConstriction.diameter", "backConstriction.index");
+}
+if (includeVoiceness) {
+  outputs.push("voiceness");
+}
+
 const neuralNetwork = ml5.neuralNetwork({
   inputs: numberOfMFCCCoefficients,
-  outputs: [
-    "tongue.index",
-    "tongue.diameter",
-    "frontConstriction.diameter",
-    "frontConstriction.index",
-    "backConstriction.diameter",
-    "backConstriction.index",
-    "voiceness",
-  ],
+  outputs,
 
   task: "regression",
   debug: "true",
-  //learningRate: 0.2,
+  //learningRate: 0.1,
   //hiddenUnity: 16,
 });
 
@@ -146,7 +166,7 @@ addDataButton.addEventListener("click", (event) => {
 
 let isCollectingData = false;
 let numberOfSamplesCollected = 0;
-let numberOfSamplesToCollect = 40;
+let numberOfSamplesToCollect = 30;
 function toggleDataCollection() {
   numberOfSamplesCollected = 0;
   isCollectingData = !isCollectingData;
@@ -156,11 +176,17 @@ function toggleDataCollection() {
 function addData(mfcc) {
   const inputs = mfcc;
   const outputs = constrictions.getData();
-  Object.assign(outputs, { voiceness });
-  delete outputs["backConstriction.index"];
-  delete outputs["backConstriction.diameter"];
-  delete outputs["frontConstriction.index"];
-  delete outputs["frontConstriction.diameter"];
+  if (includeVoiceness) {
+    Object.assign(outputs, { voiceness });
+  }
+  if (!includeBackConstriction) {
+    delete outputs["backConstriction.index"];
+    delete outputs["backConstriction.diameter"];
+  }
+  if (!includeFrontConstriction) {
+    delete outputs["frontConstriction.index"];
+    delete outputs["frontConstriction.diameter"];
+  }
   neuralNetwork.addData(inputs, outputs);
   localStorage[localStorage.length] = JSON.stringify({ inputs, outputs });
   if (clearLocalStorageButton.disabled) {
@@ -186,7 +212,7 @@ function train() {
   neuralNetwork.train(
     {
       epochs: 50,
-      batchSize: 64,
+      batchSize: 50,
     },
     whileTraining,
     onFinishedTraining
@@ -259,10 +285,17 @@ const loadDataFromLocalStorageButton = document.getElementById(
 loadDataFromLocalStorageButton.addEventListener("click", (event) => {
   for (let index = 0; index < localStorage.length; index++) {
     const { inputs, outputs } = JSON.parse(localStorage[index]);
-    delete outputs["backConstriction.index"];
-    delete outputs["backConstriction.diameter"];
-    delete outputs["frontConstriction.index"];
-    delete outputs["frontConstriction.diameter"];
+    if (!includeBackConstriction) {
+      delete outputs["backConstriction.index"];
+      delete outputs["backConstriction.diameter"];
+    }
+    if (!includeVoiceness) {
+      delete outputs["voiceness"];
+    }
+    if (!includeFrontConstriction) {
+      delete outputs["frontConstriction.index"];
+      delete outputs["frontConstriction.diameter"];
+    }
     neuralNetwork.addData(inputs, outputs);
   }
   loadDataFromLocalStorageButton.disabled = true;
