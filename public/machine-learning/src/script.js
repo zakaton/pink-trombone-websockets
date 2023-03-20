@@ -77,6 +77,7 @@ let numberOfMFCCsToAverage = 3;
 const lastNMFCCs = [];
 
 let analyzer;
+let _mfcc;
 const audio = new Audio();
 navigator.mediaDevices
   .getUserMedia({
@@ -112,6 +113,7 @@ navigator.mediaDevices
           });
           return sum / lastNMFCCs.length;
         });
+        _mfcc = mfcc;
 
         drawMFCC(mfcc);
         if (rms > rmsThreshold) {
@@ -173,7 +175,7 @@ function toggleDataCollection() {
   addDataButton.innerText = isCollectingData ? "stop adding data" : "add data";
 }
 
-function addData(mfcc) {
+function _addData(mfcc) {
   const inputs = mfcc;
   const outputs = constrictions.getData();
   if (includeVoiceness) {
@@ -193,6 +195,7 @@ function addData(mfcc) {
     clearLocalStorageButton.disabled = false;
   }
 }
+const addData = throttle((mfcc) => _addData(mfcc), 50);
 window.addEventListener("load", (event) => {
   if (localStorage.length > 0) {
     clearLocalStorageButton.disabled = false;

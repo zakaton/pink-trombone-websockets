@@ -26,6 +26,7 @@ const clients = {
   "pocket-sphinx": new Set(),
   "machine-learning": new Set(),
   mfcc: new Set(),
+  knn: new Set(),
 };
 
 const wss = new WebSocket.Server({ server: httpsServer });

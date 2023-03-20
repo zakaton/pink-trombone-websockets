@@ -94,7 +94,7 @@ function setConstriction(constriction, index, diameter) {
 let indexThreshold = 28;
 const updateConstriction = throttle(() => {
   const message = {
-    to: ["machine-learning", "debug", "mfcc"],
+    to: ["machine-learning", "debug", "mfcc", "knn"],
     type: "message",
     constrictions: {},
   };
@@ -299,7 +299,7 @@ const { send } = setupWebsocket("pink-trombone", (message) => {
 
 function sendConstrictions() {
   const message = {
-    to: ["machine-learning", "debug", "mfcc"],
+    to: ["machine-learning", "debug", "mfcc", "knn"],
     type: "message",
     constrictions: {
       tongue: deconstructConstriction(pinkTromboneElement.tongue),

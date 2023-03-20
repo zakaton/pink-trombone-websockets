@@ -8,7 +8,7 @@ const { send } = setupWebsocket("debug", (message) => {
 
 const throttledSend = throttle((message) => {
   send({
-    to: ["pink-trombone", "machine-learning", "mfcc"],
+    to: ["pink-trombone", "machine-learning", "mfcc", "knn"],
     type: "message",
     ...message,
   });
