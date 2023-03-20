@@ -1,5 +1,4 @@
-test all phonemes
-test microphone
+fix microphone (add gain, etc)
 record phoneme demo
 test A-Frame game
 record A-Frame demo

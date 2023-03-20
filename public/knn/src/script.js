@@ -234,6 +234,7 @@ trainButton.addEventListener("click", (event) => {
 });
 
 let sortedClassifications, filteredSortedClassifications, weights, results;
+const topPredictionSpan = document.getElementById("topPrediction");
 async function predict(mfcc) {
   let message;
 
@@ -241,6 +242,7 @@ async function predict(mfcc) {
     shouldNormalize ? normalizeArray(mfcc) : mfcc
   );
   const { classIndex, label, confidencesByLabel, confidences } = results;
+  topPredictionSpan.innerText = label;
   sortedClassifications = classifications.toSorted(
     (a, b) => confidences[b.index] - confidences[a.index]
   );
