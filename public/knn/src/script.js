@@ -239,8 +239,7 @@ async function predict(mfcc) {
   let message;
 
   results = await classifier.classify(
-    shouldNormalize ? normalizeArray(mfcc) : mfcc,
-    2
+    shouldNormalize ? normalizeArray(mfcc) : mfcc
   );
   const { classIndex, label, confidencesByLabel, confidences } = results;
   sortedClassifications = classifications.toSorted(
