@@ -56,6 +56,9 @@ let shouldSendConstrictions = false;
 pinkTromboneElement.addEventListener("setParameter", (event) => {
   const { newValue, parameterName } = event.detail;
   const [type, subtype] = parameterName.split(".");
+  if (parameterName == "tenseness") {
+    updateVoiceness(newValue);
+  }
   shouldSendConstrictions = true;
 });
 
@@ -114,21 +117,21 @@ const updateConstriction = throttle(() => {
     const { index, diameter } = deconstructConstriction(
       pinkTromboneElement.pinkTrombone._pinkTromboneNode._constrictions[2]
     );
-    if (index == 0 && diameter == 0) {
-      return;
+    if (!(index == 0 && diameter == 0)) {
+      const isBackConstriction = index < indexThreshold;
+      const targetConstriction = isBackConstriction
+        ? backConstriction
+        : frontConstriction;
+      setConstriction(targetConstriction, index, diameter);
+      message.constrictions[
+        isBackConstriction ? "backConstriction" : "frontConstriction"
+      ] = {
+        index,
+        diameter,
+      };
     }
-    const isBackConstriction = index < indexThreshold;
-    const targetConstriction = isBackConstriction
-      ? backConstriction
-      : frontConstriction;
-    setConstriction(targetConstriction, index, diameter);
-    message.constrictions[
-      isBackConstriction ? "backConstriction" : "frontConstriction"
-    ] = {
-      index,
-      diameter,
-    };
   }
+  message.voiceness = _voiceness;
   send(message);
 }, 100);
 
@@ -152,6 +155,9 @@ function setVoiceness(voiceness, offset) {
   nodes.forEach(({ node, value }) => {
     exponentialRampToValueAtTime(node, value, offset);
   });
+}
+function updateVoiceness(tenseness) {
+  _voiceness = Math.acos(1 - tenseness) / (Math.PI * 0.5);
 }
 
 const { send } = setupWebsocket("pink-trombone", (message) => {

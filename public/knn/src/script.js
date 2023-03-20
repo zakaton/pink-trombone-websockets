@@ -41,7 +41,6 @@ const { send } = setupWebsocket(
       if ("voiceness" in message) {
         voiceness = message.voiceness;
       }
-      //console.log(constrictions.getData(), voiceness);
     }
   },
   () => {
