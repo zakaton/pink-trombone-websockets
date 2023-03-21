@@ -91,7 +91,7 @@ let startedMicrophone = false;
 const gainNode = audioContext.createGain();
 autoResumeAudioContext(audioContext);
 
-const numberOfMFCCCoefficients = 21;
+const numberOfMFCCCoefficients = 30;
 
 let numberOfMFCCsToAverage = 5;
 const lastNMFCCs = [];
