@@ -95,6 +95,8 @@ const numberOfMFCCCoefficients = 30;
 
 let numberOfMFCCsToAverage = 5;
 const lastNMFCCs = [];
+let numberOfRMSsToAverage = 5;
+const lastNRMSs = [];
 
 let _mfcc, _rms;
 let analyzer;
@@ -122,7 +124,6 @@ const startMicrophone = () =>
         featureExtractors: ["mfcc", "rms"],
         numberOfMFCCCoefficients,
         callback: ({ mfcc, rms }) => {
-          _rms = rms;
           lastNMFCCs.push(mfcc);
           while (lastNMFCCs.length > numberOfMFCCsToAverage) {
             lastNMFCCs.shift();
@@ -134,6 +135,14 @@ const startMicrophone = () =>
             });
             return sum / lastNMFCCs.length;
           });
+
+          lastNRMSs.push(rms);
+          while (lastNRMSs.length > numberOfRMSsToAverage) {
+            lastNRMSs.shift();
+          }
+          let rmsSum = 0;
+          lastNRMSs.forEach(_rms => rmsSum += _rms)
+          rms = rmsSum / lastNRMSs.length;
 
           drawMFCC(
             mfcc,
@@ -153,6 +162,14 @@ const startMicrophone = () =>
             _mfcc = mfcc;
             throttledSendToVVVV({ mfcc, to: ["vvvv"] });
           }
+          else {
+            if (predictFlag) {
+                const message = {  intensity : Math.min(getInterpolation(0, 0.15, rms), 1)}
+                throttledSendToPinkTrombone(message)
+            }
+          }
+          _rms = rms;
+
         },
       });
 
@@ -182,7 +199,7 @@ predictButton.addEventListener("click", (event) => {
   predictButton.innerText = predictFlag ? "stop predicting" : "predict";
 });
 
-let rmsThreshold = 0.01;
+let rmsThreshold = 0.03;
 
 const addClassificationButton = document.getElementById("addClassification");
 let collectClassificationsFlag = false;
@@ -250,8 +267,7 @@ async function predict(mfcc) {
     (classification) => confidences[classification.index] > 0
   );
   message = interpolateAllConstrictions();
-  message.intensity = Math.min(getInterpolation(0, 0.2, _rms), 1);
-  console.log(message.intensity);
+  message.intensity = Math.min(getInterpolation(0, 0.15, _rms), 1);
 
   if (message) {
     throttledSendToPinkTrombone(message);
@@ -313,7 +329,7 @@ function interpolate(from, to, interpolation) {
 
 let shouldSendToPinkTrombone = true;
 let shouldSendToGame = false;
-let shouldSendToVVVV = false;
+let shouldSendToVVVV = true;
 const throttledSendToPinkTrombone = throttle((message) => {
   if (shouldSendToPinkTrombone) {
     send({ to: ["pink-trombone"], type: "message", ...message });
@@ -332,7 +348,7 @@ const throttledSendToGame = throttle(() => {
     });
     send({ to: ["game"], type: "message", results: _results, rms: _rms });
   }
-}, 20);
+}, 10);
 
 const clearLocalStorageButton = document.getElementById("clearLocalstorage");
 clearLocalStorageButton.addEventListener("click", (event) => {

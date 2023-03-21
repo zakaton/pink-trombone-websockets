@@ -1,3 +1,0 @@
-record phoneme demo
-test A-Frame game
-record A-Frame demo

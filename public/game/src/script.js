@@ -3,8 +3,8 @@
 const vectorOffset = new THREE.Vector3();
 const eulerOffset = new THREE.Euler();
 const cameraEuler = new THREE.Euler();
-let vectorScalar = 0.02;
-let eulerScalar = 0.02;
+let vectorScalar = 0.05;
+let eulerScalar = 0.05;
 const { send } = setupWebsocket("game", (message) => {
   const { results, rms } = message;
   vectorOffset.set(0, 0, 0);
@@ -33,7 +33,7 @@ const { send } = setupWebsocket("game", (message) => {
     }
   });
 
-  const rmsScalar = THREE.MathUtils.inverseLerp(0.01, 0.05, rms);
+  const rmsScalar = THREE.MathUtils.inverseLerp(0.01, 0.03, rms);
 
   eulerOffset.x *= rmsScalar * eulerScalar;
   eulerOffset.y *= rmsScalar * eulerScalar;
