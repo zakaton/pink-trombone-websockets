@@ -66,7 +66,7 @@ let isMouseDown = false;
 document.body.addEventListener("mousedown", (event) => {
   isMouseDown = true;
   if (shouldSendConstrictions) {
-    //updateConstriction();
+    updateConstriction();
     shouldSendConstrictions = false;
   }
 });

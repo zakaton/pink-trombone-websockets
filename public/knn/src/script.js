@@ -250,6 +250,8 @@ async function predict(mfcc) {
     (classification) => confidences[classification.index] > 0
   );
   message = interpolateAllConstrictions();
+  message.intensity = Math.min(getInterpolation(0, 0.2, _rms), 1);
+  console.log(message.intensity);
 
   if (message) {
     throttledSendToPinkTrombone(message);
@@ -276,7 +278,7 @@ async function predict(mfcc) {
       }
     });
 }
-const predictThrottled = throttle(predict, 50); //ms of prediction time
+const predictThrottled = throttle(predict, 100); //ms of prediction time
 
 function interpolateConstrictions(a, b, interpolation) {
   interpolation = 0;
@@ -445,7 +447,7 @@ function appendClassificationView(classification) {
   });
   const save = () => {
     const { inputs, outputs, name } = classification;
-    localStorage[classification.index] = JSON.stringify({
+    localStorage[classifications.indexOf(classification)] = JSON.stringify({
       inputs,
       outputs,
       name,

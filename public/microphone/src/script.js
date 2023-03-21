@@ -34,7 +34,7 @@ function updateVolume() {
   volumeElement.textContent = `${Math.round(volume * 100)}%`;
 }
 
-let updateInterval = 20; //x ms update intervall
+let updateInterval = 50; //x ms update intervall
 let volumeThreshold = 0.2; //% volume triggering change
 let clarityThreshold = 0.97; // 0<1 clarity
 const throttledSend = throttle(() => {
@@ -42,9 +42,9 @@ const throttledSend = throttle(() => {
     type: "message",
     from: "microphone",
     to: ["vvvv", "pink-trombone"],
-    intensity: getInterpolation(0, 0.3, volume),
+    intensity: Math.min(getInterpolation(0, 0.3, volume), 1),
   };
-  if (volume > volumeThreshold && clarity > clarityThreshold) {
+  if (volume > volumeThreshold && clarity > clarityThreshold && pitch > 100) {
     message.frequency = pitch;
   }
   send(message);
