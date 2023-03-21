@@ -34,50 +34,52 @@ function updateVolume() {
   volumeElement.textContent = `${Math.round(volume * 100)}%`;
 }
 
-let updateInterval = 50; //x ms update intervall
+let updateInterval = 20; //x ms update intervall
 let volumeThreshold = 0.2; //% volume triggering change
-let clarityThreshold = 0.9; // 0<1 clarity
+let clarityThreshold = 0.97; // 0<1 clarity
 const throttledSend = throttle(() => {
-  send({
+  const message = {
     type: "message",
     from: "microphone",
     to: ["vvvv", "pink-trombone"],
-    frequency: pitch,
-    intensity: volume,
-  });
+    intensity: getInterpolation(0, 0.2, volume),
+  };
+  if (volume > volumeThreshold && clarity > clarityThreshold) {
+    message.frequency = pitch;
+  }
+  send(message);
 }, updateInterval);
 function update() {
   updateVolume();
   updatePitch();
-  if (volume > volumeThreshold && clarity > clarityThreshold) {
-    throttledSend();
-  }
+  throttledSend();
   window.setTimeout(() => update(), updateInterval);
 }
 
-let analyserNode, audioContext, detector, pitchInput, volumeInput, stream;
-document.addEventListener("DOMContentLoaded", () => {
-  audioContext = new window.AudioContext();
-  analyserNode = audioContext.createAnalyser();
-  audioContext.addEventListener("statechange", (event) => {
-    if (audioContext.state == "running" && !stream) {
-      navigator.mediaDevices
-        .getUserMedia({
-          audio: {
-            //echoCancellation: false,
-            //noiseSuppression: false,
-            //autoGainControl: false,
-          },
-        })
-        .then((_stream) => {
-          stream = _stream;
-          audioContext.createMediaStreamSource(stream).connect(analyserNode);
-          detector = PitchDetector.forFloat32Array(analyserNode.fftSize);
-          pitchInput = new Float32Array(detector.inputLength);
-          volumeInput = new Uint8Array(detector.inputLength);
-          update();
-        });
-    }
-  });
-  autoResumeAudioContext(audioContext);
+const audioContext = new window.AudioContext();
+const analyserNode = audioContext.createAnalyser();
+const gainNode = audioContext.createGain();
+gainNode.connect(analyserNode);
+
+let detector, pitchInput, volumeInput, stream;
+audioContext.addEventListener("statechange", (event) => {
+  if (audioContext.state == "running" && !stream) {
+    navigator.mediaDevices
+      .getUserMedia({
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+        },
+      })
+      .then((_stream) => {
+        stream = _stream;
+        audioContext.createMediaStreamSource(stream).connect(gainNode);
+        detector = PitchDetector.forFloat32Array(analyserNode.fftSize);
+        pitchInput = new Float32Array(detector.inputLength);
+        volumeInput = new Uint8Array(detector.inputLength);
+        update();
+      });
+  }
 });
+autoResumeAudioContext(audioContext);
