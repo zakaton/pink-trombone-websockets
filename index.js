@@ -4,6 +4,7 @@ var http = require("http");
 var fs = require("fs");
 var app = express();
 var WebSocket = require("ws");
+var robot = require("robotjs");
 
 var options = {
   key: fs.readFileSync("./sec/key.pem"),
@@ -15,7 +16,9 @@ app.use(express.static("public"));
 const httpServer = http.createServer(app);
 httpServer.listen(80);
 const httpsServer = https.createServer(options, app);
-httpsServer.listen(443);
+httpsServer.listen(443, () => {
+  console.log("server listening on https://localhost");
+});
 
 const clients = {
   debug: new Set(),
@@ -37,7 +40,7 @@ wss.on("connection", (ws) => {
     //console.log("ws message received");
     const string = data.toString();
     const message = JSON.parse(string);
-    const { to, type } = message;
+    const { to, type, command } = message;
     switch (type) {
       case "connection":
         webpageName = message.webpage;
@@ -48,8 +51,11 @@ wss.on("connection", (ws) => {
         break;
       case "message":
         to.forEach((receiver) => {
-          clients[receiver].forEach((client) => client.send(string));
+          clients[receiver]?.forEach((client) => client.send(string));
         });
+        break;
+      case "robot":
+        onRobotCommand(command);
         break;
       default:
         console.log(`uncaught message type ${type}`);
@@ -61,3 +67,13 @@ wss.on("connection", (ws) => {
     clients[webpageName]?.delete(ws);
   });
 });
+
+function onRobotCommand(command = {}) {
+  const { method, args = [] } = command;
+  if (method in robot) {
+    console.log("calling", method, "with args", args);
+    robot[method](...args);
+  } else {
+    console.log("uncaught robot method", method);
+  }
+}

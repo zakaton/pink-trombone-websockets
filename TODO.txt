@@ -1,0 +1,6 @@
+robot.js
+  control mouse
+  keyboard (arrow keys)
+  scroll
+pronunciation game
+paint with voice
