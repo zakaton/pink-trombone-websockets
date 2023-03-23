@@ -761,6 +761,41 @@ const clamp = (value, min = 0, max = 1) => {
   return Math.max(min, Math.min(max, value));
 };
 
+// https://github.com/mrdoob/three.js/blob/master/src/math/MathUtils.js#L47
+// https://www.gamedev.net/tutorials/programming/general-and-gameplay-programming/inverse-lerp-a-super-useful-yet-often-overlooked-function-r5230/
+function inverseLerp(x, y, value) {
+  if (x !== y) {
+    return (value - x) / (y - x);
+  } else {
+    return 0;
+  }
+}
+
+// https://github.com/aframevr/aframe/blob/f5f2790eca841bf633bdaa0110b0b59d36d7e854/src/utils/index.js#L140
+/**
+ * Returns debounce function that gets called only once after a set of repeated calls.
+ *
+ * @param {function} functionToDebounce
+ * @param {number} wait - Time to wait for repeated function calls (milliseconds).
+ * @param {boolean} immediate - Calls the function immediately regardless of if it should be waiting.
+ * @returns {function} Debounced function.
+ */
+function debounce(func, wait, immediate) {
+  var timeout;
+  return function () {
+    var context = this;
+    var args = arguments;
+    var later = function () {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+}
+
 const utterances = [
   {
     name: "pleasure",

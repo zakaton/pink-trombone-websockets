@@ -1,6 +1,6 @@
 /* global setupWebsocket, autoResumeAudioContext, Pitchy */
 
-const { send } = setupWebsocket("microphone", (message) => {
+const { send } = setupWebsocket("pitch", (message) => {
   // FILL
 });
 
@@ -40,7 +40,7 @@ let clarityThreshold = 0.97; // 0<1 clarity
 const throttledSend = throttle(() => {
   const message = {
     type: "message",
-    from: "microphone",
+    from: "pitch",
     to: ["vvvv", "pink-trombone"],
     //intensity: Math.min(getInterpolation(0, 0.3, volume), 1),
   };

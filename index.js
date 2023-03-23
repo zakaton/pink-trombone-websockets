@@ -25,11 +25,12 @@ const clients = {
   vvvv: new Set(),
   game: new Set(),
   "pink-trombone": new Set(),
-  microphone: new Set(),
+  pitch: new Set(),
   "pocket-sphinx": new Set(),
   "machine-learning": new Set(),
   mfcc: new Set(),
   knn: new Set(),
+  robot: new Set(),
 };
 
 const wss = new WebSocket.Server({ server: httpsServer });
@@ -55,7 +56,10 @@ wss.on("connection", (ws) => {
         });
         break;
       case "robot":
-        onRobotCommand(command);
+        const commands = Array.isArray(command) ? command : [command];
+        commands.forEach((command) => {
+          onRobotCommand(command);
+        });
         break;
       default:
         console.log(`uncaught message type ${type}`);
@@ -68,10 +72,12 @@ wss.on("connection", (ws) => {
   });
 });
 
+robot.setMouseDelay(1);
+//robot.setKeyboardDelay(1);
 function onRobotCommand(command = {}) {
   const { method, args = [] } = command;
   if (method in robot) {
-    console.log("calling", method, "with args", args);
+    //console.log("calling", method, "with args", args);
     robot[method](...args);
   } else {
     console.log("uncaught robot method", method);

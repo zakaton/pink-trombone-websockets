@@ -1,6 +1,5 @@
-robot.js
-  control mouse
-  keyboard (arrow keys)
-  scroll
-pronunciation game
-paint with voice
+record robot demo (mouse, keyboard, scroll)
+shape manipulation (orbit object, scale, move around... - 'z' to toggle maipulation modes)
+pronunciation game (type with phonemes, get the word)
+facial animation (ready player me)
+SFX (make wind or ocean sound by making the similar sound)

@@ -141,7 +141,7 @@ const startMicrophone = () =>
             lastNRMSs.shift();
           }
           let rmsSum = 0;
-          lastNRMSs.forEach(_rms => rmsSum += _rms)
+          lastNRMSs.forEach((_rms) => (rmsSum += _rms));
           rms = rmsSum / lastNRMSs.length;
 
           drawMFCC(
@@ -161,15 +161,15 @@ const startMicrophone = () =>
             }
             _mfcc = mfcc;
             throttledSendToVVVV({ mfcc, to: ["vvvv"] });
-          }
-          else {
+          } else {
             if (predictFlag) {
-                const message = {  intensity : Math.min(getInterpolation(0, 0.15, rms), 1)}
-                throttledSendToPinkTrombone(message)
+              const message = {
+                intensity: Math.min(getInterpolation(0, 0.15, rms), 1),
+              };
+              throttledSendToPinkTrombone(message);
             }
           }
           _rms = rms;
-
         },
       });
 
@@ -294,7 +294,7 @@ async function predict(mfcc) {
       }
     });
 }
-const predictThrottled = throttle(predict, 100); //ms of prediction time
+const predictThrottled = throttle(predict, 20); //ms of prediction time
 
 function interpolateConstrictions(a, b, interpolation) {
   interpolation = 0;
@@ -330,6 +330,7 @@ function interpolate(from, to, interpolation) {
 let shouldSendToPinkTrombone = true;
 let shouldSendToGame = false;
 let shouldSendToVVVV = true;
+let shouldSendToRobot = false;
 const throttledSendToPinkTrombone = throttle((message) => {
   if (shouldSendToPinkTrombone) {
     send({ to: ["pink-trombone"], type: "message", ...message });
@@ -341,14 +342,21 @@ const throttledSendToVVVV = throttle((message) => {
   }
 }, 20);
 const throttledSendToGame = throttle(() => {
-  if (shouldSendToGame) {
+  if (shouldSendToGame || shouldSendToRobot) {
+    const to = [];
+    if (shouldSendToGame) {
+      to.push("game");
+    }
+    if (shouldSendToRobot) {
+      to.push("robot");
+    }
     const _results = [];
     filteredSortedClassifications.forEach(({ name, index }) => {
       _results.push({ name, weight: results.confidences[index] });
     });
-    send({ to: ["game"], type: "message", results: _results, rms: _rms });
+    send({ to, type: "message", results: _results, rms: _rms });
   }
-}, 10);
+}, 5);
 
 const clearLocalStorageButton = document.getElementById("clearLocalstorage");
 clearLocalStorageButton.addEventListener("click", (event) => {
