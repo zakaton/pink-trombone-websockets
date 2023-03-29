@@ -48,7 +48,7 @@ const getUtterance = () => {
 const renderKeyframes = (time = 0, frequency = 140) => {
   const keyframes = [];
   resultsContainer.querySelectorAll(".result").forEach((resultContainer) => {
-    const _keyframes = resultContainer.renderKeyframes(time);
+    const _keyframes = resultContainer.renderKeyframes(time, frequency);
     time = _keyframes[_keyframes.length - 1].time;
     frequency = _keyframes[_keyframes.length - 1].frequency;
     keyframes.push(..._keyframes);
@@ -56,7 +56,7 @@ const renderKeyframes = (time = 0, frequency = 140) => {
   keyframes.push({
     name: ".",
     time: time + releaseTime / speed,
-    //frequency,
+    frequency,
     intensity: 0,
   });
   return keyframes;
