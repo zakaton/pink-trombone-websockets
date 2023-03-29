@@ -280,7 +280,7 @@ const createResultContainer = () => {
           const holdKeyframe = Object.assign({}, keyframe);
           holdKeyframe.isHold = true;
           holdKeyframe.timeDelta = holdTime;
-          holdKeyframe.name = `_${holdKeyframe.name}_`;
+          holdKeyframe.name = `${holdKeyframe.name}]`;
           _keyframes.push(holdKeyframe);
 
           if (type == "consonant" && !voiced) {
@@ -291,8 +291,7 @@ const createResultContainer = () => {
             );
             _keyframes[0].intensity = 0;
             const voicedToVoicelessKeyframe = Object.assign({}, _keyframes[0]);
-            voicedToVoicelessKeyframe.name =
-              voicedToVoicelessKeyframe.name + " V-";
+            voicedToVoicelessKeyframe.name = `{${voicedToVoicelessKeyframe.name}`;
             voicedToVoicelessKeyframe.isHold = false;
             voicedToVoicelessKeyframe.timeDelta = 0.001;
             voicedToVoicelessKeyframe.intensity = 0.8;
@@ -307,8 +306,8 @@ const createResultContainer = () => {
               {},
               _keyframes[_keyframes.length - 1]
             );
-            voicelessToVoicedKeyframe.name =
-              voicelessToVoicedKeyframe.name + " V+";
+            voicelessToVoicedKeyframe.timeDelta = 0.001;
+            voicelessToVoicedKeyframe.name = `${voicelessToVoicedKeyframe.name}}`;
             voicelessToVoicedKeyframe.isHold = false;
 
             //voicelessToVoicedKeyframe.intensity = 0;
