@@ -1,5 +1,18 @@
-record robot demo (mouse, keyboard, scroll)
-shape manipulation (orbit object, scale, move around... - 'z' to toggle maipulation modes)
-pronunciation game (type with phonemes, get the word)
+text to speech
+  add pitch (rising, falling, or none)
+pronunciation
+  type in word
+  show large text with pronunciation under it
+  click on each phoneme to hear it being said
+  highlight each phoneme as it is hear
+speech recognition
+  speak each phoneme
+  type of each phoneme
+  show word being said under it
 facial animation (ready player me)
+shape manipulation (orbit object, scale, move around... - 'z' to toggle maipulation modes)
 SFX (make wind or ocean sound by making the similar sound)
+
+NICE TO HAVES
+  "include in training" checkboxes for /knn classes (can "mute" some classes, or "solo" others)
+  checkboxes to send to PT/game/robot/etc in /knn 

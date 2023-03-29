@@ -31,6 +31,7 @@ const clients = {
   mfcc: new Set(),
   knn: new Set(),
   robot: new Set(),
+  tts: new Set(),
 };
 
 const wss = new WebSocket.Server({ server: httpsServer });

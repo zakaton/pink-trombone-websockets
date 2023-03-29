@@ -164,7 +164,8 @@ const { send } = setupWebsocket("pink-trombone", (message) => {
   let didSetVoiceness = false;
   let canSetVoiceness = true;
   for (const key in message) {
-    const value = Number(message[key]);
+    const value = message[key];
+    const valueNumber = Number(value);
     let node;
     let nodes = [];
     switch (key) {
@@ -219,7 +220,7 @@ const { send } = setupWebsocket("pink-trombone", (message) => {
         if (!canSetVoiceness) {
           return;
         }
-        setVoiceness(value);
+        setVoiceness(valueNumber);
         didSetVoiceness = true;
         break;
       case "phoneme":
@@ -279,7 +280,12 @@ const { send } = setupWebsocket("pink-trombone", (message) => {
         }
         break;
       case "utterance":
-        const { keyframes } = utterances[message.utterance];
+        let keyframes;
+        if (typeof value == "object") {
+          keyframes = value.keyframes;
+        } else if (value in utterances) {
+          keyframes = utterances[value].keyframes;
+        }
         if (keyframes?.length > 0) {
           playKeyframes(keyframes);
         }
@@ -293,7 +299,8 @@ const { send } = setupWebsocket("pink-trombone", (message) => {
     }
     if (nodes.length > 0) {
       nodes.forEach((node) => {
-        exponentialRampToValueAtTime(node, value, 0.01);
+        valueNumber = clamp(valueNumber, node.minValue, node.maxValue);
+        exponentialRampToValueAtTime(node, valueNumber, 0.01);
       });
     }
 
@@ -338,6 +345,9 @@ const keyframeStrings = [
   "frontConstriction.index",
   "frontConstriction.diameter",
 
+  "backConstriction.index",
+  "backConstriction.diameter",
+
   "tenseness",
   "loudness",
 
@@ -347,13 +357,17 @@ const keyframeStrings = [
 function playKeyframes(keyframes) {
   keyframes.forEach((keyframe) => {
     keyframeStrings.forEach((keyframeString) => {
+      const value = keyframe[keyframeString];
+      if (value == undefined) {
+        return;
+      }
       const path = keyframeString.split(".");
-      let value = pinkTromboneElement;
+      let node = pinkTromboneElement;
       while (path.length) {
-        value = value[path.shift()];
+        node = node[path.shift()];
       }
       const offset = keyframe.time;
-      value.linearRampToValueAtTime(
+      node.linearRampToValueAtTime(
         keyframe[keyframeString],
         pinkTromboneElement.audioContext.currentTime + offset
       );

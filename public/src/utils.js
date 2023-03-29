@@ -120,12 +120,8 @@ const phonemes = {
     example: "fat",
     constrictions: {
       front: {
-        index: 41.34956359863281,
-        diameter: 0.5388981103897095,
-      },
-      tongue: {
-        index: 21.017623901367188,
-        diameter: 3.6824817657470703,
+        index: 39.577491760253906,
+        diameter: 0.5085345506668091,
       },
     },
   },
@@ -241,8 +237,8 @@ const phonemes = {
         diameter: 0.8469864130020142,
       },
       tongue: {
-        index: 14.571993827819824,
-        diameter: 1.7225748300552368,
+        index: 8.940977096557617,
+        diameter: 1.365233302116394,
       },
     },
   },
@@ -279,11 +275,11 @@ const phonemes = {
     example: "wit",
     constrictions: {
       front: {
-        index: 40.623783111572266,
-        diameter: 0.9160601496696472,
+        index: 41.214935302734375,
+        diameter: 0.8578535318374634,
       },
       tongue: {
-        index: 8.366361618041992,
+        index: 12.515311241149902,
         diameter: 1.740299105644226,
       },
     },
@@ -357,12 +353,12 @@ const phonemes = {
     example: "ring",
     constrictions: {
       tongue: {
-        index: 11.262357711791992,
-        diameter: 1.9802567958831787,
+        index: 22.66060447692871,
+        diameter: 1.5032392740249634,
       },
       back: {
-        index: 11.977778434753418,
-        diameter: 0.19189877808094025,
+        index: 22.110883712768555,
+        diameter: -1.3278001546859741,
       },
     },
   },
@@ -796,6 +792,25 @@ function debounce(func, wait, immediate) {
   };
 }
 
+const alternateIPAs = {
+  e: "ɪ",
+  o: "ɒ",
+  ɚ: "r",
+  a: "ɒ",
+  ɑ: "ɒ",
+  ɹ: "r",
+  i: "ɪ",
+  u: "w",
+  ɔ: "ɒ",
+  ʤ: "tʃ",
+  ʧ: "tʃ",
+};
+
+for (const alternatePhoneme in alternateIPAs) {
+  const phoneme = alternateIPAs[alternatePhoneme];
+  phonemes[alternatePhoneme] = phonemes[phoneme];
+}
+
 const utterances = [
   {
     name: "pleasure",
@@ -875,3 +890,9 @@ const utterances = [
     ],
   },
 ];
+
+function deconstructVoiceness(voiceness) {
+  const tenseness = 1 - Math.cos(voiceness * Math.PI * 0.5);
+  const loudness = Math.pow(tenseness, 0.25);
+  return { tenseness, loudness };
+}

@@ -1,0 +1,89 @@
+<html>
+  <head>
+    <title>Text to Speech</title>
+    <script src="./../src/utils.js"></script>
+    <!-- https://github.com/surrsurus/text-to-ipa -->
+    <script src="./../src/text-to-ipa.js"></script>
+  </head>
+
+  <body>
+    <h1>Text to Speech</h1>
+
+    <input type="text" id="text" autocomplete="off" />
+    <select id="inputType" hidden>
+      <optgroup label="input type"></optgroup>
+    </select>
+    <span id="validText"></span>
+    <br /><br />
+    <div id="controls">
+      <label
+        >speed
+        <input type="number" value="1" id="speed" step="0.1" min="0.1" max="5"
+      /></label>
+      <button id="play" disabled>play all</button>
+      <button id="download" disabled>download all</button>
+      <a id="downloadLink" hidden></a>
+    </div>
+    <br />
+    <div id="results" style="display: flex; flex-direction: column">
+      <template id="resultTemplate">
+        <div class="result">
+          <div
+            class="alternatives"
+            style="display: flex; flex-direction: row"
+          ></div>
+          <br />
+          <div
+            class="phonemes"
+            style="display: flex; flex-direction: column"
+          ></div>
+          <br />
+          <button class="play">play</button>
+          <br />
+          <br />
+        </div>
+      </template>
+      <template id="phonemeTemplate">
+        <div class="phoneme">
+          <span class="text" style="margin-right: 5px"></span>
+          <label
+            >offset
+            <input
+              class="offset"
+              type="number"
+              value="0.1"
+              min="0.1"
+              max="2"
+              step="0.1"
+          /></label>
+          <label
+            >hold
+            <input
+              class="hold"
+              type="number"
+              value="0"
+              min="0"
+              max="2"
+              step="0.1"
+          /></label>
+
+          <label style="margin-right: 10px"
+            >falling <input value="falling" type="radio" name="pitchCurve"
+          /></label>
+          <label style="margin-right: 10px"
+            >none <input value="none" type="radio" name="pitchCurve" checked
+          /></label>
+          <label
+            >rising <input value="rising" type="radio" name="pitchCurve"
+          /></label>
+        </div>
+      </template>
+      <template id="alternativeTemplate">
+        <div class="alternative" style="margin-right: 10px">
+          <label><span></span> <input type="radio" /></label>
+        </div>
+      </template>
+    </div>
+  </body>
+  <script src="./src/script.js"></script>
+</html>
