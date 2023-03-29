@@ -1,5 +1,3 @@
-text to speech
-  add pitch (rising, falling, or none)
 pronunciation
   type in word
   show large text with pronunciation under it
