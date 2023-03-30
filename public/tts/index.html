@@ -67,14 +67,15 @@
               step="0.1"
           /></label>
 
-          <label style="margin-right: 10px"
-            >falling <input value="falling" type="radio" name="pitchCurve"
-          /></label>
-          <label style="margin-right: 10px"
-            >none <input value="none" type="radio" name="pitchCurve" checked
-          /></label>
           <label
-            >rising <input value="rising" type="radio" name="pitchCurve"
+            >semitones
+            <input
+              class="semitones"
+              type="number"
+              value="0"
+              step="1"
+              max="100"
+              min="-100"
           /></label>
         </div>
       </template>

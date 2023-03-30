@@ -342,6 +342,15 @@ const createResultContainer = () => {
           });
         });
 
+      const semitonesInput = phonemeContainer.querySelector(".semitones");
+      semitonesInput.addEventListener("input", (event) => {
+        const semitones = Number(event.target.value);
+        const pitchedKeyframe = _keyframes[0]; // FIX?
+        if (pitchedKeyframe) {
+          pitchedKeyframe.semitones = semitones;
+        }
+      });
+
       const offsetInput = phonemeContainer.querySelector(".offset");
       offsetInput.addEventListener("input", (event) => {
         setOffsetTime(Number(event.target.value));
@@ -378,6 +387,10 @@ const createResultContainer = () => {
               frequency /= 2 ** (5 / 12); // FIX
               break;
           }
+        }
+        if ("semitones" in keyframe) {
+          const { semitones } = keyframe;
+          frequency *= 2 ** (semitones / 12);
         }
         _keyframe.frequency = frequency;
         delete _keyframe.timeDelta;
