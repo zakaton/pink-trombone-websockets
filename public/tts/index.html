@@ -9,15 +9,23 @@
   <body>
     <h1>Text to Speech</h1>
 
-    <input type="text" id="text" autocomplete="off" />
+    <label
+      >text <input type="text" id="text" autocomplete="off" size="70"
+    /></label>
     <select id="inputType" hidden>
       <optgroup label="input type"></optgroup>
     </select>
-    <span id="validText"></span>
+    <p id="validText"></p>
+    <label
+      >phoneme substitutions
+      <select id="phonemeSubstitutions">
+        <option>none</option>
+      </select></label
+    >
     <br /><br />
-    <select id="phonemeSubstitutions">
-      <option>none</option>
-    </select>
+    <label
+      >phonemes <input type="text" id="phonemes" size="70" autocomplete="off"
+    /></label>
     <br /><br />
     <div id="controls">
       <label

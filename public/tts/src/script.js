@@ -86,7 +86,6 @@ let finalString = "";
 textInput.addEventListener("input", (event) => {
   const strings = event.target.value.split(" ");
   results.length = 0;
-  resultsContainer.innerHTML = "";
 
   const validTextStrings = [];
   strings.forEach((string) => {
@@ -110,15 +109,33 @@ textInput.addEventListener("input", (event) => {
     }
   });
 
-  //console.log("results", results);
-
   if (results.length > 0 && validTextStrings.length > 0) {
     finalString = validTextStrings.join(" ");
     validTextSpan.innerText = finalString;
+  } else {
+    validTextSpan.innerText = "";
+  }
+
+  onResultsUpdate();
+});
+
+let isResultFromPhoneme = false;
+const onResultsUpdate = (fromPhonemes = false) => {
+  isResultFromPhoneme = fromPhonemes;
+  if (fromPhonemes) {
+    textInput.value = "";
+  } else {
+    phonemesInput.value = "";
+  }
+
+  console.log("results", results);
+
+  resultsContainer.innerHTML = "";
+
+  if (results.length > 0) {
     playButton.disabled = false;
     downloadButton.disabled = false;
   } else {
-    validTextSpan.innerText = "";
     playButton.disabled = true;
     downloadButton.disabled = true;
   }
@@ -137,15 +154,48 @@ textInput.addEventListener("input", (event) => {
       }
     }
 
-    // FILL - put in "ipa" input
-
     results.forEach((alternatives) => {
       if (alternatives.length > 0) {
         const resultContainer = getResultContainer(alternatives);
       }
     });
+    if (!fromPhonemes) {
+      updatePhonemesInput();
+    }
   }
+};
+
+const phonemesInput = document.getElementById("phonemes");
+phonemesInput.addEventListener("input", (event) => {
+  const strings = event.target.value.split(" ").map((string) => {
+    let characters = string.split("");
+    characters = characters.filter((character) => {
+      if (character == "ˈ" || character == "ˌ" || character == ".") {
+        return true;
+      } else {
+        return character in phonemes;
+      }
+    });
+    return characters.join("");
+  });
+
+  results.length = 0;
+  strings.forEach((string) => {
+    results.push([string]);
+  });
+  onResultsUpdate(true);
 });
+
+const updatePhonemesInput = () => {
+  if (isResultFromPhoneme) {
+    return;
+  }
+  const selectedResults = [];
+  resultsContainer.querySelectorAll(".result").forEach((container) => {
+    selectedResults.push(container.alternative);
+  });
+  phonemesInput.value = selectedResults.join(" ");
+};
 
 const resultsContainer = document.getElementById("results");
 const resultTemplate = document.getElementById("resultTemplate");
@@ -225,6 +275,7 @@ const createResultContainer = () => {
   const keyframes = [];
   const setAlternative = (_alternative) => {
     alternative = _alternative;
+    resultContainer.alternative = alternative;
     //console.log("setting alternative", alternative);
     phonemesContainer.innerHTML = "";
 
@@ -250,7 +301,7 @@ const createResultContainer = () => {
       };
       const setHoldTime = (_holdTime) => {
         holdTime = _holdTime;
-        const holdKeyframe = _keyframes.find((keyframe) => keyframe.isHold);
+        const holdKeyframe = _keyframes.findLast((keyframe) => keyframe.isHold);
         if (holdKeyframe) {
           holdKeyframe.timeDelta = holdTime;
         }
@@ -311,7 +362,7 @@ const createResultContainer = () => {
             _keyframes[0].intensity = 0;
             const voicedToVoicelessKeyframe = Object.assign({}, _keyframes[0]);
             voicedToVoicelessKeyframe.name = `{${voicedToVoicelessKeyframe.name}`;
-            voicedToVoicelessKeyframe.isHold = false;
+            //voicedToVoicelessKeyframe.isHold = false;
             voicedToVoicelessKeyframe.timeDelta = 0.001;
             voicedToVoicelessKeyframe.intensity = 0.8;
             Object.assign(
@@ -327,7 +378,7 @@ const createResultContainer = () => {
             );
             voicelessToVoicedKeyframe.timeDelta = 0.001;
             voicelessToVoicedKeyframe.name = `${voicelessToVoicedKeyframe.name}}`;
-            voicelessToVoicedKeyframe.isHold = false;
+            //voicelessToVoicedKeyframe.isHold = false;
 
             //voicelessToVoicedKeyframe.intensity = 0;
             Object.assign(
@@ -340,6 +391,18 @@ const createResultContainer = () => {
       }
       if (nextPhoneme == "ˈ" || nextPhoneme == "ˌ") {
         holdTime = holdTimes[nextPhoneme];
+      }
+      if (phoneme == ".") {
+        const startSilence = Object.assign({}, keyframes[keyframes.length - 1]);
+        startSilence.intensity = 0;
+        startSilence.timeDelta = timeBetweenPhonemes;
+        startSilence.name = "[.";
+        _keyframes.push(startSilence);
+        const holdSilence = Object.assign({}, startSilence);
+        holdSilence.intensity = 0;
+        holdSilence.isHold = true;
+        startSilence.name = "].";
+        _keyframes.push(holdSilence);
       }
 
       keyframes.push(..._keyframes);
@@ -389,6 +452,7 @@ const createResultContainer = () => {
       phonemesContainer.appendChild(phonemeContainer);
     });
     //console.log("keyframes", keyframes);
+    updatePhonemesInput();
   };
   const renderKeyframes = (time = 0, frequency = 140) => {
     const _keyframes = [];
