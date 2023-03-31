@@ -403,6 +403,7 @@ const createResultContainer = () => {
         holdSilence.isHold = true;
         startSilence.name = "].";
         _keyframes.push(holdSilence);
+        holdTime = holdTimes.ˈ;
       }
 
       keyframes.push(..._keyframes);
