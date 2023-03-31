@@ -103,18 +103,32 @@ const phonemes = {
           diameter: 0.088,
         },
       },
+      {
+        front: {
+          index: 41.10761642456055,
+          diameter: 0.5994295477867126,
+        },
+      },
     ],
   },
   d: {
     voiced: true,
     graphemes: ["d", "dd", "ed"],
     example: "dad",
-    constrictions: {
-      front: {
-        index: 35.8536376953125,
-        diameter: 0.088,
+    constrictions: [
+      {
+        front: {
+          index: 35.8536376953125,
+          diameter: 0.088,
+        },
       },
-    },
+      {
+        front: {
+          index: 35.8536376953125,
+          diameter: 0.7306244969367981,
+        },
+      },
+    ],
   },
   f: {
     voiced: false,
@@ -131,16 +145,28 @@ const phonemes = {
     voiced: true,
     graphemes: ["g", "gg", "gh", "gu", "gue"],
     example: "gun",
-    constrictions: {
-      back: {
-        index: 22.009140014648438,
-        diameter: 0.17730380594730377,
+    constrictions: [
+      {
+        back: {
+          index: 22.009140014648438,
+          diameter: 0.17730380594730377,
+        },
+        tongue: {
+          index: 14.824607849121094,
+          diameter: 2.7940967082977295,
+        },
       },
-      tongue: {
-        index: 14.824607849121094,
-        diameter: 2.7940967082977295,
+      {
+        back: {
+          index: 22.009140014648438,
+          diameter: 0.7,
+        },
+        tongue: {
+          index: 14.824607849121094,
+          diameter: 2.7940967082977295,
+        },
       },
-    },
+    ],
   },
   h: {
     voiced: false,

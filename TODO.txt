@@ -15,17 +15,16 @@ SFX (make wind or ocean sound by making the similar sound)
 Make up a language? (custom phonemes, words, morphology, syntax, lexicon)
 Scrabble, but with phonemes?
 
-
 NICE TO HAVES
   knn
     "include in training" checkboxes for /knn classes (can "mute" some classes, or "solo" others)
     checkboxes to send to PT/game/robot/etc in /knn 
   tts
-    add stops (glottal stops, pauses, periods)
-    aspiration ending (k, g, b, p), adding a voiceless plosive
     second text input for raw phonemes (word input auto-fills raw phoneme input)
+    add stops (glottal stops, pauses, periods)
     gibberish button (markov chain that generates strings and suffixes like "wumbo")
     "blur" slider (from pure words to "gibberish")
     pig latin
+    contrast in phonetic substitutions (find constriction differences between 2 versions of a single word, and exaggerate the difference in one direction, e.g. a british english mocking an american english accent or vv)
     smooth-out phonemes, e.g. "is this" => "iz zis", where the sudden change of voice/voiceless smooths out, or tongue-twisters that alternate between similar phonemes "really likes" to "lilly rikes", switching particular phonemes
   

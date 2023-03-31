@@ -302,7 +302,7 @@ const createResultContainer = () => {
           holdKeyframe.name = `${holdKeyframe.name}]`;
           _keyframes.push(holdKeyframe);
 
-          if (type == "consonant" && !voiced) {
+          if (index == 0 && type == "consonant" && !voiced) {
             // add keyframe after first to change to voiced
             Object.assign(
               _keyframes[0],
