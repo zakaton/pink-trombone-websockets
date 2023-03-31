@@ -215,6 +215,7 @@ const getResultContainer = (alternatives) => {
 let holdTimes = {
   ˈ: 0.05,
   ˌ: 0.05,
+  ".": 0.05,
 };
 let consonantHoldTime = 0.05;
 let timeBetweenSubResults = 0.1; // seconds
@@ -403,7 +404,7 @@ const createResultContainer = () => {
         holdSilence.isHold = true;
         startSilence.name = "].";
         _keyframes.push(holdSilence);
-        holdTime = holdTimes.ˈ;
+        holdTime = holdTimes["."];
       }
 
       keyframes.push(..._keyframes);
