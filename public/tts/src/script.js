@@ -59,6 +59,11 @@ const renderKeyframes = (time = 0, frequency = 140) => {
     frequency,
     intensity: 0,
   });
+  if (isWhispering) {
+    keyframes.forEach((keyframe) => {
+      Object.assign(keyframe, deconstructVoiceness(0));
+    });
+  }
   return keyframes;
 };
 
@@ -90,7 +95,7 @@ textInput.addEventListener("input", (event) => {
         const ipas = TextToIPA._IPADict[string];
         if (ipas) {
           validTextStrings.push(string);
-          results.push(ipas);
+          results.push(ipas.slice());
           //console.log("ipas", index, ipas);
         }
       } else {
@@ -98,7 +103,7 @@ textInput.addEventListener("input", (event) => {
         const words = TextToIPA._WordDict[string];
         if (words) {
           validTextStrings.push(string);
-          results.push(words);
+          results.push(words.slice());
           //console.log("words", index, words);
         }
       }
@@ -120,6 +125,20 @@ textInput.addEventListener("input", (event) => {
 
   clearResultContainers();
   if (results.length > 0) {
+    if (phonemeSubstitution) {
+      for (const fromPhoneme in phonemeSubstitution) {
+        const toPhoneme = phonemeSubstitution[fromPhoneme];
+        results.forEach((result) => {
+          result.forEach((alternative, index) => {
+            alternative = alternative.replaceAll(fromPhoneme, toPhoneme);
+            result[index] = alternative;
+          });
+        });
+      }
+    }
+
+    // FILL - put in "ipa" input
+
     results.forEach((alternatives) => {
       if (alternatives.length > 0) {
         const resultContainer = getResultContainer(alternatives);
@@ -420,3 +439,41 @@ const throttledSend = throttle((message) => {
     ...message,
   });
 }, 100);
+
+const phonemeSubstitutionsSelect = document.getElementById(
+  "phonemeSubstitutions"
+);
+
+for (const substitutionType in phonemeSubstitutions) {
+  const optGroup = document.createElement("optgroup");
+  optGroup.label = substitutionType;
+  const substitutionSubTypes = phonemeSubstitutions[substitutionType];
+  for (const substitutionSubType in substitutionSubTypes) {
+    const option = new Option(
+      substitutionSubType,
+      `${substitutionType}.${substitutionSubType}`
+    );
+    optGroup.appendChild(option);
+  }
+  phonemeSubstitutionsSelect.appendChild(optGroup);
+}
+
+let phonemeSubstitutionType = "none";
+let phonemeSubstitution;
+phonemeSubstitutionsSelect.addEventListener("input", (event) => {
+  phonemeSubstitutionType = event.target.value;
+  if (phonemeSubstitutionType == "none") {
+    phonemeSubstitution = null;
+  } else {
+    const [type, subType] = phonemeSubstitutionType.split(".");
+    phonemeSubstitution = phonemeSubstitutions[type][subType];
+  }
+  console.log("phonemeSubstitution", phonemeSubstitution);
+  textInput.dispatchEvent(new Event("input"));
+});
+
+let isWhispering = false;
+const onWhisperInput = (event) => {
+  isWhispering = event.target.checked;
+  console.log("isWhispering", isWhispering);
+};

@@ -15,12 +15,19 @@
     </select>
     <span id="validText"></span>
     <br /><br />
+    <select id="phonemeSubstitutions">
+      <option>none</option>
+    </select>
+    <br /><br />
     <div id="controls">
       <label
         >speed
         <input type="number" value="1" id="speed" step="0.1" min="0.1" max="5"
       /></label>
       <button id="play" disabled>play all</button>
+      <label
+        >whisper <input oninput="onWhisperInput(event)" type="checkbox"
+      /></label>
       <button id="download" disabled>download all</button>
       <a id="downloadLink" hidden></a>
     </div>
@@ -52,9 +59,9 @@
               class="offset"
               type="number"
               value="0.1"
-              min="0.1"
+              min="0.05"
               max="2"
-              step="0.1"
+              step="0.05"
           /></label>
           <label
             >hold
@@ -64,7 +71,7 @@
               value="0"
               min="0"
               max="2"
-              step="0.1"
+              step="0.05"
           /></label>
 
           <label

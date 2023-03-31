@@ -96,12 +96,14 @@ const phonemes = {
     voiced: true,
     graphemes: ["b", "bb"],
     example: "bug",
-    constrictions: {
-      front: {
-        index: 41.10761642456055,
-        diameter: 0.088,
+    constrictions: [
+      {
+        front: {
+          index: 41.10761642456055,
+          diameter: 0.088,
+        },
       },
-    },
+    ],
   },
   d: {
     voiced: true,
@@ -145,14 +147,16 @@ const phonemes = {
     graphemes: ["h", "wh"],
     example: "hop",
     constrictions: {
+      /*
       back: {
         index: 10.536121368408203,
         diameter: 0.4411369264125824,
       },
       tongue: {
-        index: 19.82225227355957,
-        diameter: 3.5797972679138184,
+        index: 12.820167541503906,
+        diameter: 2.3550286293029785,
       },
+      */
     },
   },
   dʒ: {
@@ -315,8 +319,8 @@ const phonemes = {
         diameter: 2.72188401222229,
       },
       front: {
-        index: 31.402315139770508,
-        diameter: -0.054616913199424744,
+        index: 31.482295989990234,
+        diameter: 0.4663625657558441,
       },
     },
   },
@@ -421,12 +425,12 @@ const phonemes = {
     example: "end",
     constrictions: {
       tongue: {
-        index: 26.440641403198242,
-        diameter: 2.970951557159424,
+        index: 23.29936981201172,
+        diameter: 3.968519687652588,
       },
     },
   },
-  "i:": {
+  i: {
     graphemes: ["e", "ee", "ea", "y", "ey", "oe", "ie", "i", "ei", "eo", "ay"],
     example: "be",
     constrictions: {
@@ -469,8 +473,8 @@ const phonemes = {
     example: "swan",
     constrictions: {
       tongue: {
-        index: 10.080545425415039,
-        diameter: 2.3536839485168457,
+        index: 1.551837682723999,
+        diameter: 1.551837682723999,
       },
     },
   },
@@ -524,7 +528,7 @@ const phonemes = {
       },
     },
   },
-  "u:": {
+  u: {
     graphemes: ["o", "oo", "ew", "ue", "u_e", "oe", "ough", "ui", "oew", "ou"],
     example: "who",
     constrictions: {
@@ -594,6 +598,22 @@ const phonemes = {
       },
     ],
   },
+  "👄": {
+    constrictions: {
+      tongue: {
+        index: 17.572158813476562,
+        diameter: 1.8030052185058594,
+      },
+    },
+  },
+  "👅": {
+    constrictions: {
+      tongue: {
+        index: 23.101163864135742,
+        diameter: 1.9783293008804321,
+      },
+    },
+  },
   eəʳ: {
     graphemes: ["air", "are", "ear", "ere", "eir", "ayer"],
     example: "chair",
@@ -660,7 +680,7 @@ const phonemes = {
       },
     },
   },
-  "ɔ:": {
+  ɔ: {
     graphemes: [
       "aw",
       "a",
@@ -793,15 +813,15 @@ function debounce(func, wait, immediate) {
 }
 
 const alternateIPAs = {
-  e: "ɪ",
+  e: "ɛ",
   o: "ɒ",
   ɚ: "r",
   a: "ɒ",
   ɑ: "ɒ",
   ɹ: "r",
-  i: "ɪ",
-  u: "w",
-  ɔ: "ɒ",
+  //i: "ɪ",
+  //u: "w",
+  //ɔ: "ɒ",
   ʤ: "tʃ",
   ʧ: "tʃ",
 };
@@ -896,3 +916,61 @@ function deconstructVoiceness(voiceness) {
   const loudness = Math.pow(tenseness, 0.25);
   return { tenseness, loudness };
 }
+
+const phonemeSubstitutions = {
+  accents: {
+    arabic: {
+      p: "b",
+      ð: "z",
+      θ: "s",
+    },
+    japanese: {
+      ʧ: "ʃ",
+      ə: "ʌ",
+      ɑ: "ɔ",
+      ow: "ɔ",
+      ɚ: "a",
+      wʌn: "ʌn",
+      wʌˈn: "ʌˈn",
+      ɹ: "w",
+      //l: "w",
+      θ: "s",
+      e: "eɪ",
+      ʌn: "ɪn",
+      ʌk: "ek",
+      li: "ti",
+    },
+  },
+  dialects: {
+    boston: {
+      ɑɹ: "a",
+      ɑˈɹ: "a",
+      ɑˈ: "wɑ",
+    },
+    southern: {
+      aj: "æh",
+      ɛ: "ej",
+      ʌ: "👄",
+      ə: "👅",
+      e: "ɪ",
+    },
+  },
+  impediments: {
+    lisp: {
+      s: "θ",
+      z: "ð",
+      ʃ: "θ",
+      ʒ: "ð",
+    },
+  },
+  misc: {
+    baby: {
+      l: "w",
+      ɹ: "w",
+      t: "d",
+      θ: "d",
+      ʒ: "d",
+      ð: "d",
+    },
+  },
+};
