@@ -106,7 +106,7 @@ const phonemes = {
       {
         front: {
           index: 41.10761642456055,
-          diameter: 0.5994295477867126,
+          diameter: 0.9,
         },
       },
     ],
@@ -381,16 +381,28 @@ const phonemes = {
     voiced: true,
     graphemes: ["ng", "n", "ngue"],
     example: "ring",
-    constrictions: {
-      tongue: {
-        index: 22.66060447692871,
-        diameter: 1.5032392740249634,
+    constrictions: [
+      {
+        tongue: {
+          index: 22.66060447692871,
+          diameter: 1.5032392740249634,
+        },
+        back: {
+          index: 22.110883712768555,
+          diameter: -1.3278001546859741,
+        },
       },
-      back: {
-        index: 22.110883712768555,
-        diameter: -1.3278001546859741,
+      {
+        tongue: {
+          index: 22.66060447692871,
+          diameter: 1.5032392740249634,
+        },
+        back: {
+          index: 22.110883712768555,
+          diameter: 0.6745198965072632,
+        },
       },
-    },
+    ],
   },
   j: {
     voiced: true,
@@ -948,6 +960,7 @@ const phonemeSubstitutions = {
     arabic: {
       p: "b",
       ð: "z",
+      θs: "s",
       θ: "s",
     },
     japanese: {
@@ -979,6 +992,7 @@ const phonemeSubstitutions = {
       ʌ: "👄",
       ə: "👅",
       e: "ɪ",
+      ɪŋ: "ɪn",
     },
   },
   impediments: {
@@ -998,5 +1012,7 @@ const phonemeSubstitutions = {
       ʒ: "d",
       ð: "d",
     },
+    mumbling: {},
+    slurring: {},
   },
 };

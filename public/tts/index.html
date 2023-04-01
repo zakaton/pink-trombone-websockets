@@ -6,15 +6,20 @@
     <script src="./../src/text-to-ipa.js"></script>
   </head>
 
+  <style>
+    .valid {
+      color: green;
+      font-weight: bold;
+    }
+    #validPhonemes > span {
+      margin-right: 10px;
+    }
+  </style>
+
   <body>
     <h1>Text to Speech</h1>
 
-    <label
-      >text <input type="text" id="text" autocomplete="off" size="70"
-    /></label>
-    <select id="inputType" hidden>
-      <optgroup label="input type"></optgroup>
-    </select>
+    <textarea id="text" cols="70" placeholder="text"></textarea>
     <p id="validText"></p>
     <label
       >phoneme substitutions
@@ -23,9 +28,8 @@
       </select></label
     >
     <br /><br />
-    <label
-      >phonemes <input type="text" id="phonemes" size="70" autocomplete="off"
-    /></label>
+    <textarea id="phonemes" cols="70" placeholder="phonemes"></textarea>
+    <p id="validPhonemes"></p>
     <br /><br />
     <div id="controls">
       <label
@@ -43,6 +47,7 @@
     <div id="results" style="display: flex; flex-direction: column">
       <template id="resultTemplate">
         <div class="result">
+          <b class="word"></b>
           <div
             class="alternatives"
             style="display: flex; flex-direction: row"

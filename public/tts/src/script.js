@@ -67,44 +67,24 @@ const renderKeyframes = (time = 0, frequency = 140) => {
   return keyframes;
 };
 
-const inputTypes = ["word", "ipa"];
-let inputType = inputTypes[0];
-const inputTypeSelect = document.getElementById("inputType");
-const inputTypeSelectOptgroup = inputTypeSelect.querySelector("optgroup");
-inputTypes.forEach((inputType) => {
-  const option = new Option(inputType);
-  inputTypeSelectOptgroup.appendChild(option);
-});
-inputTypeSelect.addEventListener("input", (event) => {
-  inputType = event.target.value;
-  console.log("new input type", inputType);
-});
 const validTextSpan = document.getElementById("validText");
+const validPhonemesSpan = document.getElementById("validPhonemes");
 const textInput = document.getElementById("text");
 const results = [];
 let finalString = "";
+const validTextStrings = [];
 textInput.addEventListener("input", (event) => {
   const strings = event.target.value.split(" ");
   results.length = 0;
 
-  const validTextStrings = [];
+  validTextStrings.length = 0;
   strings.forEach((string) => {
     if (string.length > 0) {
-      if (inputType == "word") {
-        const ipas = TextToIPA._IPADict[string];
-        if (ipas) {
-          validTextStrings.push(string);
-          results.push(ipas.slice());
-          //console.log("ipas", index, ipas);
-        }
-      } else {
-        string = string.replace("'", "ˈ");
-        const words = TextToIPA._WordDict[string];
-        if (words) {
-          validTextStrings.push(string);
-          results.push(words.slice());
-          //console.log("words", index, words);
-        }
+      const ipas = TextToIPA._IPADict[string];
+      if (ipas) {
+        validTextStrings.push(string);
+        results.push(ipas.slice());
+        //console.log("ipas", index, ipas);
       }
     }
   });
@@ -143,15 +123,17 @@ const onResultsUpdate = (fromPhonemes = false) => {
   clearResultContainers();
   if (results.length > 0) {
     if (phonemeSubstitution) {
-      for (const fromPhoneme in phonemeSubstitution) {
-        const toPhoneme = phonemeSubstitution[fromPhoneme];
-        results.forEach((result) => {
-          result.forEach((alternative, index) => {
-            alternative = alternative.replaceAll(fromPhoneme, toPhoneme);
-            result[index] = alternative;
-          });
+      results.forEach((result) => {
+        result.forEach((alternative, index) => {
+          const keys = Object.keys(phonemeSubstitution);
+          const regex = new RegExp(keys.join("|"), "g");
+          alternative = alternative.replaceAll(
+            regex,
+            (match) => phonemeSubstitution[match]
+          );
+          result[index] = alternative;
         });
-      }
+      });
     }
 
     results.forEach((alternatives) => {
@@ -166,8 +148,17 @@ const onResultsUpdate = (fromPhonemes = false) => {
 };
 
 const phonemesInput = document.getElementById("phonemes");
+const validResultsIndices = [];
 phonemesInput.addEventListener("input", (event) => {
-  const strings = event.target.value.split(" ").map((string) => {
+  validTextStrings.length = 0;
+  validResultsIndices.length = 0;
+  const strings = event.target.value.split(" ").map((string, index) => {
+    const word =
+      TextToIPA._WordDict[
+        string.replaceAll("ˈ", "").replaceAll("ˌ", "").replaceAll(".", "")
+      ];
+    validTextStrings.push(word || string);
+    validResultsIndices[index] = Boolean(word);
     let characters = string.split("");
     characters = characters.filter((character) => {
       if (character == "ˈ" || character == "ˌ" || character == ".") {
@@ -177,6 +168,18 @@ phonemesInput.addEventListener("input", (event) => {
       }
     });
     return characters.join("");
+  });
+
+  validPhonemesSpan.innerHTML = "";
+  validResultsIndices.forEach((isValid, index) => {
+    const span = document.createElement("span");
+    span.innerText = validTextStrings[index];
+    if (isValid) {
+      span.classList.add("valid");
+    } else {
+      span.classList.add("invalid");
+    }
+    validPhonemesSpan.appendChild(span);
   });
 
   results.length = 0;
@@ -210,6 +213,11 @@ const getResultContainer = (alternatives) => {
   }
   resultContainer.setAlternatives(alternatives);
   resultContainer.style.display = "";
+
+  const wordSpan = resultContainer.querySelector(".word");
+  wordSpan.innerText =
+    validTextStrings[resultContainer.resultContainerIndex] || "";
+
   return resultContainer;
 };
 let holdTimes = {
@@ -222,7 +230,7 @@ let timeBetweenSubResults = 0.1; // seconds
 let spaceTime = 0;
 let releaseTime = 0.1;
 let timeBetweenPhonemes = 0.1;
-let timeBetweenSubPhonemes = 0.1;
+let timeBetweenSubPhonemes = 0.05;
 let defaultVoiceness = 0.8;
 let defaultVoiceless = 0.2;
 const createResultContainer = () => {
@@ -234,6 +242,7 @@ const createResultContainer = () => {
   let alternative;
 
   const resultContainerIndex = resultsContainer.childElementCount;
+  resultContainer.resultContainerIndex = resultContainerIndex;
 
   const alternativesContainer = resultContainer.querySelector(".alternatives");
 
@@ -413,23 +422,25 @@ const createResultContainer = () => {
         .cloneNode(true)
         .querySelector(".phoneme");
 
+      /*
       phonemeContainer
         .querySelectorAll("[name='pitchCurve']")
         .forEach((pitchCurveRadio) => {
           pitchCurveRadio.name = `pitchCurve-${resultContainerIndex}-${index}`;
           pitchCurveRadio.addEventListener("input", () => {
             const pitchCurve = pitchCurveRadio.value;
-            const pitchedKeyframe = _keyframes[0]; // FIX?
+            const pitchedKeyframe = _keyframes[0];
             if (pitchedKeyframe) {
               pitchedKeyframe.pitchCurve = pitchCurve;
             }
           });
         });
+      */
 
       const semitonesInput = phonemeContainer.querySelector(".semitones");
       semitonesInput.addEventListener("input", (event) => {
         const semitones = Number(event.target.value);
-        const pitchedKeyframe = _keyframes[0]; // FIX?
+        const pitchedKeyframe = _keyframes[0];
         if (pitchedKeyframe) {
           pitchedKeyframe.semitones = semitones;
         }
@@ -463,16 +474,18 @@ const createResultContainer = () => {
       if (_keyframe.timeDelta > 0) {
         time += _keyframe.timeDelta / speed;
         _keyframe.time = time;
+        /*
         if ("pitchCurve" in keyframe) {
           switch (keyframe.pitchCurve) {
             case "rising":
-              frequency *= 2 ** (5 / 12); // FIX
+              frequency *= 2 ** (5 / 12);
               break;
             case "falling":
-              frequency /= 2 ** (5 / 12); // FIX
+              frequency /= 2 ** (5 / 12);
               break;
           }
         }
+        */
         if ("semitones" in keyframe) {
           const { semitones } = keyframe;
           frequency *= 2 ** (semitones / 12);
