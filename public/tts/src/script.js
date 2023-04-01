@@ -64,6 +64,11 @@ const renderKeyframes = (time = 0, frequency = 140) => {
       Object.assign(keyframe, deconstructVoiceness(0));
     });
   }
+  if (phonemeSubstitutionType == "misc.slurring") {
+    keyframes.forEach((keyframe) => {
+      Object.assign(keyframe, deconstructVoiceness(0.8));
+    });
+  }
   return keyframes;
 };
 
@@ -111,10 +116,8 @@ const onResultsUpdate = (fromPhonemes = false) => {
   }
 
   if (isUsingPigLatin) {
-    // FILL
     results.forEach((alternatives) => {
       alternatives.forEach((alternative, alternativeIndex) => {
-        console.log(alternative);
         let vowelIndex = -1;
         alternative.split("").some((phoneme, index) => {
           if (index != 0 && phonemes[phoneme]?.type == "vowel") {
@@ -122,7 +125,6 @@ const onResultsUpdate = (fromPhonemes = false) => {
             return true;
           }
         });
-        console.log("vowelIndex", vowelIndex);
         if (vowelIndex > -1) {
           const alternativeParts = [
             alternative.substring(vowelIndex),
@@ -178,6 +180,7 @@ const onResultsUpdate = (fromPhonemes = false) => {
 const phonemesInput = document.getElementById("phonemes");
 const validResultsIndices = [];
 phonemesInput.addEventListener("input", (event) => {
+  validTextSpan.innerText = "";
   validTextStrings.length = 0;
   validResultsIndices.length = 0;
   const strings = event.target.value.split(" ").map((string, index) => {
@@ -575,14 +578,14 @@ phonemeSubstitutionsSelect.addEventListener("input", (event) => {
     const [type, subType] = phonemeSubstitutionType.split(".");
     phonemeSubstitution = phonemeSubstitutions[type][subType];
   }
-  console.log("phonemeSubstitution", phonemeSubstitution);
+  //console.log("phonemeSubstitution", phonemeSubstitution);
   textInput.dispatchEvent(new Event("input"));
 });
 
 let isWhispering = false;
 const onWhisperInput = (event) => {
   isWhispering = event.target.checked;
-  console.log("isWhispering", isWhispering);
+  //console.log("isWhispering", isWhispering);
 };
 
 let numberOfRandomPhonemes = 10;
