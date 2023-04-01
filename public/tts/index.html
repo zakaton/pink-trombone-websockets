@@ -4,6 +4,8 @@
     <script src="./../src/utils.js"></script>
     <!-- https://github.com/surrsurus/text-to-ipa -->
     <script src="./../src/text-to-ipa.js"></script>
+    <!-- https://github.com/EdThePro101/js-markov -->
+    <script src="./../src/markov.js"></script>
   </head>
 
   <style>
@@ -13,6 +15,7 @@
     }
     #validPhonemes > span {
       margin-right: 10px;
+      display: inline-block;
     }
   </style>
 
@@ -27,10 +30,22 @@
         <option>none</option>
       </select></label
     >
+    <br />
+    <br />
+    <label
+      >number of random phonemes
+      <input
+        id="numberOfRandomPhonemes"
+        type="number"
+        min="1"
+        max="100"
+        value="10"
+        step="1"
+    /></label>
+    <button id="generateRandomPhonemes">generate</button>
     <br /><br />
     <textarea id="phonemes" cols="70" placeholder="phonemes"></textarea>
     <p id="validPhonemes"></p>
-    <br /><br />
     <div id="controls">
       <label
         >speed

@@ -20,7 +20,6 @@ NICE TO HAVES
     "include in training" checkboxes for /knn classes (can "mute" some classes, or "solo" others)
     checkboxes to send to PT/game/robot/etc in /knn 
   tts
-    gibberish button (markov chain that generates strings and suffixes like "wumbo")
     "blur" slider (from pure words to "gibberish")
     pig latin
     contrast in phonetic substitutions (find constriction differences between 2 versions of a single word, and exaggerate the difference in one direction, e.g. a british english mocking an american english accent or vv)

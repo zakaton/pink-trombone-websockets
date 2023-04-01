@@ -1,3 +1,5 @@
+/* global Markov */
+
 //  text-to-ipa.js
 
 //  This file creates a global TextToIPA object containing the public loadDict
@@ -100,6 +102,7 @@ if (typeof TextToIPA !== "object") {
       }
 
       console.log("TextToIPA: Done parsing.");
+      createMarkovChain();
     };
   }
 
@@ -190,3 +193,18 @@ if (typeof TextToIPA !== "object") {
 // Could be intensive, might only want to load when necessary. Therefore it is commented out.
 // Feel free to re-enable if you want to just load the dictionary here, instead of somewhere else
 window.onload = TextToIPA.loadDict("../src/ipadict.txt");
+
+let markov;
+const createMarkovChain = () => {
+  markov = new Markov();
+  for (let phonemeString in TextToIPA._WordDict) {
+    nonPhonemeIPAs.forEach((nonPhonemeIPA) => {
+      phonemeString = phonemeString.replaceAll(nonPhonemeIPA, "");
+    });
+    markov.addStates(phonemeString);
+  }
+  markov.train();
+  console.log("done training markov chain");
+};
+
+const nonPhonemeIPAs = ["ˈ", "ˌ", "."];

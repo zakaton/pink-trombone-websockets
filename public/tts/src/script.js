@@ -77,6 +77,8 @@ textInput.addEventListener("input", (event) => {
   const strings = event.target.value.split(" ");
   results.length = 0;
 
+  validPhonemesSpan.innerHTML = "";
+
   validTextStrings.length = 0;
   strings.forEach((string) => {
     if (string.length > 0) {
@@ -108,7 +110,7 @@ const onResultsUpdate = (fromPhonemes = false) => {
     phonemesInput.value = "";
   }
 
-  console.log("results", results);
+  //console.log("results", results);
 
   resultsContainer.innerHTML = "";
 
@@ -556,3 +558,32 @@ const onWhisperInput = (event) => {
   isWhispering = event.target.checked;
   console.log("isWhispering", isWhispering);
 };
+
+let numberOfRandomPhonemes = 10;
+const numberOfRandomPhonemesInput = document.getElementById(
+  "numberOfRandomPhonemes"
+);
+numberOfRandomPhonemesInput.addEventListener("input", (event) => {
+  numberOfRandomPhonemes = Number(event.target.value);
+  //console.log("numberOfRandomPhonemes", numberOfRandomPhonemes);
+});
+const generateRandomPhonemesButton = document.getElementById(
+  "generateRandomPhonemes"
+);
+generateRandomPhonemesButton.addEventListener("click", () => {
+  let netLength = 0;
+  const randomResults = [];
+  while (netLength < numberOfRandomPhonemes) {
+    const randomPhonemes = markov.generateRandom(getRandomInt(3, 6));
+    randomResults.push(randomPhonemes);
+    netLength += randomPhonemes.length;
+  }
+  phonemesInput.value = randomResults.join(" ");
+  phonemesInput.dispatchEvent(new Event("input"));
+});
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min) + min);
+}
