@@ -20,7 +20,6 @@ NICE TO HAVES
     "include in training" checkboxes for /knn classes (can "mute" some classes, or "solo" others)
     checkboxes to send to PT/game/robot/etc in /knn 
   tts
-    pig latin (split phonemes by the first vowel, reverse, and add "n" to the front of the second part)
     mumbling (all voiced, low intensity)
     slurred
     "blur" slider (from pure words to "gibberish")
