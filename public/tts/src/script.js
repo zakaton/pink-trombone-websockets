@@ -110,6 +110,32 @@ const onResultsUpdate = (fromPhonemes = false) => {
     phonemesInput.value = "";
   }
 
+  if (isUsingPigLatin) {
+    // FILL
+    results.forEach((alternatives) => {
+      alternatives.forEach((alternative, alternativeIndex) => {
+        console.log(alternative);
+        let vowelIndex = -1;
+        alternative.split("").some((phoneme, index) => {
+          if (index != 0 && phonemes[phoneme]?.type == "vowel") {
+            vowelIndex = index;
+            return true;
+          }
+        });
+        console.log("vowelIndex", vowelIndex);
+        if (vowelIndex > -1) {
+          const alternativeParts = [
+            alternative.substring(vowelIndex),
+            alternative.substring(0, vowelIndex),
+          ];
+          console.log(alternativeParts);
+          alternativeParts[1] = alternativeParts[1] + "ej";
+          alternatives[alternativeIndex] = alternativeParts.join("ˈ");
+        }
+      });
+    });
+  }
+
   //console.log("results", results);
 
   resultsContainer.innerHTML = "";
@@ -587,3 +613,11 @@ function getRandomInt(min, max) {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min) + min);
 }
+
+let isUsingPigLatin = false;
+const pigLatinCheckbox = document.getElementById("pigLatin");
+pigLatinCheckbox.addEventListener("input", (event) => {
+  isUsingPigLatin = event.target.checked;
+  //console.log("isUsingPigLatin", isUsingPigLatin);
+  onResultsUpdate();
+});
