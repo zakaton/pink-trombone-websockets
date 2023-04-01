@@ -207,7 +207,7 @@ const phonemes = {
     alternative: "g",
   },
   l: {
-    //voiced: true,
+    voiced: true,
     graphemes: ["l", "ll"],
     example: "live",
     constrictions: {
@@ -258,7 +258,7 @@ const phonemes = {
     alternative: "b",
   },
   r: {
-    //voiced: true,
+    voiced: true,
     graphemes: ["r", "rr", "wr", "rh"],
     example: "run",
     constrictions: {

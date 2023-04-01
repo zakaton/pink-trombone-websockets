@@ -23,12 +23,3 @@ NICE TO HAVES
     "blur" slider (from pure words to "gibberish")
     contrast in phonetic substitutions (find constriction differences between 2 versions of a single word, and exaggerate the difference in one direction, e.g. a british english mocking an american english accent or vv)
     smooth-out phonemes, e.g. "is this" => "iz zis", where the sudden change of voice/voiceless smooths out, or tongue-twisters that alternate between similar phonemes "really likes" to "lilly rikes", switching particular phonemes
-  
-
-demo
-  say sentence (hello world)
-  whisper
-  modify phonemes
-  try substitutions
-  pig latin
-  generate phonemes
