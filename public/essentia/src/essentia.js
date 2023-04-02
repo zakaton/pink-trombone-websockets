@@ -1,6 +1,6 @@
 exports = {};
 
-const recordButton = document.getElementById("record");
+const toggleMicrophoneButton = document.getElementById("toggleMicrophone");
 
 // From a series of URL to js files, get an object URL that can be loaded in an
 // AudioWorklet. This is useful to be able to use multiple files (utils, data
@@ -24,8 +24,8 @@ let AudioContext;
 // global var for web audio API AudioContext
 let audioCtx;
 let bufferSize = 2 ** 10;
-let hopSize = 2 ** 9;
-let melNumBands = 30;
+let melNumBands = 21;
+let numberMFCCCoefficients = 13;
 
 try {
   AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -33,13 +33,14 @@ try {
 } catch (e) {
   throw "Could not instantiate AudioContext: " + e.message;
 }
+autoResumeAudioContext(audioCtx);
 
 // global var getUserMedia mic stream
 let gumStream;
 // global audio node variables
 let mic;
 let gain;
-let melspectrogramNode;
+let essentiaNode;
 let splitter;
 
 // Shared data with AudioWorkletGlobalScope
@@ -52,19 +53,18 @@ function arraySum(total, num) {
   return total + num;
 }
 
-function onRecordClickHandler() {
-  let recording = recordButton.classList.contains("recording");
-  if (!recording) {
-    recordButton.disabled = true;
-    // start microphone stream using getUserMedia and runs the feature extraction
-    startMicRecordStream();
+let isMicrophoneEnabled = false;
+function onToggleMicrophoneButtonClickHandler() {
+  isMicrophoneEnabled = !isMicrophoneEnabled;
+  if (isMicrophoneEnabled) {
+    enableMicrophone();
   } else {
-    stopMicRecordStream();
+    disableMicrophone();
   }
 }
 
 // record native microphone input and do further audio processing on each audio buffer using the given callback functions
-function startMicRecordStream() {
+function enableMicrophone() {
   if (navigator.mediaDevices.getUserMedia) {
     console.log("Initializing audio...");
     navigator.mediaDevices
@@ -91,6 +91,7 @@ function startAudioProcessing(stream) {
     // and the default bufferSize will be 4096, giving 10-12 updates/sec.
     if (audioCtx.state == "closed") {
       audioCtx = new AudioContext();
+      autoResumeAudioContext(audioCtx);
     } else if (audioCtx.state == "suspended") {
       audioCtx.resume();
     }
@@ -102,7 +103,7 @@ function startAudioProcessing(stream) {
     let codeForProcessorModule = [
       "./src/essentia-wasm.umd.js",
       "./src/essentia.js-extractor.umd.js",
-      "./src/melspectrogram-processor.js",
+      "./src/essentia-processor.js",
       "./src/ringbuf.js",
     ];
 
@@ -125,9 +126,9 @@ function startAudioProcessing(stream) {
       });
 
     // set button to stop
-    recordButton.classList.add("recording");
-    recordButton.innerText = "stop recording";
-    recordButton.disabled = false;
+    toggleMicrophoneButton.classList.add("recording");
+    toggleMicrophoneButton.innerText = "stop recording";
+    toggleMicrophoneButton.disabled = false;
   } else {
     throw "Mic stream not active";
   }
@@ -139,37 +140,35 @@ function setupAudioGraph() {
     melNumBands * 18,
     Float32Array
   );
+
   let rb = new exports.RingBuffer(sab, Float32Array);
   audioReader = new exports.AudioReader(rb);
-
-  melspectrogramNode = new AudioWorkletNode(
-    audioCtx,
-    "melspectrogram-processor",
-    {
-      processorOptions: {
-        bufferSize: bufferSize,
-        hopSize: hopSize,
-        melNumBands: melNumBands,
-        sampleRate: audioCtx.sampleRate,
-      },
-    }
-  );
+  essentiaNode = new AudioWorkletNode(audioCtx, "essentia-processor", {
+    processorOptions: {
+      bufferSize: bufferSize,
+      melNumBands: melNumBands,
+      sampleRate: audioCtx.sampleRate,
+    },
+  });
 
   try {
-    melspectrogramNode.port.postMessage({
+    essentiaNode.port.postMessage({
       sab: sab,
     });
   } catch (_) {
     alert("No SharedArrayBuffer tranfer support, try another browser.");
-    recordButton.removeEventListener("click", onRecordClickHandler);
-    recordButton.disabled = true;
+    toggleMicrophoneButton.removeEventListener(
+      "click",
+      onToggleMicrophoneButtonClickHandler
+    );
+    toggleMicrophoneButton.disabled = true;
     return;
   }
 
   // It seems necessary to connect the stream to a sink for the pipeline to work, contrary to documentataions.
   // As a workaround, here we create a gain node with zero gain, and connect temp to the system audio output.
-  mic.connect(melspectrogramNode);
-  melspectrogramNode.connect(gain);
+  mic.connect(essentiaNode);
+  essentiaNode.connect(gain);
   gain.connect(audioCtx.destination);
 
   requestAnimationFrame(animateSpectrogram); // start plot animation
@@ -184,18 +183,18 @@ function animateSpectrogram(timestamp) {
   animationLoopId = requestAnimationFrame(animateSpectrogram);
 
   /* SAB method */
-  let melspectrumBuffer = new Float32Array(melNumBands);
+  let buffer = new Float32Array(melNumBands);
   if (audioReader.available_read() >= melNumBands) {
-    let toread = audioReader.dequeue(melspectrumBuffer);
+    let toread = audioReader.dequeue(buffer);
     if (toread !== 0) {
       // scale spectrum values to [0-255]
-      let scaledMelspectrum = melspectrumBuffer.map((x) => x * 35.5);
+      let scaledMelspectrum = buffer.map((x) => x * 35.5);
       onMFCC(scaledMelspectrum);
     }
   }
 }
 
-function stopMicRecordStream() {
+function disableMicrophone() {
   if (animationLoopId) {
     cancelAnimationFrame(animationLoopId);
   }
@@ -208,15 +207,14 @@ function stopMicRecordStream() {
 
   audioCtx.close().then(function () {
     // manage button state
-    recordButton.classList.remove("recording");
-    recordButton.innerText = "start recording";
+    toggleMicrophoneButton.innerText = "enable microphone";
 
     // disconnect nodes
     mic.disconnect();
-    melspectrogramNode.disconnect();
+    essentiaNode.disconnect();
+    essentiaNode = undefined;
     gain.disconnect();
     mic = undefined;
-    melspectrogramNode = undefined;
     gain = undefined;
 
     console.log("Stopped recording ...");
@@ -227,11 +225,14 @@ try {
   const testSAB = new SharedArrayBuffer(1);
   delete testSAB;
   // add event listeners to ui objects
-  recordButton.addEventListener("click", onRecordClickHandler);
-  recordButton.disabled = false;
+  toggleMicrophoneButton.addEventListener(
+    "click",
+    onToggleMicrophoneButtonClickHandler
+  );
+  toggleMicrophoneButton.disabled = false;
 } catch (e) {
   if (e instanceof ReferenceError && !crossOriginIsolated) {
-    recordButton.disabled = true;
+    toggleMicrophoneButton.disabled = true;
     // redirect to cross-origin isolated SAB-capable version on Netlify
     //window.location = "https://essentiajs-melspectrogram.netlify.app";
   }

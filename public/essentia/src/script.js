@@ -2,6 +2,7 @@
 const mfccCanvas = document.getElementById("mfcc");
 const mfccContext = mfccCanvas.getContext("2d");
 let mfccDrawRange = 255;
+
 mfccContext.strokeStyle = "black";
 /**
  * @param {number[]} mfcc

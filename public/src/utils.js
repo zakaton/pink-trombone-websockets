@@ -49,7 +49,7 @@ function autoResumeAudioContext(audioContext) {
   window.audioContext = audioContext;
   const resumeAudioContext = () => {
     console.log(`new audio context state "${audioContext.state}"`);
-    if (audioContext.state != "running") {
+    if (audioContext.state != "running" && audioContext.state != "closed") {
       document.body.addEventListener("click", () => audioContext.resume(), {
         once: true,
       });

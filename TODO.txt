@@ -1,3 +1,6 @@
+Essentia.js
+  get pitch to work
+  bring over rest of knn
 pronunciation
   type in word
   show large text with pronunciation under it
