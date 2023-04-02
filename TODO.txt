@@ -3,13 +3,11 @@ pronunciation
   show large text with pronunciation under it
   click on each phoneme to hear it being said
   highlight each phoneme as it is hear
-speech recognition
-  speak each phoneme
-  type of each phoneme
-  show word being said under it
+  listen for phonemes from knn
+  can type with spoken phonemes for speech recognition (can use "autocorrect" to find similar existing words, like error detection)
 facial animation (ready player me) - can also animate from tts
 wordplay
-  input word and it gives rhymes, similar words, 
+  input word and it gives rhymes, similar words, puns...
 shape manipulation (orbit object, scale, move around... - 'z' to toggle maipulation modes)
 SFX (make wind or ocean sound by making the similar sound)
 Make up a language? (custom phonemes, words, morphology, syntax, lexicon)
@@ -20,6 +18,6 @@ NICE TO HAVES
     "include in training" checkboxes for /knn classes (can "mute" some classes, or "solo" others)
     checkboxes to send to PT/game/robot/etc in /knn 
   tts
-    "blur" slider (from pure words to "gibberish")
+    "filter" button (takes phonemes and replace with similar phonemes, like a substitution button you can re-press multiple times like re-doing image filters), e.g. "blur", "mumble", etc
     contrast in phonetic substitutions (find constriction differences between 2 versions of a single word, and exaggerate the difference in one direction, e.g. a british english mocking an american english accent or vv)
     smooth-out phonemes, e.g. "is this" => "iz zis", where the sudden change of voice/voiceless smooths out, or tongue-twisters that alternate between similar phonemes "really likes" to "lilly rikes", switching particular phonemes

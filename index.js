@@ -11,6 +11,11 @@ var options = {
   cert: fs.readFileSync("./sec/cert.pem"),
 };
 
+app.use(function (req, res, next) {
+  res.header("Cross-Origin-Embedder-Policy", "require-corp");
+  res.header("Cross-Origin-Opener-Policy", "same-origin");
+  next();
+});
 app.use(express.static("public"));
 
 const httpServer = http.createServer(app);
@@ -32,6 +37,7 @@ const clients = {
   knn: new Set(),
   robot: new Set(),
   tts: new Set(),
+  pronunciation: new Set(),
 };
 
 const wss = new WebSocket.Server({ server: httpsServer });
