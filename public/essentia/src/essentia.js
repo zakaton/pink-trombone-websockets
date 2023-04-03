@@ -183,13 +183,14 @@ function animateSpectrogram(timestamp) {
   animationLoopId = requestAnimationFrame(animateSpectrogram);
 
   /* SAB method */
-  let buffer = new Float32Array(melNumBands);
+  let buffer = new Float32Array(melNumBands + 1);
   if (audioReader.available_read() >= melNumBands) {
     let toread = audioReader.dequeue(buffer);
     if (toread !== 0) {
       // scale spectrum values to [0-255]
-      let scaledMelspectrum = buffer.map((x) => x * 35.5);
-      onMFCC(scaledMelspectrum);
+      const melSpectrum = buffer.slice(0, -1).map((x) => x * 35.5);
+      const loudness = buffer[buffer.length - 1];
+      onData({ melSpectrum, loudness });
     }
   }
 }

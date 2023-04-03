@@ -1,29 +1,29 @@
 /** @type {HTMLCanvasElement} */
-const mfccCanvas = document.getElementById("mfcc");
-const mfccContext = mfccCanvas.getContext("2d");
-let mfccDrawRange = 255;
+const graphCanvas = document.getElementById("graph");
+const graphContext = graphCanvas.getContext("2d");
+let graphDrawRange = 255;
 
-mfccContext.strokeStyle = "black";
+graphContext.strokeStyle = "black";
 /**
- * @param {number[]} mfcc
+ * @param {number[]} graph
  */
-function drawMFCC(mfcc, canvas, context, otherMMFC) {
+function drawGraph(graph, canvas, context, otherGraph) {
   const { width: w, height: h } = canvas;
   context.clearRect(0, 0, w, h);
-  if (otherMMFC) {
-    _drawMFCC(otherMMFC, "blue", canvas, context);
+  if (otherGraph) {
+    _drawGraph(otherGraph, "blue", canvas, context);
   }
-  if (mfcc) {
-    _drawMFCC(mfcc, "black", canvas, context);
+  if (graph) {
+    _drawGraph(graph, "black", canvas, context);
   }
 }
 
-function _drawMFCC(mfcc, color = "black", canvas, context) {
+function _drawGraph(graph, color = "black", canvas, context) {
   const { width: w, height: h } = canvas;
-  const segmentLength = w / mfcc.length;
+  const segmentLength = w / graph.length;
   context.strokeStyle = color;
-  mfcc.forEach((value, index) => {
-    let height = 1 - value / mfccDrawRange;
+  graph.forEach((value, index) => {
+    let height = 1 - value / graphDrawRange;
     height *= h;
     context.beginPath();
     context.moveTo(index * segmentLength, height);
@@ -32,6 +32,6 @@ function _drawMFCC(mfcc, color = "black", canvas, context) {
   });
 }
 
-const onMFCC = (mfcc) => {
-  drawMFCC(mfcc, mfccCanvas, mfccContext);
+const onData = ({ melSpectrum, loudness }) => {
+  drawGraph(melSpectrum, graphCanvas, graphContext);
 };

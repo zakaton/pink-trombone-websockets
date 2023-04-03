@@ -68,47 +68,28 @@ class EssentiaProcessor extends AudioWorkletProcessor {
         this._accumData[0],
         this._sampleRate
       );
-      if (this._audio_writer.available_write() >= this._melNumBands) {
-        this._audio_writer.enqueue(this._spectrum);
-      }
 
       const accumDataVector = this._extractor.arrayToVector(this._accumData[0]);
-      // const windowedFrame = this._extractor.Windowing(accumDataVector).frame;
-      // const spectrum = this._extractor.Spectrum(windowedFrame).spectrum;
+
+      //const windowedFrame = this._extractor.Windowing(accumDataVector).frame;
+      //const spectrum = this._extractor.Spectrum(windowedFrame).spectrum;
+
       // const entropy = this._extractor.Entropy(spectrum);
-      //console.log(entropy);
+      // console.log(entropy);
 
-      //const mfcc = this._extractor.MFCC(spectrum);
-      //const mfccArray = this._extractor.vectorToArray(mfcc.mfcc);
-      //console.log(mfccArray);
+      // const mfcc = this._extractor.MFCC(spectrum);
+      // const mfccArray = this._extractor.vectorToArray(mfcc.mfcc);
+      // console.log(mfccArray);
 
-      //const loudness = this._extractor.Loudness(accumDataVector);
+      const loudness = this._extractor.Loudness(accumDataVector);
       //console.log(loudness);
 
-      //const rms = this._extractor.RMS(accumDataVector);
-      //console.log(rms);
+      // const rms = this._extractor.RMS(accumDataVector);
+      // console.log(rms);
 
-      const algoOutput = this._extractor.PitchMelodia(
-        accumDataVector,
-        10,
-        3,
-        this._frameSize,
-        false,
-        0.8,
-        this._hopSize,
-        1,
-        40,
-        this._highestFreq,
-        100,
-        this._lowestFreq,
-        20,
-        0.9,
-        0.9,
-        27.5625,
-        this._lowestFreq,
-        this._sampleRate,
-        100
-      );
+      // only works  for large buffer sizes (2**13)
+      /*
+      const algoOutput = this._extractor.PitchMelodia(accumDataVector);
       const pitchFrames = this._extractor.vectorToArray(algoOutput.pitch);
       const confidenceFrames = this._extractor.vectorToArray(
         algoOutput.pitchConfidence
@@ -124,6 +105,15 @@ class EssentiaProcessor extends AudioWorkletProcessor {
         confidenceFrames.reduce((acc, val) => acc + val, 0) / numVoicedFrames;
 
       console.log(meanPitch, meanConfidence);
+      */
+
+      if (this._audio_writer.available_write() >= this._melNumBands) {
+        const output = exports.Float32Concat(
+          this._spectrum,
+          Float32Array.from([loudness.loudness])
+        );
+        this._audio_writer.enqueue(output);
+      }
 
       let zeros = new Float32Array(128 - this._spectrum.length);
       let zeroPaddedSpectrum = exports.Float32Concat(this._spectrum, zeros);

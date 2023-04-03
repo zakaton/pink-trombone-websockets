@@ -1,6 +1,5 @@
 Essentia.js
-  get pitch to work
-  bring over rest of knn
+  port /knn
 pronunciation
   type in word
   show large text with pronunciation under it
@@ -24,3 +23,5 @@ NICE TO HAVES
     "filter" button (takes phonemes and replace with similar phonemes, like a substitution button you can re-press multiple times like re-doing image filters), e.g. "blur", "mumble", etc
     contrast in phonetic substitutions (find constriction differences between 2 versions of a single word, and exaggerate the difference in one direction, e.g. a british english mocking an american english accent or vv)
     smooth-out phonemes, e.g. "is this" => "iz zis", where the sudden change of voice/voiceless smooths out, or tongue-twisters that alternate between similar phonemes "really likes" to "lilly rikes", switching particular phonemes
+    similar words (get phonetic difference between words, and calculate distance between phonemes by constriction values), and syllables/rhymes (use same number of syllables to make a new "bar"), and apply autocorrect?
+    blank keys for song placeholders (retain syllables and fill in phonemes (or phoneme classes/rhymes, or sub-phrases like regex for phonemes) - useful for songs or setting words to a beat)
