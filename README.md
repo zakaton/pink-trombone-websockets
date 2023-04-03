@@ -2,10 +2,8 @@
 
 On macOS: 
 for the security stuff, run the command in the terminal:
-`sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./selfsigned.key -out selfsigned.crt`
+`sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./key.pem -out cert.pem`
 
-rename selfsigned.crt to cert.pem
-rename selfsigned.key to key.pem
 put the \*.pem files in the /pink-trombone-websockets/sec/ folder
 
 install https://code.visualstudio.com/ & https://nodejs.org/en/
