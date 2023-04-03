@@ -3,6 +3,7 @@
 On macOS: 
 for the security stuff, run the command in the terminal:
 `sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./key.pem -out cert.pem`
+Windows is the same but without `sudo`, if you have openssl installed
 
 put the \*.pem files in the /pink-trombone-websockets/sec/ folder
 
