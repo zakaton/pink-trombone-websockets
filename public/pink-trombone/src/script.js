@@ -168,7 +168,7 @@ const { send } = setupWebsocket("pink-trombone", (message) => {
   let canSetVoiceness = true;
   for (const key in message) {
     const value = message[key];
-    const valueNumber = Number(value);
+    let valueNumber = Number(value);
     let node;
     let nodes = [];
     switch (key) {
