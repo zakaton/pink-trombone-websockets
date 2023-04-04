@@ -6,7 +6,7 @@ const cameraEuler = new THREE.Euler();
 let vectorScalar = 0.05;
 let eulerScalar = 0.05;
 const { send } = setupWebsocket("game", (message) => {
-  const { results, rms } = message;
+  const { results, loudness } = message;
   vectorOffset.set(0, 0, 0);
   eulerOffset.set(0, 0, 0);
 
@@ -33,15 +33,15 @@ const { send } = setupWebsocket("game", (message) => {
     }
   });
 
-  const rmsScalar = THREE.MathUtils.inverseLerp(0.01, 0.03, rms);
+  const loudnessScalar = THREE.MathUtils.inverseLerp(0.01, 0.03, loudness);
 
-  eulerOffset.x *= rmsScalar * eulerScalar;
-  eulerOffset.y *= rmsScalar * eulerScalar;
+  eulerOffset.x *= loudnessScalar * eulerScalar;
+  eulerOffset.y *= loudnessScalar * eulerScalar;
 
   camera.object3D.rotation.x += eulerOffset.x;
   camera.object3D.rotation.y += eulerOffset.y;
 
-  vectorOffset.multiplyScalar(rmsScalar * vectorScalar);
+  vectorOffset.multiplyScalar(loudnessScalar * vectorScalar);
 
   cameraEuler.copy(camera.object3D.rotation);
   cameraEuler.x = cameraEuler.z = 0;
@@ -52,6 +52,5 @@ const { send } = setupWebsocket("game", (message) => {
 let camera;
 const scene = document.querySelector("a-scene");
 scene.addEventListener("loaded", (event) => {
-  console.log(event);
   camera = document.querySelector("a-camera");
 });

@@ -1,4 +1,4 @@
-const useEssentia = searchParams.get("essentia") !== null;
+/* global setupWebsocket, autoResumeAudioContext, Meyda, ml5, throttle*/
 
 const constrictions = {
   getData() {
@@ -53,49 +53,32 @@ const { send } = setupWebsocket(
 );
 
 /** @type {HTMLCanvasElement} */
-const spectrumCanvas = document.getElementById("spectrum");
-const spectrumContext = spectrumCanvas.getContext("2d");
-
-spectrumContext.strokeStyle = "black";
+const mfccCanvas = document.getElementById("mfcc");
+const mfccContext = mfccCanvas.getContext("2d");
+let mfccDrawRange = 200;
+mfccContext.strokeStyle = "black";
 /**
- * @param {number[]} spectrum
+ * @param {number[]} mfcc
  */
-function drawSpectrum(spectrum, canvas, context, otherSpectrum) {
+function drawMFCC(mfcc, canvas, context, otherMMFC) {
   const { width: w, height: h } = canvas;
   context.clearRect(0, 0, w, h);
-  if (otherSpectrum) {
-    _drawSpectrum(otherSpectrum, "blue", canvas, context);
+  if (otherMMFC) {
+    _drawMFCC(otherMMFC, "blue", canvas, context);
   }
-  if (spectrum) {
-    _drawSpectrum(spectrum, "black", canvas, context);
+  if (mfcc) {
+    _drawMFCC(mfcc, "black", canvas, context);
   }
 }
 
-const spectrumRange = { min: Infinity, max: -Infinity };
-const updateSpectrum = (value) => {
-  let didUpdateRange = false;
-  if (value < spectrumRange.min) {
-    spectrumRange.min = value;
-    didUpdateRange = true;
-  } else if (value > spectrumRange.max) {
-    spectrumRange.max = value;
-    didUpdateRange = true;
-  }
-  if (didUpdateRange) {
-    spectrumRange.range = spectrumRange.max - spectrumRange.min;
-  }
-};
-const normalizeValue = (value) => {
-  return (value - spectrumRange.min) / spectrumRange.range;
-};
-function _drawSpectrum(spectrum, color = "black", canvas, context) {
+function _drawMFCC(mfcc, color = "black", canvas, context) {
   const { width: w, height: h } = canvas;
-  const segmentLength = w / spectrum.length;
+  const segmentLength = w / mfcc.length;
   context.strokeStyle = color;
-  spectrum.forEach((value, index) => {
-    const normalizedValue = normalizeValue(value);
-    let height = 1 - normalizedValue;
+  mfcc.forEach((value, index) => {
+    let height = 1 - value / mfccDrawRange;
     height *= h;
+    height -= h / 2;
     context.beginPath();
     context.moveTo(index * segmentLength, height);
     context.lineTo((index + 1) * segmentLength, height);
@@ -103,65 +86,103 @@ function _drawSpectrum(spectrum, color = "black", canvas, context) {
   });
 }
 
-const numberOfSpectrumCoefficients = 30;
+const audioContext = new AudioContext();
+let startedMicrophone = false;
+const gainNode = audioContext.createGain();
+autoResumeAudioContext(audioContext);
 
-let numberOfSpectrumsToAverage = 5;
-const lastNSpectrums = [];
-let numberOfLoudnessesToAverage = 5;
-const lastNLoudnesses = [];
+const numberOfMFCCCoefficients = 30;
 
-let loudnessThreshold = 0.03;
+let numberOfMFCCsToAverage = 5;
+const lastNMFCCs = [];
+let numberOfRMSsToAverage = 5;
+const lastNRMSs = [];
 
-let _spectrum, _loudness;
+let _mfcc, _rms;
+let analyzer;
 let selectedClassification, selectedClassificationContainer;
+const audio = new Audio();
+const startMicrophone = () =>
+  navigator.mediaDevices
+    .getUserMedia({
+      audio: {
+        noiseSuppression: false,
+        autoGainControl: false,
+        echoCancellation: false,
+      },
+    })
+    .then((stream) => {
+      window.stream = stream;
+      const sourceNode = audioContext.createMediaStreamSource(stream);
+      sourceNode.connect(gainNode);
+      audio.srcObject = stream;
 
-const onData = ({ spectrum, loudness }) => {
-  lastNSpectrums.push(spectrum);
-  while (lastNSpectrums.length > numberOfSpectrumsToAverage) {
-    lastNSpectrums.shift();
-  }
-  spectrum = spectrum.map((_, index) => {
-    let sum = 0;
-    lastNSpectrums.forEach((_spectrum) => {
-      sum += _spectrum[index];
+      // Create a Meyda analyzer node to calculate MFCCs
+      analyzer = Meyda.createMeydaAnalyzer({
+        audioContext: audioContext,
+        source: gainNode,
+        featureExtractors: ["mfcc", "rms"],
+        numberOfMFCCCoefficients,
+        callback: ({ mfcc, rms }) => {
+          lastNMFCCs.push(mfcc);
+          while (lastNMFCCs.length > numberOfMFCCsToAverage) {
+            lastNMFCCs.shift();
+          }
+          mfcc = mfcc.map((_, index) => {
+            let sum = 0;
+            lastNMFCCs.forEach((_mfcc) => {
+              sum += _mfcc[index];
+            });
+            return sum / lastNMFCCs.length;
+          });
+
+          lastNRMSs.push(rms);
+          while (lastNRMSs.length > numberOfRMSsToAverage) {
+            lastNRMSs.shift();
+          }
+          let rmsSum = 0;
+          lastNRMSs.forEach((_rms) => (rmsSum += _rms));
+          rms = rmsSum / lastNRMSs.length;
+
+          drawMFCC(
+            mfcc,
+            mfccCanvas,
+            mfccContext,
+            selectedClassification?.inputs[
+              selectedClassification?.selectedInputIndex
+            ]
+          );
+          if (rms > rmsThreshold) {
+            if (selectedClassificationContainer?.collectClassificationsFlag) {
+              selectedClassificationContainer.addData(mfcc);
+            }
+            if (predictFlag) {
+              predictThrottled(mfcc);
+            }
+            _mfcc = mfcc;
+            throttledSendToVVVV({ mfcc, to: ["vvvv"] });
+          } else {
+            if (predictFlag) {
+              const message = {
+                intensity: Math.min(getInterpolation(0, 0.15, rms), 1),
+              };
+              throttledSendToPinkTrombone(message);
+            }
+          }
+          _rms = rms;
+        },
+      });
+
+      // Start the analyzer to begin processing audio classifications
+      analyzer.start();
     });
-    return sum / lastNSpectrums.length;
-  });
-  spectrum.forEach((value) => updateSpectrum(value));
 
-  lastNLoudnesses.push(loudness);
-  while (lastNLoudnesses.length > numberOfLoudnessesToAverage) {
-    lastNLoudnesses.shift();
+audioContext.addEventListener("statechange", () => {
+  if (!startedMicrophone && audioContext.state == "running") {
+    startMicrophone();
+    startedMicrophone = true;
   }
-  let loudnessSum = 0;
-  lastNLoudnesses.forEach((_loudness) => (loudnessSum += _loudness));
-  loudness = loudnessSum / lastNLoudnesses.length;
-
-  drawSpectrum(
-    spectrum,
-    spectrumCanvas,
-    spectrumContext,
-    selectedClassification?.inputs[selectedClassification?.selectedInputIndex]
-  );
-  if (loudness > loudnessThreshold) {
-    if (selectedClassificationContainer?.collectClassificationsFlag) {
-      selectedClassificationContainer.addData(spectrum);
-    }
-    if (predictFlag) {
-      predictThrottled(spectrum);
-    }
-    _spectrum = spectrum;
-    throttledSendToVVVV({ spectrum, to: ["vvvv"] });
-  } else {
-    if (predictFlag) {
-      const message = {
-        intensity: Math.min(getInterpolation(0, 0.15, loudness), 1),
-      };
-      throttledSendToPinkTrombone(message);
-    }
-  }
-  _loudness = loudness;
-};
+});
 
 let predictFlag = false;
 const predictButton = document.getElementById("predict");
@@ -177,6 +198,8 @@ predictButton.addEventListener("click", (event) => {
   }
   predictButton.innerText = predictFlag ? "stop predicting" : "predict";
 });
+
+let rmsThreshold = 0.03;
 
 const addClassificationButton = document.getElementById("addClassification");
 let collectClassificationsFlag = false;
@@ -229,11 +252,11 @@ trainButton.addEventListener("click", (event) => {
 
 let sortedClassifications, filteredSortedClassifications, weights, results;
 const topPredictionSpan = document.getElementById("topPrediction");
-async function predict(spectrum) {
+async function predict(mfcc) {
   let message;
 
   results = await classifier.classify(
-    shouldNormalize ? normalizeArray(spectrum) : spectrum
+    shouldNormalize ? normalizeArray(mfcc) : mfcc
   );
   const { classIndex, label, confidencesByLabel, confidences } = results;
   topPredictionSpan.innerText = label;
@@ -244,18 +267,18 @@ async function predict(spectrum) {
     (classification) => confidences[classification.index] > 0
   );
   message = interpolateAllConstrictions();
-  message.intensity = Math.min(getInterpolation(0, 0.15, _loudness), 1);
+  message.intensity = Math.min(getInterpolation(0, 0.15, _rms), 1);
 
   if (message) {
     throttledSendToPinkTrombone(message);
     throttledSendToGame();
   }
 
-  _drawSpectrum(
+  _drawMFCC(
     sortedClassifications[0].inputs[0],
     "green",
-    spectrumCanvas,
-    spectrumContext
+    mfccCanvas,
+    mfccContext
   );
 
   classificationsContainer
@@ -305,9 +328,9 @@ function interpolate(from, to, interpolation) {
 }
 
 let shouldSendToPinkTrombone = true;
-let shouldSendToGame = true;
+let shouldSendToGame = false;
 let shouldSendToVVVV = true;
-let shouldSendToRobot = true;
+let shouldSendToRobot = false;
 const throttledSendToPinkTrombone = throttle((message) => {
   if (shouldSendToPinkTrombone) {
     send({ to: ["pink-trombone"], type: "message", ...message });
@@ -331,7 +354,7 @@ const throttledSendToGame = throttle(() => {
     filteredSortedClassifications.forEach(({ name, index }) => {
       _results.push({ name, weight: results.confidences[index] });
     });
-    send({ to, type: "message", results: _results, loudness: _loudness });
+    send({ to, type: "message", results: _results, rms: _rms });
   }
 }, 5);
 
@@ -434,7 +457,9 @@ function appendClassificationView(classification) {
   let selectedSampleIndex = 0;
   updateSampleSpans();
   const drawCanvas = () => {
-    drawSpectrum(classification.inputs[selectedSampleIndex], canvas, context);
+    console.log(classification.inputs[selectedSampleIndex]);
+
+    drawMFCC(classification.inputs[selectedSampleIndex], canvas, context);
   };
   drawCanvas();
   canvas.addEventListener("mousemove", (event) => {
@@ -460,17 +485,17 @@ function appendClassificationView(classification) {
     container.collectClassificationsFlag =
       !container.collectClassificationsFlag;
   });
-  const addData = (spectrum) => {
+  const addData = (mfcc) => {
     if (classification.inputs.length < maxDataPerClassification) {
-      classification.inputs.push(spectrum.slice());
+      classification.inputs.push(mfcc.slice());
       save();
       selectedSampleIndex = classification.inputs.length - 1;
       updateSampleSpans();
       drawCanvas();
     }
   };
-  container.addData = throttle((spectrum) => {
-    addData(spectrum);
+  container.addData = throttle((mfcc) => {
+    addData(mfcc);
   }, 50);
   const rePTButton = container.querySelector(".rePT");
   rePTButton.addEventListener("click", () => {

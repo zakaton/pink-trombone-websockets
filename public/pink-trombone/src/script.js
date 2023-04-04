@@ -3,8 +3,6 @@
 const audioContext = new AudioContext();
 autoResumeAudioContext(audioContext);
 
-const searchParams = new URLSearchParams(location.search);
-
 const pinkTromboneElement = document.querySelector("pink-trombone");
 let frontConstriction, backConstriction;
 

@@ -2,6 +2,8 @@ if (location.href.startsWith("http://")) {
   //location = location.href.replace("http://", "https://");
 }
 
+const searchParams = new URLSearchParams(location.search);
+
 /**
  * Resumes the audiocontext when it's suspended after a user clicks
  * @param {string} webpageName the name of the webpage this is called from to identify itself

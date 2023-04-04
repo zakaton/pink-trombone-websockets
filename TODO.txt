@@ -1,5 +1,3 @@
-Essentia.js
-  port /knn
 pronunciation
   type in word
   show large text with pronunciation under it

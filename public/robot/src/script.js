@@ -4,9 +4,9 @@ let scalar = 30;
 
 const { send } = setupWebsocket("robot", (message) => {
   if (message.from == "knn") {
-    const { results, rms } = message;
+    const { results, loudness } = message;
     const { name, weight } = results[0];
-    const rmsScalar = clamp(inverseLerp(0.01, 0.1, rms), 0, 2);
+    const loudnessScalar = clamp(inverseLerp(0.01, 0.1, loudness), 0, 2);
 
     let keyToTap;
     let mouseToggleDown;
@@ -14,19 +14,19 @@ const { send } = setupWebsocket("robot", (message) => {
     const xy = [0, 0];
     switch (name) {
       case "left":
-        xy[0] = -scalar * rmsScalar;
+        xy[0] = -scalar * loudnessScalar;
         keyToTap = "left";
         break;
       case "right":
-        xy[0] = scalar * rmsScalar;
+        xy[0] = scalar * loudnessScalar;
         keyToTap = "right";
         break;
       case "up":
-        xy[1] = scalar * rmsScalar;
+        xy[1] = scalar * loudnessScalar;
         keyToTap = "up";
         break;
       case "down":
-        xy[1] = -scalar * rmsScalar;
+        xy[1] = -scalar * loudnessScalar;
         keyToTap = "down";
         break;
       case "mousedown":
