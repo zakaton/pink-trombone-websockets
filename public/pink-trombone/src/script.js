@@ -3,6 +3,8 @@
 const audioContext = new AudioContext();
 autoResumeAudioContext(audioContext);
 
+const searchParams = new URLSearchParams(location.search);
+
 const pinkTromboneElement = document.querySelector("pink-trombone");
 let frontConstriction, backConstriction;
 
@@ -17,6 +19,9 @@ pinkTromboneElement.addEventListener("load", (event) => {
     frontConstriction._isEnabled = true;
     backConstriction = pinkTromboneElement.newConstriction(10.5, 1.8);
     pinkTromboneElement.backConstriction = backConstriction;
+    if (typeof searchParams.get("dark") == "string") {
+      toggleDarkMode();
+    }
   });
 });
 
