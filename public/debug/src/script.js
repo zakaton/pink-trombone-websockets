@@ -8,7 +8,7 @@ const { send } = setupWebsocket("debug", (message) => {
 
 const throttledSend = throttle((message) => {
   send({
-    to: ["pink-trombone", "machine-learning", "mfcc", "knn"],
+    to: ["pink-trombone", "machine-learning", "mfcc", "knn", "tts"],
     type: "message",
     ...message,
   });
@@ -111,4 +111,34 @@ utteranceSelect.addEventListener("input", (event) => {
     throttledSend({ utterance });
     event.target.value = "";
   }
+});
+
+const ttsInput = document.getElementById("ttsInput");
+const ttsButton = document.getElementById("ttsButton");
+ttsInput.addEventListener("input", (event) => {
+  let string = event.target.value;
+  ttsButton.disabled = string.length == 0;
+  if (string.endsWith("\n")) {
+    event.target.value = string.slice(0, -1);
+    ttsButton.click();
+  }
+});
+ttsButton.addEventListener("click", () => {
+  const text = ttsInput.value;
+  throttledSend({ text });
+});
+
+const ptsInput = document.getElementById("ptsInput");
+const ptsButton = document.getElementById("ptsButton");
+ptsInput.addEventListener("input", (event) => {
+  let string = event.target.value;
+  ptsButton.disabled = string.length == 0;
+  if (string.endsWith("\n")) {
+    event.target.value = string.slice(0, -1);
+    ptsButton.click();
+  }
+});
+ptsButton.addEventListener("click", () => {
+  const phonemes = ptsInput.value;
+  throttledSend({ phonemes });
 });

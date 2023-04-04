@@ -1,6 +1,17 @@
 /* global setupWebsocket, TextToIPA, phonemes */
 
-const { send } = setupWebsocket("tts", (message) => {});
+const { send } = setupWebsocket("tts", (message) => {
+  const { text, phonemes } = message;
+  if (text) {
+    textInput.value = text;
+    textInput.dispatchEvent(new Event("input"));
+    playButton.click();
+  } else if (phonemes) {
+    phonemesInput.value = phonemes;
+    phonemesInput.dispatchEvent(new Event("input"));
+    playButton.click();
+  }
+});
 
 let speed = 1;
 const speedInput = document.getElementById("speed");

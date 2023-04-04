@@ -126,6 +126,16 @@
         <option value="">--select utterance--</option>
       </select>
     </label>
+    <label style="display: inline"
+      >text-to-speech <textarea id="ttsInput" placeholder="text"></textarea>
+    </label>
+    <button id="ttsButton" disabled>speak</button>
+    <br />
+    <label style="display: inline"
+      >phoneme-to-speech
+      <textarea placeholder="phonemes" id="ptsInput"></textarea>
+    </label>
+    <button id="ptsButton" disabled>speak</button>
   </body>
   <script src="./src/script.js"></script>
 </html>
