@@ -286,7 +286,7 @@ const { send } = setupWebsocket("pink-trombone", (message) => {
         } else if (value in utterances) {
           keyframes = utterances[value].keyframes;
         }
-        if (keyframes?.length > 0) {
+        if (keyframes && keyframes.length > 0) {
           playKeyframes(keyframes);
         }
         break;

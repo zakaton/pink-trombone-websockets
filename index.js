@@ -40,7 +40,7 @@ const clients = {
   pronunciation: new Set(),
 };
 
-const wss = new WebSocket.Server({ server: httpsServer });
+const wss = new WebSocket.Server({ server: httpServer });
 wss.on("connection", (ws) => {
   console.log("new ws connection");
   let webpageName;

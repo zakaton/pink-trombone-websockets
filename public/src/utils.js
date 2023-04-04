@@ -1,5 +1,5 @@
 if (location.href.startsWith("http://")) {
-  location = location.href.replace("http://", "https://");
+  //location = location.href.replace("http://", "https://");
 }
 
 /**
@@ -13,7 +13,7 @@ function setupWebsocket(webpageName, onMessage, onConnect) {
   let socket;
 
   const createSocket = () => {
-    socket = new WebSocket("wss://localhost/");
+    socket = new WebSocket("ws://localhost/");
 
     socket.addEventListener("open", () => {
       console.log("connection opened");
