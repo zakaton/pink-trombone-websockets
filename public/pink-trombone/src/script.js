@@ -377,7 +377,7 @@ function playKeyframes(keyframes) {
 
 const darkModeButton = document.getElementById("darkMode");
 let isDarkMode = false;
-darkModeButton.addEventListener("click", (event) => {
+const toggleDarkMode = () => {
   isDarkMode = !isDarkMode;
   if (isDarkMode) {
     pinkTromboneElement.UI._container.style.gridTemplateRows = "auto 200px";
@@ -395,4 +395,8 @@ darkModeButton.addEventListener("click", (event) => {
     document.body.style.margin = "";
     document.body.style.filter = "";
   }
+};
+const debouncedToggleDarkMode = debounce(() => toggleDarkMode(), 10);
+darkModeButton.addEventListener("click", () => {
+  debouncedToggleDarkMode();
 });
