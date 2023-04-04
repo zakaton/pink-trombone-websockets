@@ -103,10 +103,10 @@ if (useEssentia) {
       gain.gain.setValueAtTime(0, audioCtx.currentTime);
 
       let codeForProcessorModule = [
-        "./src/essentia-wasm.umd.js",
-        "./src/essentia.js-extractor.umd.js",
-        "./src/essentia-processor.js",
-        "./src/ringbuf.js",
+        "../src/essentia-wasm.umd.js",
+        "../src/essentia.js-extractor.umd.js",
+        "../src/essentia-processor.js",
+        "../src/ringbuf.js",
       ];
 
       // inject Essentia.js code into AudioWorkletGlobalScope context, then setup audio graph and start animation
