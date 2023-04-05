@@ -291,12 +291,6 @@ const createResultContainer = () => {
   const playButton = resultContainer.querySelector(".play");
   playButton.addEventListener("click", () => {
     const utterance = { name: alternative, keyframes: renderKeyframes() };
-    let time = utterance.keyframes[utterance.keyframes.length - 1].time;
-    utterance.keyframes.push({
-      name: ".",
-      time: time + releaseTime / speed,
-      intensity: 0,
-    });
     console.log("utterance", utterance);
     throttledSend({ utterance });
   });
@@ -464,21 +458,6 @@ const createResultContainer = () => {
         .cloneNode(true)
         .querySelector(".phoneme");
 
-      /*
-      phonemeContainer
-        .querySelectorAll("[name='pitchCurve']")
-        .forEach((pitchCurveRadio) => {
-          pitchCurveRadio.name = `pitchCurve-${resultContainerIndex}-${index}`;
-          pitchCurveRadio.addEventListener("input", () => {
-            const pitchCurve = pitchCurveRadio.value;
-            const pitchedKeyframe = _keyframes[0];
-            if (pitchedKeyframe) {
-              pitchedKeyframe.pitchCurve = pitchCurve;
-            }
-          });
-        });
-      */
-
       const semitonesInput = phonemeContainer.querySelector(".semitones");
       semitonesInput.addEventListener("input", (event) => {
         const semitones = Number(event.target.value);
@@ -516,18 +495,6 @@ const createResultContainer = () => {
       if (_keyframe.timeDelta > 0) {
         time += _keyframe.timeDelta / speed;
         _keyframe.time = time;
-        /*
-        if ("pitchCurve" in keyframe) {
-          switch (keyframe.pitchCurve) {
-            case "rising":
-              frequency *= 2 ** (5 / 12);
-              break;
-            case "falling":
-              frequency /= 2 ** (5 / 12);
-              break;
-          }
-        }
-        */
         if ("semitones" in keyframe) {
           const { semitones } = keyframe;
           frequency *= 2 ** (semitones / 12);

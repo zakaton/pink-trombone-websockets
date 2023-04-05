@@ -1032,3 +1032,127 @@ const phonemeSubstitutions = {
     },
   },
 };
+
+const generateKeyframes = (pronunciation) => {
+  const keyframes = [];
+  Array.from(pronunciation).forEach((phoneme, index) => {
+    if (nonPhonemeIPAs.includes(phoneme)) {
+      return;
+    }
+
+    let offsetTime = 0.1;
+
+    let holdTime = 0;
+    let nextPhoneme = pronunciation[index + 1];
+    if (nextPhoneme == "ˈ" || nextPhoneme == "ˌ") {
+      holdTime = holdTimes[nextPhoneme];
+    }
+
+    const { type, voiced, constrictions } = phonemes[phoneme];
+    if (type == "consonant") {
+      holdTime = consonantHoldTime;
+    }
+
+    const _keyframes = [];
+    constrictions.forEach((constriction, index) => {
+      let name = phoneme;
+      if (constrictions.length > 1) {
+        name += `(${index})`;
+      }
+
+      const keyframe = {
+        intensity: 1,
+        name,
+        timeDelta:
+          index == constrictions.length - 1
+            ? timeBetweenPhonemes
+            : timeBetweenSubPhonemes,
+        "frontConstriction.diameter": 5,
+        "backConstriction.diameter": 5,
+      };
+
+      let voiceness = defaultVoiceness;
+      if (type == "consonant") {
+        voiceness = voiced ? defaultVoiceness : defaultVoiceless;
+      }
+      Object.assign(keyframe, deconstructVoiceness(voiceness));
+
+      for (const key in constriction) {
+        for (const subKey in constriction[key]) {
+          let string = key;
+          if (key != "tongue") {
+            string += "Constriction";
+          }
+          string += `.${subKey}`;
+          keyframe[string] = constriction[key][subKey];
+        }
+      }
+      _keyframes.push(keyframe);
+
+      const holdKeyframe = Object.assign({}, keyframe);
+      holdKeyframe.isHold = true;
+      holdKeyframe.timeDelta = holdTime;
+      holdKeyframe.name = `${holdKeyframe.name}]`;
+      _keyframes.push(holdKeyframe);
+
+      if (index == 0 && type == "consonant" && !voiced) {
+        // add keyframe after first to change to voiced
+        Object.assign(_keyframes[0], deconstructVoiceness(defaultVoiceness));
+        _keyframes[0].intensity = 0;
+        const voicedToVoicelessKeyframe = Object.assign({}, _keyframes[0]);
+        voicedToVoicelessKeyframe.name = `{${voicedToVoicelessKeyframe.name}`;
+        //voicedToVoicelessKeyframe.isHold = false;
+        voicedToVoicelessKeyframe.timeDelta = 0.001;
+        voicedToVoicelessKeyframe.intensity = 0.8;
+        Object.assign(
+          voicedToVoicelessKeyframe,
+          deconstructVoiceness(defaultVoiceless)
+        );
+        _keyframes.splice(1, 0, voicedToVoicelessKeyframe);
+
+        // add keyframe after last to change back to voiced
+        const voicelessToVoicedKeyframe = Object.assign(
+          {},
+          _keyframes[_keyframes.length - 1]
+        );
+        voicelessToVoicedKeyframe.timeDelta = 0.001;
+        voicelessToVoicedKeyframe.name = `${voicelessToVoicedKeyframe.name}}`;
+        //voicelessToVoicedKeyframe.isHold = false;
+
+        //voicelessToVoicedKeyframe.intensity = 0;
+        Object.assign(
+          voicelessToVoicedKeyframe,
+          deconstructVoiceness(defaultVoiceness)
+        );
+        _keyframes.push(voicelessToVoicedKeyframe);
+      }
+    });
+    keyframes.push(..._keyframes);
+  });
+  return keyframes;
+};
+
+const RenderKeyframes = (keyframes, time = 0, frequency = 140, speed = 1) => {
+  const _keyframes = [];
+  keyframes.forEach((keyframe) => {
+    const _keyframe = Object.assign({}, keyframe);
+    if (_keyframe.timeDelta > 0) {
+      time += _keyframe.timeDelta / speed;
+      _keyframe.time = time;
+      if ("semitones" in keyframe) {
+        const { semitones } = keyframe;
+        frequency *= 2 ** (semitones / 12);
+      }
+      _keyframe.frequency = frequency;
+      delete _keyframe.timeDelta;
+      _keyframes.push(_keyframe);
+    }
+  });
+  _keyframes.push({
+    name: ".",
+    time: time + releaseTime / speed,
+    frequency,
+    intensity: 0,
+  });
+  return _keyframes;
+};

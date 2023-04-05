@@ -102,7 +102,9 @@ if (typeof TextToIPA !== "object") {
       }
 
       console.log("TextToIPA: Done parsing.");
-      createMarkovChain();
+      if (window.Markov) {
+        createMarkovChain();
+      }
     };
   }
 
@@ -192,19 +194,24 @@ if (typeof TextToIPA !== "object") {
 // Load dict
 // Could be intensive, might only want to load when necessary. Therefore it is commented out.
 // Feel free to re-enable if you want to just load the dictionary here, instead of somewhere else
-window.onload = TextToIPA.loadDict("../src/ipadict.txt");
+window.onload = TextToIPA.loadDict("../src/english.txt");
+
+const nonPhonemeIPAs = ["ˈ", "ˌ", "."];
+
+const trimPronunciation = (pronunciation) => {
+  nonPhonemeIPAs.forEach((nonPhonemeIPA) => {
+    pronunciation = pronunciation.replaceAll(nonPhonemeIPA, "");
+  });
+  return pronunciation;
+};
 
 let markov;
 const createMarkovChain = () => {
   markov = new Markov();
   for (let phonemeString in TextToIPA._WordDict) {
-    nonPhonemeIPAs.forEach((nonPhonemeIPA) => {
-      phonemeString = phonemeString.replaceAll(nonPhonemeIPA, "");
-    });
+    phonemeString = trimPronunciation(phonemeString);
     markov.addStates(phonemeString);
   }
   markov.train();
   console.log("done training markov chain");
 };
-
-const nonPhonemeIPAs = ["ˈ", "ˌ", "."];

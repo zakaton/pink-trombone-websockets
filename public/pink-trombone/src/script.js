@@ -234,6 +234,19 @@ const { send } = setupWebsocket("pink-trombone", (message) => {
             voiceness = voiced ? 0.8 : 0.0;
           }
           setVoiceness(voiceness);
+          if (!("intensity" in message)) {
+            exponentialRampToValueAtTime(pinkTromboneElement.intensity, 1);
+            exponentialRampToValueAtTime(
+              pinkTromboneElement.intensity,
+              1,
+              0.1 * constrictions.length
+            );
+            exponentialRampToValueAtTime(
+              pinkTromboneElement.intensity,
+              0,
+              0.1 * constrictions.length + 1
+            );
+          }
           constrictions.forEach((constriction, index) => {
             const { tongue, front, back } = constriction;
             const nodes = [];
@@ -274,7 +287,7 @@ const { send } = setupWebsocket("pink-trombone", (message) => {
             }
             nodes.forEach(({ node, value }) => {
               // FIX timing
-              exponentialRampToValueAtTime(node, value, 0.01 + index * 0.3);
+              exponentialRampToValueAtTime(node, value, 0.01 + index * 0.1);
             });
           });
           setTimeout(() => {
@@ -332,7 +345,7 @@ function exponentialRampToValueAtTime(node, value, offset = 0.01) {
   if (value == 0) {
     value = 0.0001;
   }
-  node.cancelAndHoldAtTime(pinkTromboneElement.audioContext.currentTime);
+  //node.cancelAndHoldAtTime(pinkTromboneElement.audioContext.currentTime);
   node.exponentialRampToValueAtTime(
     value,
     pinkTromboneElement.audioContext.currentTime + offset

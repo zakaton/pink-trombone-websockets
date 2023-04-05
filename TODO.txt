@@ -1,9 +1,5 @@
 pronunciation
-  type in word
-  show large text with pronunciation under it
-  click on each phoneme to hear it being said
-  highlight each phoneme as it is hear
-  listen for phonemes from knn
+  highlight each phoneme as it is heard
   can type with spoken phonemes for speech recognition (can use "autocorrect" to find similar existing words, like error detection)
 facial animation (ready player me) - can also animate from tts
 wordplay
