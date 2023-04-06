@@ -1,8 +1,3 @@
-pronunciation
-  record demo
-speech recognition
-  text input converting phonemes to words (with clear button)
-  listen for phonemes to fill text input
 facial animation (ready player me) - can also animate from tts
 wordplay
   input word and it gives rhymes, similar words, puns...
