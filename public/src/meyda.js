@@ -1,5 +1,5 @@
 if (!useEssentia) {
-  const audio = new Audio();
+  audio = new Audio();
   const audioContext = new AudioContext();
   gainNode = audioContext.createGain();
   autoResumeAudioContext(audioContext);

@@ -1,5 +1,5 @@
 const useEssentia = searchParams.get("essentia") !== null;
-let gainNode;
+let gainNode, audio
 const constrictions = {
   getData() {
     if (this.hasAllConstrictions()) {
