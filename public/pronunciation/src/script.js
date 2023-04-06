@@ -1,8 +1,17 @@
 const { send } = setupWebsocket("pronunciation", (message) => {
-  if (message.from == "knn") {
-    const { results } = message;
-    const { name, weight } = results[0];
-    // FILL 3 - highlight phonemes as they're said
+  if (selectedPronunciation) {
+    if (message.from == "knn") {
+      const { results } = message;
+      const { name, weight } = results[0];
+      if (name == trimmedSelectedPronunciation[currentPhonemeIndex]) {
+        if (currentPhonemeIndex + 1 == trimmedSelectedPronunciation.length) {
+          //reset();
+          setPhonemeIndex(currentPhonemeIndex + 1);
+        } else {
+          setPhonemeIndex(currentPhonemeIndex + 1);
+        }
+      }
+    }
   }
 });
 
@@ -16,13 +25,15 @@ const throttledSend = throttle((message) => {
 
 const wordInput = document.getElementById("word");
 let word, pronunciations;
-let selectedPronunciation = 0;
+let selectedPronunciation;
+let trimmedSelectedPronunciation;
+let currentPhonemeIndex = 0;
 wordInput.addEventListener("input", (event) => {
   word = event.target.value;
   pronunciations = TextToIPA._IPADict[word] || [];
   updatePronunciations();
   setPronunciation(pronunciations[0]);
-  playButton.style.display = pronunciations.length == 0 ? "none" : "";
+  buttonsContainer.style.display = pronunciations.length == 0 ? "none" : "";
 });
 
 const pronunciationsContainer = document.getElementById("pronunciations");
@@ -47,6 +58,23 @@ const updatePronunciations = () => {
   });
 };
 
+const setPhonemeIndex = (phonemeIndex) => {
+  currentPhonemeIndex = phonemeIndex;
+  phonemesContainer.querySelectorAll("span").forEach((span, index) => {
+    if (index < phonemeIndex) {
+      span.classList.add("spoken");
+    } else {
+      span.classList.remove("spoken");
+    }
+
+    if (index == phonemeIndex) {
+      span.classList.add("current");
+    } else {
+      span.classList.remove("current");
+    }
+  });
+};
+
 let highlightedPhoneme;
 let debouncedSilence = debounce(() => {
   if (!highlightedPhoneme) {
@@ -59,72 +87,69 @@ let playPhonemeOnHover = true;
 const phonemesContainer = document.getElementById("phonemes");
 const setPronunciation = (pronunciation) => {
   selectedPronunciation = pronunciation;
+
   console.log("selectedPronunciation", selectedPronunciation);
 
   phonemesContainer.innerHTML = "";
   if (pronunciation) {
-    const trimmedPronunciation = trimPronunciation(pronunciation);
-    Array.from(trimmedPronunciation).forEach((phoneme, index) => {
+    trimmedSelectedPronunciation = trimPronunciation(selectedPronunciation);
+    Array.from(trimmedSelectedPronunciation).forEach((phoneme, index) => {
       const span = document.createElement("span");
       span.innerText = phoneme;
       span.addEventListener("mouseenter", () => {
-        span.classList.add("highlighted");
-        highlightedPhoneme = phoneme;
-      });
-      span.addEventListener("mouseleave", () => {
-        span.classList.remove("highlighted");
-        highlightedPhoneme = undefined;
-      });
-      span.addEventListener("mouseenter", () => {
         if (playPhonemeOnHover) {
+          span.classList.add("highlighted");
+          highlightedPhoneme = phoneme;
           throttledSend({ phoneme, intensity: 1 });
         }
       });
       span.addEventListener("mouseleave", () => {
         if (playPhonemeOnHover) {
+          span.classList.remove("highlighted");
+          highlightedPhoneme = undefined;
           debouncedSilence();
         }
       });
 
       span.addEventListener("mousedown", () => {
         if (!playPhonemeOnHover) {
+          span.classList.add("highlighted");
+          highlightedPhoneme = phoneme;
           throttledSend({ phoneme, intensity: 1 });
         }
       });
       span.addEventListener("mouseup", () => {
         if (!playPhonemeOnHover) {
+          span.classList.remove("highlighted");
+          highlightedPhoneme = undefined;
           throttledSend({ intensity: 0 });
         }
       });
 
       phonemesContainer.appendChild(span);
     });
+    setPhonemeIndex(0);
   }
 };
+
+const buttonsContainer = document.getElementById("buttons");
 
 const playButton = document.getElementById("play");
 playButton.addEventListener("click", () =>
   playPronunciation(selectedPronunciation)
 );
-
 const playPronunciation = (pronunciation) => {
   let keyframes = generateKeyframes(pronunciation);
   keyframes = RenderKeyframes(keyframes);
   const utterance = { name: word, keyframes };
   throttledSend({ utterance });
-  // FILL 2 - send to pink trombone
 };
 
-let holdTimes = {
-  ˈ: 0.05,
-  ˌ: 0.05,
-  ".": 0.05,
+const resetButton = document.getElementById("reset");
+resetButton.addEventListener("click", () => {
+  reset();
+});
+
+const reset = () => {
+  setPhonemeIndex(0);
 };
-let consonantHoldTime = 0.05;
-let timeBetweenSubResults = 0.1; // seconds
-let spaceTime = 0;
-let releaseTime = 0.1;
-let timeBetweenPhonemes = 0.1;
-let timeBetweenSubPhonemes = 0.05;
-let defaultVoiceness = 0.8;
-let defaultVoiceless = 0.2;

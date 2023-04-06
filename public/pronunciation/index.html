@@ -14,8 +14,14 @@
       font-weight: bold;
       user-select: none;
     }
-    #phonemes > span:hover {
+    #phonemes > span.spoken {
+      color: green;
+    }
+    #phonemes > span.current {
       color: orange;
+    }
+    #phonemes > span.highlighted {
+      color: red;
     }
   </style>
   <body>
@@ -46,7 +52,10 @@
 
     <div id="phonemes"></div>
     <br />
-    <button style="display: none" id="play">play</button>
+    <div id="buttons" style="display: none">
+      <button id="play">play</button>
+      <button id="reset">reset</button>
+    </div>
   </body>
   <script src="./src/script.js"></script>
 </html>

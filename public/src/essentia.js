@@ -40,7 +40,6 @@ if (useEssentia) {
   // global audio node variables
   let mic;
   let gain;
-  let gainNode;
   let essentiaNode;
   let splitter;
 

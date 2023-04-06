@@ -1,5 +1,5 @@
 const useEssentia = searchParams.get("essentia") !== null;
-
+let gainNode;
 const constrictions = {
   getData() {
     if (this.hasAllConstrictions()) {
@@ -110,7 +110,7 @@ const lastNSpectrums = [];
 let numberOfLoudnessesToAverage = 5;
 const lastNLoudnesses = [];
 
-let loudnessThreshold = 0.03;
+let loudnessThreshold = 0.02;
 
 let _spectrum, _loudness;
 let selectedClassification, selectedClassificationContainer;
@@ -304,10 +304,11 @@ function interpolate(from, to, interpolation) {
   return (1 - interpolation) * from + interpolation * to;
 }
 
-let shouldSendToPinkTrombone = true;
-let shouldSendToGame = true;
+let shouldSendToPinkTrombone = false;
+let shouldSendToGame = false;
 let shouldSendToVVVV = true;
-let shouldSendToRobot = true;
+let shouldSendToRobot = false;
+let shouldSendToPronunciation = false;
 const throttledSendToPinkTrombone = throttle((message) => {
   if (shouldSendToPinkTrombone) {
     send({ to: ["pink-trombone"], type: "message", ...message });
@@ -319,14 +320,17 @@ const throttledSendToVVVV = throttle((message) => {
   }
 }, 20);
 const throttledSendToGame = throttle(() => {
-  if (shouldSendToGame || shouldSendToRobot) {
-    const to = [];
-    if (shouldSendToGame) {
-      to.push("game");
-    }
-    if (shouldSendToRobot) {
-      to.push("robot");
-    }
+  const to = [];
+  if (shouldSendToGame) {
+    to.push("game");
+  }
+  if (shouldSendToRobot) {
+    to.push("robot");
+  }
+  if (shouldSendToPronunciation) {
+    to.push("pronunciation");
+  }
+  if (to.length > 0) {
     const _results = [];
     filteredSortedClassifications.forEach(({ name, index }) => {
       _results.push({ name, weight: results.confidences[index] });

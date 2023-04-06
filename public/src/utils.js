@@ -1033,6 +1033,19 @@ const phonemeSubstitutions = {
   },
 };
 
+let holdTimes = {
+  ˈ: 0.05,
+  ˌ: 0.05,
+  ".": 0.05,
+};
+let consonantHoldTime = 0.05;
+let timeBetweenSubResults = 0.1; // seconds
+let spaceTime = 0;
+let releaseTime = 0.1;
+let timeBetweenPhonemes = 0.1;
+let timeBetweenSubPhonemes = 0.05;
+let defaultVoiceness = 0.8;
+let defaultVoiceless = 0.2;
 const generateKeyframes = (pronunciation) => {
   const keyframes = [];
   Array.from(pronunciation).forEach((phoneme, index) => {

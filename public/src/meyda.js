@@ -1,7 +1,7 @@
 if (!useEssentia) {
   const audio = new Audio();
   const audioContext = new AudioContext();
-  const gainNode = audioContext.createGain();
+  gainNode = audioContext.createGain();
   autoResumeAudioContext(audioContext);
   let startedMicrophone = false;
 

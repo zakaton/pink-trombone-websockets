@@ -1,6 +1,8 @@
 pronunciation
-  highlight each phoneme as it is heard
-  can type with spoken phonemes for speech recognition (can use "autocorrect" to find similar existing words, like error detection)
+  record demo
+speech recognition
+  text input converting phonemes to words (with clear button)
+  listen for phonemes to fill text input
 facial animation (ready player me) - can also animate from tts
 wordplay
   input word and it gives rhymes, similar words, puns...
