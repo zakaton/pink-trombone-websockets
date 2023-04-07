@@ -46,7 +46,7 @@ function downloadJSON(json) {
 
 const playButton = document.getElementById("play");
 playButton.addEventListener("click", () => {
-  const utterance = getUtterance();
+  const utterance = getUtterance(true);
   throttledSend({ utterance });
 });
 
@@ -279,6 +279,14 @@ const createResultContainer = () => {
   const playButton = resultContainer.querySelector(".play");
   playButton.addEventListener("click", () => {
     const utterance = { name: alternative, keyframes: renderKeyframes() };
+    const { time, frequency } =
+      utterance.keyframes[utterance.keyframes.length - 1];
+    utterance.keyframes.push({
+      name: ".",
+      time: time + releaseTime / speed,
+      frequency,
+      intensity: 0,
+    });
     console.log("utterance", utterance);
     throttledSend({ utterance });
   });

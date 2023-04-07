@@ -1,4 +1,7 @@
 facial animation (ready player me) - can also animate from tts
+  function to set mouth shape from phoneme
+  receive "phoneme" message
+  receive "utterance" message (get phoneme "name" from keys)
 wordplay
   input word and it gives rhymes, similar words, puns...
 shape manipulation (orbit object, scale, move around... - 'z' to toggle maipulation modes)
@@ -16,3 +19,11 @@ NICE TO HAVES
     smooth-out phonemes, e.g. "is this" => "iz zis", where the sudden change of voice/voiceless smooths out, or tongue-twisters that alternate between similar phonemes "really likes" to "lilly rikes", switching particular phonemes
     similar words (get phonetic difference between words, and calculate distance between phonemes by constriction values), and syllables/rhymes (use same number of syllables to make a new "bar"), and apply autocorrect?
     blank keys for song placeholders (retain syllables and fill in phonemes (or phoneme classes/rhymes, or sub-phrases like regex for phonemes) - useful for songs or setting words to a beat)
+    for consonants like h/k/m, use the next vowel to determine where to put the tongue
+    add timeDelta to multi-consonant phonemes themselves for pre-set timing
+    speed can affect the phonemes (speaking slowly "over-anunciates", and quickly removes phonemes)
+    can add "umms" randomly, or mix up phonemes, e.g. "downstairs" to "sound-dairs"
+    find "cross-homophones", where mapping the english.txt through a phonetic substitution/accent can be interpreted as a different word in the orignal voice, e.g. "keys" can sound like "kiss" when sounding...italian?
+    drop phonemes if the end of one word is the same/similar to the next, e.g. "next time" to "necks I'm"
+    pronounce things literally, e.g. "store" as "story" because it ends in "e" (like how children read stuff incorrectly because of arbitrary rules), or "th" in Thomas instead of saying it like "Tomas"
+    Pronunciation like commas, which change the pitch temporarily (The ball, which is red, bounced), or a question mark can change inflection of the last word

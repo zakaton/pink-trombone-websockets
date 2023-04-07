@@ -25,20 +25,7 @@ httpsServer.listen(443, () => {
   console.log("server listening on https://localhost");
 });
 
-const clients = {
-  debug: new Set(),
-  vvvv: new Set(),
-  game: new Set(),
-  "pink-trombone": new Set(),
-  pitch: new Set(),
-  "pocket-sphinx": new Set(),
-  "machine-learning": new Set(),
-  mfcc: new Set(),
-  knn: new Set(),
-  robot: new Set(),
-  tts: new Set(),
-  pronunciation: new Set(),
-};
+const clients = {};
 
 const wss = new WebSocket.Server({ server: httpServer });
 wss.on("connection", (ws) => {
@@ -55,7 +42,10 @@ wss.on("connection", (ws) => {
         console.log(
           `received initial message from the "${webpageName}" webpage`
         );
-        clients[webpageName]?.add(ws);
+        if (!clients[webpageName]) {
+          clients[webpageName] = new Set();
+        }
+        clients[webpageName].add(ws);
         break;
       case "message":
         to.forEach((receiver) => {

@@ -1,5 +1,5 @@
 const useEssentia = searchParams.get("essentia") !== null;
-let gainNode, audio
+let gainNode, audio;
 const constrictions = {
   getData() {
     if (this.hasAllConstrictions()) {
@@ -306,6 +306,7 @@ function interpolate(from, to, interpolation) {
 
 let shouldSendToPinkTrombone = false;
 let shouldSendToGame = false;
+let shouldSendToLipSync = false;
 let shouldSendToVVVV = true;
 let shouldSendToRobot = false;
 let shouldSendToPronunciation = false;
@@ -323,6 +324,9 @@ const throttledSendToGame = throttle(() => {
   const to = [];
   if (shouldSendToGame) {
     to.push("game");
+  }
+  if (shouldSendToLipSync) {
+    to.push("lip-sync");
   }
   if (shouldSendToRobot) {
     to.push("robot");

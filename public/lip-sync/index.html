@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <title>Lip Sync</title>
+    <script src="./../src/aframe.min.js"></script>
+    <!-- https://github.com/elbobo/aframe-gltf-morph-component -->
+    <script src="./src/aframe-gltf-morph-component.js"></script>
+  </head>
+  <body>
+    <a-scene
+      renderer="colorManagement: true; antialias: false;"
+      vr-mode-ui="enabled: false"
+    >
+      <a-assets>
+        <a-asset-item id="readyPlayerMe" src="./avatar.glb"></a-asset-item>
+      </a-assets>
+      <a-entity id="avatar" gltf-model="#readyPlayerMe"></a-entity>
+      <a-camera
+        look-controls="enabled: false;"
+        wasd-controls="enabled: false;"
+        position="0 0.59 0.4"
+        fov="60"
+      ></a-camera>
+    </a-scene>
+  </body>
+  <script src="./../src/utils.js"></script>
+  <script src="./src/script.js"></script>
+</html>
