@@ -399,6 +399,7 @@ const phonemes = {
         },
       },
       {
+        timeDelta: 0,
         tongue: {
           index: 22.66060447692871,
           diameter: 1.5032392740249634,
@@ -643,6 +644,7 @@ const phonemes = {
     ],
   },
   "👄": {
+    example: "ulcer (c)",
     constrictions: {
       tongue: {
         index: 17.572158813476562,
@@ -651,6 +653,7 @@ const phonemes = {
     },
   },
   "👅": {
+    name: "under (u)",
     constrictions: {
       tongue: {
         index: 23.101163864135742,
@@ -831,6 +834,12 @@ function inverseLerp(x, y, value) {
   }
 }
 
+// https://github.com/mrdoob/three.js/blob/master/src/math/MathUtils.js#L62
+// https://en.wikipedia.org/wiki/Linear_interpolation
+function lerp(x, y, t) {
+  return (1 - t) * x + t * y;
+}
+
 // https://github.com/aframevr/aframe/blob/f5f2790eca841bf633bdaa0110b0b59d36d7e854/src/utils/index.js#L140
 /**
  * Returns debounce function that gets called only once after a set of repeated calls.
@@ -866,7 +875,7 @@ const alternateIPAs = {
   //i: "ɪ",
   //u: "w",
   //ɔ: "ɒ",
-  ʤ: "tʃ",
+  ʤ: "dʒ",
   ʧ: "tʃ",
 };
 
@@ -1043,7 +1052,7 @@ let timeBetweenSubResults = 0.1; // seconds
 let spaceTime = 0;
 let releaseTime = 0.1;
 let timeBetweenPhonemes = 0.1;
-let timeBetweenSubPhonemes = 0.05;
+let timeBetweenSubPhonemes = 0.01;
 let defaultVoiceness = 0.8;
 let defaultVoiceless = 0.2;
 const generateKeyframes = (pronunciation) => {
@@ -1169,3 +1178,5 @@ const RenderKeyframes = (keyframes, time = 0, frequency = 140, speed = 1) => {
   });
   return _keyframes;
 };
+
+const nonPhonemeIPAs = ["ˈ", "ˌ", "."];

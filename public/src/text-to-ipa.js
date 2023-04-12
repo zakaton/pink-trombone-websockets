@@ -42,6 +42,8 @@
 // beforehand
 /* eslint-disable no-console, no-undef */
 
+const useMarkov = true || searchParams.get("markov") !== null;
+
 // Create a TextToIPA object only if one does not already exist. We create the
 // methods in a closure to avoid creating global variables.
 if (typeof TextToIPA !== "object") {
@@ -102,8 +104,11 @@ if (typeof TextToIPA !== "object") {
       }
 
       console.log("TextToIPA: Done parsing.");
-      if (window.Markov) {
+      if (window.Markov && useMarkov) {
         createMarkovChain();
+        if (createWordMarkov) {
+          createWordMarkovChain();
+        }
       }
     };
   }
@@ -196,8 +201,6 @@ if (typeof TextToIPA !== "object") {
 // Feel free to re-enable if you want to just load the dictionary here, instead of somewhere else
 window.onload = TextToIPA.loadDict("../src/english.txt");
 
-const nonPhonemeIPAs = ["ˈ", "ˌ", "."];
-
 const trimPronunciation = (pronunciation) => {
   nonPhonemeIPAs.forEach((nonPhonemeIPA) => {
     pronunciation = pronunciation.replaceAll(nonPhonemeIPA, "");
@@ -214,4 +217,15 @@ const createMarkovChain = () => {
   }
   markov.train();
   console.log("done training markov chain");
+};
+
+let wordMarkov;
+const createWordMarkov = false;
+const createWordMarkovChain = () => {
+  wordMarkov = new Markov();
+  for (let wordString in TextToIPA._IPADict) {
+    wordMarkov.addStates(wordString);
+  }
+  wordMarkov.train();
+  console.log("done training word markov chain");
 };

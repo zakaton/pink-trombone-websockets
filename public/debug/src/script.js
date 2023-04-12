@@ -8,7 +8,7 @@ const { send } = setupWebsocket("debug", (message) => {
 
 const throttledSend = throttle((message) => {
   send({
-    to: ["pink-trombone", "machine-learning", "mfcc", "knn", "tts"],
+    to: ["pink-trombone", "machine-learning", "mfcc", "knn", "tts", "lip-sync"],
     type: "message",
     ...message,
   });
@@ -95,7 +95,17 @@ for (const phoneme in phonemes) {
 phonemeSelect.addEventListener("input", (event) => {
   const phoneme = event.target.value;
   if (phoneme.length > 0) {
-    throttledSend({ phoneme });
+    if (true) {
+      throttledSend({ phoneme });
+    } else {
+      throttledSend({
+        utterance: {
+          name: phoneme,
+          keyframes: RenderKeyframes(generateKeyframes(phoneme)),
+        },
+      });
+    }
+
     event.target.value = "";
   }
 });

@@ -333,6 +333,7 @@ const createResultContainer = () => {
 
       let offsetTime = 0.1;
       let holdTime = 0;
+      let offsetBetweenSubPhonemes = timeBetweenSubPhonemes;
 
       const setOffsetTime = (_offsetTime) => {
         offsetTime = _offsetTime;
@@ -349,10 +350,25 @@ const createResultContainer = () => {
         }
       };
 
+      const setOffsetBetweenSubPhonemes = (_offsetBetweenSubPhonemes) => {
+        offsetBetweenSubPhonemes = _offsetBetweenSubPhonemes;
+        const subPhonemeKeyframes = _keyframes.filter(
+          (keyframe) => keyframe.isSubPhoneme
+        );
+        subPhonemeKeyframes.forEach((subPhonemeKeyframe) => {
+          subPhonemeKeyframe.timeDelta = offsetBetweenSubPhonemes;
+        });
+      };
+
+      let hasSubPhonemes = false;
+
       if (phoneme in phonemes) {
         const { type, voiced, constrictions } = phonemes[phoneme];
         if (type == "consonant") {
           holdTime = consonantHoldTime;
+        }
+        if (constrictions.length > 1) {
+          hasSubPhonemes = true;
         }
         constrictions.forEach((constriction, index) => {
           let name = phoneme;
@@ -360,13 +376,14 @@ const createResultContainer = () => {
             name += `(${index})`;
           }
 
+          const isSubPhoneme = index > 0;
           const keyframe = {
+            isSubPhoneme,
             intensity: 1,
             name,
-            timeDelta:
-              index == constrictions.length - 1
-                ? timeBetweenPhonemes
-                : timeBetweenSubPhonemes,
+            timeDelta: !isSubPhoneme
+              ? timeBetweenPhonemes
+              : timeBetweenSubPhonemes,
             "frontConstriction.diameter": 5,
             "backConstriction.diameter": 5,
           };
@@ -478,6 +495,17 @@ const createResultContainer = () => {
         holdInput.value = holdTime;
       }
 
+      const offsetBetweenSubPhonemesInput = phonemeContainer.querySelector(
+        ".offsetBetweenSubPhonemes"
+      );
+      offsetBetweenSubPhonemesInput.addEventListener("input", (event) => {
+        setOffsetBetweenSubPhonemes(Number(event.target.value));
+      });
+
+      if (!hasSubPhonemes) {
+        offsetBetweenSubPhonemesInput.parentElement.style.display = "none";
+      }
+
       phonemeContainer.querySelector(".text").innerText = phoneme;
       phonemesContainer.appendChild(phonemeContainer);
     });
@@ -518,7 +546,7 @@ const clearResultContainers = () => {
 
 const throttledSend = throttle((message) => {
   send({
-    to: ["pink-trombone"],
+    to: ["pink-trombone", "lip-sync"],
     type: "message",
     ...message,
   });
