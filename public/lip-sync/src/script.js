@@ -1,6 +1,6 @@
 /*
   TODO
-    test voice
+    interpolate voice
 */
 
 const { send } = setupWebsocket("lip-sync", (message) => {
@@ -14,14 +14,28 @@ const { send } = setupWebsocket("lip-sync", (message) => {
     playKeyframes(utterance.keyframes);
   } else if (results) {
     const { name: phoneme } = results[0];
-    setMouthFromPhoneme(phoneme);
-    debouncedResetMouth();
+    const morphTargets = phonemeToMorphTargets[phoneme];
+    if (morphTargets) {
+      interpolateTowardsMorphTargets(morphTargets);
+      debouncedResetMouth();
+    }
   }
 });
 
+const interpolateTowardsMorphTargets = (morphTargets, interpolation = 0.5) => {
+  for (const name in morphTargetDictionary) {
+    const key = morphTargetDictionary[name];
+    morphTargetInfluences[key] = lerp(
+      morphTargetInfluences[key] || 0,
+      morphTargets[name] || 0,
+      interpolation
+    );
+  }
+};
+
 const debouncedResetMouth = debounce(() => {
   playKeyframes(RenderKeyframes(generateKeyframes(".")));
-}, 200);
+}, 100);
 
 const isDebug = searchParams.get("debug") != undefined;
 
@@ -50,7 +64,7 @@ const playKeyframes = (_keyframes) => {
   } else {
     keyframes.push(..._keyframes);
   }
-  console.log("keyframes", keyframes.slice());
+  //console.log("keyframes", keyframes.slice());
 
   if (!isAnimationRunning) {
     isAnimationRunning = true;
@@ -112,21 +126,36 @@ const unpackPhoneme = (phoneme) => {
 };
 const getMorphTargetsFromPhoneme = ({ phoneme, index }) => {
   let morphTargets = {};
-  if (index > 0) {
-    const _phoneme = phoneme + index;
-    if (_phoneme in phonemeToMorphTargets) {
-      Object.assign(morphTargets, phonemeToMorphTargets[_phoneme]);
-    } else {
-      Object.assign(morphTargets, phonemeToMorphTargets[phoneme]);
-      morphTargets.mouthOpen = 0.5;
-    }
+  if (!phoneme) {
+    morphTargets = getCurrentMorphTargets();
   } else {
-    morphTargets = Object.assign(morphTargets, phonemeToMorphTargets[phoneme]);
+    if (index > 0) {
+      const _phoneme = phoneme + index;
+      if (_phoneme in phonemeToMorphTargets) {
+        Object.assign(morphTargets, phonemeToMorphTargets[_phoneme]);
+      } else {
+        Object.assign(morphTargets, phonemeToMorphTargets[phoneme]);
+        morphTargets.mouthOpen = 0.5;
+      }
+    } else {
+      morphTargets = Object.assign(
+        morphTargets,
+        phonemeToMorphTargets[phoneme]
+      );
+    }
   }
   if (!morphTargets) {
     //console.warn("no morphTargets for ", phoneme, index);
   }
   return morphTargets;
+};
+const getCurrentMorphTargets = () => {
+  const currentMorphTargets = {};
+  for (const name in morphTargetDictionary) {
+    const key = morphTargetDictionary[name];
+    currentMorphTargets[name] = morphTargetInfluences[key];
+  }
+  return currentMorphTargets;
 };
 const setMouthFromPhonemes = (fromPhoneme, toPhoneme, interpolation = 0) => {
   let morphTargets = {};
