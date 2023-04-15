@@ -72,7 +72,7 @@ const audioContext = new AudioContext();
 const gainNode = audioContext.createGain();
 autoResumeAudioContext(audioContext);
 
-const numberOfMFCCCoefficients = 13;
+const numberOfMFCCCoefficients = 21;
 let numberOfMFCCsToAverage = 3;
 const lastNMFCCs = [];
 

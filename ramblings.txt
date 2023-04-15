@@ -1,11 +1,15 @@
 lip-sync
 wordplay
   input word and it gives rhymes, similar words, puns...
-  startup ideas
+  alliteration
   "bars" for lyrics
-  find nearest word phonemes given other phonemes
+  find nearest word phonemes given other phonemes, e.g. "rise" and "rice"
   attempt to pronounce non-words (e.g. license plates)
-  puns (find overlap between words, e.g. pun+funny => punny)
+  puns (find overlap between words, e.g. pun+funny => punny - use to make "startup" names)
+  generate mispelled words (take regular word, then note how phonemes can be spelled, e.g. replace "f" with "gh" as in "rough" => "rouff" => "ruff")
+  figure out how to make a {phoneme: [...possible spellings]} and VV, e.g. {f: ["f", "gh"]}
+  find words inside other words, like "I need a" in "Anita"
+  play with suffixes/prefixes to words, like "go" and "un-go", when we have explicit words like "stop", or "upload" and "unload", where we assume a prefix like "up" in "upload" (taking the first syllable)
 shape manipulation (orbit object, scale, move around... - 'z' to toggle maipulation modes)
 SFX (make wind or ocean sound by making the similar sound)
 Make up a language? (custom phonemes, words, morphology, syntax, lexicon)
@@ -36,3 +40,4 @@ NICE TO HAVES
     pronounce things literally, e.g. "store" as "story" because it ends in "e" (like how children read stuff incorrectly because of arbitrary rules), or "th" in Thomas instead of saying it like "Tomas"
     Pronunciation like commas, which change the pitch temporarily (The ball, which is red, bounced), or a question mark can change inflection of the last word
     given multiple languages, one can map a word in one language to its phonemes, and then to another language's words (or find the closest words in the other language to see how it can be interpreted) - can be useful to see how words can be interpreted by others who don't know (or make double meaning if bilingual)
+    Use syntax to break a sentence down into a tree, figuring which words to emphasize (e.g. the subject of a sentence), and adding the ability to map poses in animation to certain words that can be re-ordered when translated to different languages with different word order - can also add typography to the words for simpler emphasis (bold, italic, underline, color), which can affect the pitch, speed, duration...
