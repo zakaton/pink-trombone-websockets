@@ -16,7 +16,19 @@ Make up a language? (custom phonemes, words, morphology, syntax, lexicon)
 Scrabble, but with phonemes?
 use markov chain to not only mkae up giberish, but convert it back to english (mapping from english characters/strings to phonemes, e.g. "ch" maps to that "tj" symbol, or simple r to r, where you can give it a random word and it can predict how to pronounce it, e.g. chophouse, being cho-pho-use vs chop-house) - can also make up english words using a markov chain and guess the pronunciation
 
+Grapheme Algorithm
+  an algorithm where given a {word: [...phonemes]} dictionary, figure out a substitution where for each phoneme, figure all the possible graphemes it can produce, e.g. 'θ' can produce "th", but generative from the lexicon
+  each phoneme may produce multiple graphemes, but multiple phonemes may produce a single letter
+  can can start with an empty {phoneme: [...productions]}, and for each new word add all the possible partitions of the word (and link the original word it came from), looking for similar examples. after the entire dictionary is parsed trim all the productions that only appear once
+
 NICE TO HAVES
+  wordplay
+    note overlapping words (the end of one word matches the beginning of another), e.g. apple+please => applease
+    misheard lyrics and bad lip reasings (text to phonemes, phonemes to visemes, visemes back to phonemes, and back to words)
+    use markov chain to find regex of a language (tendencies of phonetic strings), then figure difficult or easy sentences (whatever the most likely phoneme to follow, find the least likely phoneme to follow)
+    given a sentence, find a similar sentence using different words (the last amount of phoneme changes to make a comletely different sentence) - similar to eminem's lyrics
+    phoneme placeholders, where a phoneme can be generalized (z/s, generalizing voiceness), specify a consonant or vowel, or just a blank phoneme where gaps are filled, e.g. "a_l" can be "apple" or "at all" or...you get the idea - can be interesting for alliteration... - can have consonants and it fills the blanks with vowels, e.g. "_m_n" can be "simon" or "rhymin'" or "omen"...
+    regex-like phoneme patterns, generating words/utterances following the pattern, e.g. alternating vowels/consonants to avoid consonant clusters
   pink-trombone
     add "easing" feature to keyframes, allowing for quick changes (e.g. voiceness change)
   pronunciation
@@ -41,3 +53,6 @@ NICE TO HAVES
     Pronunciation like commas, which change the pitch temporarily (The ball, which is red, bounced), or a question mark can change inflection of the last word
     given multiple languages, one can map a word in one language to its phonemes, and then to another language's words (or find the closest words in the other language to see how it can be interpreted) - can be useful to see how words can be interpreted by others who don't know (or make double meaning if bilingual)
     Use syntax to break a sentence down into a tree, figuring which words to emphasize (e.g. the subject of a sentence), and adding the ability to map poses in animation to certain words that can be re-ordered when translated to different languages with different word order - can also add typography to the words for simpler emphasis (bold, italic, underline, color), which can affect the pitch, speed, duration...
+    intensity input for each phoneme
+    breath duration (will become more voiceless/hoarse and raise in pitch the longer you go without pausing (will have a little "gasp" for breath utterance))
+    talkig fast may remove the last part/consonant of a word, e.g. "I'm talking really fast" to "I ta'in rea fas"
