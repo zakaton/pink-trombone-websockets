@@ -380,13 +380,26 @@ const createResultContainer = () => {
       let hasSubPhonemes = false;
 
       if (phoneme in phonemes) {
-        const { type, voiced, constrictions } = phonemes[phoneme];
+        const phonemeInfo = phonemes[phoneme];
+        const { type, voiced, constrictions } = phonemeInfo;
+
         if (type == "consonant") {
           holdTime = consonantHoldTime;
         }
         if (constrictions.length > 1) {
           hasSubPhonemes = true;
         }
+
+        if ("offsetTime" in phonemeInfo) {
+          offsetTime = phonemeInfo.offsetTime;
+        }
+        if ("holdTime" in phonemeInfo) {
+          holdTime = phonemeInfo.holdTime;
+        }
+        if ("offsetBetweenSubPhonemes" in phonemeInfo) {
+          offsetBetweenSubPhonemes = phonemeInfo.offsetBetweenSubPhonemes;
+        }
+
         constrictions.forEach((constriction, index) => {
           let name = phoneme;
           if (constrictions.length > 1) {
@@ -506,6 +519,7 @@ const createResultContainer = () => {
       });
 
       const offsetInput = phonemeContainer.querySelector(".offset");
+      offsetInput.value = offsetTime;
       offsetInput.addEventListener("input", (event) => {
         setOffsetTime(Number(event.target.value));
       });
@@ -513,6 +527,7 @@ const createResultContainer = () => {
         offsetInput.value = offsetTime;
       }
       const holdInput = phonemeContainer.querySelector(".hold");
+      holdInput.value = holdTime;
       holdInput.addEventListener("input", (event) => {
         setHoldTime(Number(event.target.value));
       });
@@ -523,6 +538,7 @@ const createResultContainer = () => {
       const offsetBetweenSubPhonemesInput = phonemeContainer.querySelector(
         ".offsetBetweenSubPhonemes"
       );
+      offsetBetweenSubPhonemesInput.value = offsetBetweenSubPhonemes;
       offsetBetweenSubPhonemesInput.addEventListener("input", (event) => {
         setOffsetBetweenSubPhonemes(Number(event.target.value));
       });

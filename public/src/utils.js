@@ -151,6 +151,7 @@ const phonemes = {
     voiced: true,
     graphemes: ["g", "gg", "gh", "gu", "gue"],
     example: "gun",
+    holdTime: 0.01,
     constrictions: [
       {
         back: {
@@ -387,6 +388,8 @@ const phonemes = {
     voiced: true,
     graphemes: ["ng", "n", "ngue"],
     example: "ring",
+    holdTime: 0.01,
+    offsetBetweenSubPhonemes: 0,
     constrictions: [
       {
         tongue: {
@@ -399,7 +402,6 @@ const phonemes = {
         },
       },
       {
-        timeDelta: 0,
         tongue: {
           index: 22.66060447692871,
           diameter: 1.5032392740249634,

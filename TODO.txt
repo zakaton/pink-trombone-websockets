@@ -1,3 +1,4 @@
 TTS
-  timeDelta for multi-phoneme keyframes (plosives), like "hang"
-  voice* keyframes set a "change" keyframe (also update timeline editor)
+  easing keyframe type
+  voice shift setValueAtTime (pink-trombone)
+  timeline editor keyframe type (UI and playback)

@@ -23,6 +23,10 @@ Grapheme Algorithm
 NICE TO HAVES
   wordplay
     note overlapping words (the end of one word matches the beginning of another), e.g. apple+please => applease
+    phonetic anagrams
+    freudian slip - can blend the word you were gonna say with the actual word to say, interrupting to fix yourself - can also just mix words in general with pauses to correct, adding "I mean"
+    given 2 languages, one can make a sentence that means something in both languages (both are valid words) - can even type in one sentence and change the words to synonyms that mean something
+    phoneme lookup (type word and it shows the phonemes) - can "type in phonemes" by typing in the word and using the number keys to select which phoneme to use
     misheard lyrics and bad lip reasings (text to phonemes, phonemes to visemes, visemes back to phonemes, and back to words)
     use markov chain to find regex of a language (tendencies of phonetic strings), then figure difficult or easy sentences (whatever the most likely phoneme to follow, find the least likely phoneme to follow)
     given a sentence, find a similar sentence using different words (the last amount of phoneme changes to make a comletely different sentence) - similar to eminem's lyrics
@@ -36,6 +40,7 @@ NICE TO HAVES
     "include in training" checkboxes for /knn classes (can "mute" some classes, or "solo" others)
     checkboxes to send to PT/game/robot/etc in /knn 
   tts
+    phonetic keyboard (typing in phoneme textarea takes the actual letter and converts it, e.g. "f" turns to "f" as expected, but "th" turns to θ, using "enter" to finish it, sorta like typing on an old phone)
     emotion (happy, sad, sarcastic, etc)
     "filter" button (takes phonemes and replace with similar phonemes, like a substitution button you can re-press multiple times like re-doing image filters), e.g. "blur", "mumble", etc
     contrast in phonetic substitutions (find constriction differences between 2 versions of a single word, and exaggerate the difference in one direction, e.g. a british english mocking an american english accent or vv, where you can hear how different accents perceive each other)
