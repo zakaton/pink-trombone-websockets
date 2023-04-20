@@ -20,12 +20,19 @@ speedInput.addEventListener("input", (event) => {
   //console.log("speed", speed);
 });
 
+let initialFrequency = 140;
+const initialFrequencyInput = document.getElementById("initialFrequency");
+initialFrequencyInput.addEventListener("input", (event) => {
+  initialFrequency = Number(event.target.value);
+  //console.log("initialFrequency", initialFrequency);
+});
+
 const downloadButton = document.getElementById("download");
 downloadButton.addEventListener("click", () => {
   const utterance = getUtterance();
   utterance.keyframes.forEach((keyframe) => {
     if (!("frequency" in keyframe)) {
-      keyframe.frequency = 140;
+      keyframe.frequency = initialFrequency;
     }
   });
   downloadJSON([utterance]);
@@ -56,7 +63,7 @@ const getUtterance = () => {
   return utterance;
 };
 
-const renderKeyframes = (time = 0, frequency = 140) => {
+const renderKeyframes = (time = 0, frequency = initialFrequency) => {
   const keyframes = [];
   resultsContainer.querySelectorAll(".result").forEach((resultContainer) => {
     const _keyframes = resultContainer.renderKeyframes(time, frequency);
@@ -333,8 +340,18 @@ const createResultContainer = () => {
 
       let offsetTime = 0.1;
       let holdTime = 0;
+      let intensity = 1;
       let offsetBetweenSubPhonemes = timeBetweenSubPhonemes;
 
+      const setIntensity = (_intensity) => {
+        intensity = _intensity;
+        _keyframes.forEach((keyframe) => {
+          if (!keyframe.isSilent) {
+            const intensityMultiplier = keyframe.intensityMultiplier || 1;
+            keyframe.intensity = intensity * intensityMultiplier;
+          }
+        });
+      };
       const setOffsetTime = (_offsetTime) => {
         offsetTime = _offsetTime;
         const keyframe = _keyframes[0];
@@ -419,11 +436,14 @@ const createResultContainer = () => {
               deconstructVoiceness(defaultVoiceness)
             );
             _keyframes[0].intensity = 0;
+            _keyframes[0].isSilent = true;
             const voicedToVoicelessKeyframe = Object.assign({}, _keyframes[0]);
             voicedToVoicelessKeyframe.name = `{${voicedToVoicelessKeyframe.name}`;
             //voicedToVoicelessKeyframe.isHold = false;
             voicedToVoicelessKeyframe.timeDelta = 0.001;
+            voicedToVoicelessKeyframe.isSilent = false;
             voicedToVoicelessKeyframe.intensity = 0.8;
+            voicedToVoicelessKeyframe.intensityMultiplier = 0.8;
             Object.assign(
               voicedToVoicelessKeyframe,
               deconstructVoiceness(defaultVoiceless)
@@ -480,6 +500,11 @@ const createResultContainer = () => {
         }
       });
 
+      const intensityInput = phonemeContainer.querySelector(".intensity");
+      intensityInput.addEventListener("input", (event) => {
+        setIntensity(Number(event.target.value));
+      });
+
       const offsetInput = phonemeContainer.querySelector(".offset");
       offsetInput.addEventListener("input", (event) => {
         setOffsetTime(Number(event.target.value));
@@ -512,7 +537,7 @@ const createResultContainer = () => {
     //console.log("keyframes", keyframes);
     updatePhonemesInput();
   };
-  const renderKeyframes = (time = 0, frequency = 140) => {
+  const renderKeyframes = (time = 0, frequency = initialFrequency) => {
     const _keyframes = [];
     keyframes.forEach((keyframe) => {
       const _keyframe = Object.assign({}, keyframe);

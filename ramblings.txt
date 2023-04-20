@@ -1,4 +1,3 @@
-lip-sync
 wordplay
   input word and it gives rhymes, similar words, puns...
   alliteration
@@ -44,7 +43,6 @@ NICE TO HAVES
     similar words (get phonetic difference between words, and calculate distance between phonemes by constriction values), and syllables/rhymes (use same number of syllables to make a new "bar"), and apply autocorrect?
     blank keys for song placeholders (retain syllables and fill in phonemes (or phoneme classes/rhymes, or sub-phrases like regex for phonemes) - useful for songs or setting words to a beat)
     for consonants like h/k/m, use the next vowel to determine where to put the tongue
-    add timeDelta to multi-consonant phonemes themselves for pre-set timing
     speed can affect the phonemes (speaking slowly "over-anunciates", and quickly removes phonemes)
     can add "umms" randomly, or mix up phonemes, e.g. "downstairs" to "sound-dairs"
     find "cross-homophones", where mapping the english.txt through a phonetic substitution/accent can be interpreted as a different word in the orignal voice, e.g. "keys" can sound like "kiss" when sounding...italian?
@@ -53,6 +51,5 @@ NICE TO HAVES
     Pronunciation like commas, which change the pitch temporarily (The ball, which is red, bounced), or a question mark can change inflection of the last word
     given multiple languages, one can map a word in one language to its phonemes, and then to another language's words (or find the closest words in the other language to see how it can be interpreted) - can be useful to see how words can be interpreted by others who don't know (or make double meaning if bilingual)
     Use syntax to break a sentence down into a tree, figuring which words to emphasize (e.g. the subject of a sentence), and adding the ability to map poses in animation to certain words that can be re-ordered when translated to different languages with different word order - can also add typography to the words for simpler emphasis (bold, italic, underline, color), which can affect the pitch, speed, duration...
-    intensity input for each phoneme
     breath duration (will become more voiceless/hoarse and raise in pitch the longer you go without pausing (will have a little "gasp" for breath utterance))
-    talkig fast may remove the last part/consonant of a word, e.g. "I'm talking really fast" to "I ta'in rea fas"
+    talking fast may remove the last part/consonant of a word, e.g. "I'm talking really fast" to "I ta'in rea fas"

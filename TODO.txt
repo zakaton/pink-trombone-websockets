@@ -1,0 +1,3 @@
+TTS
+  timeDelta for multi-phoneme keyframes (plosives), like "hang"
+  voice* keyframes set a "change" keyframe (also update timeline editor)
