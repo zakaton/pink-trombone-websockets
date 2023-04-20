@@ -1,4 +1,0 @@
-TTS
-  easing keyframe type
-  voice shift setValueAtTime (pink-trombone)
-  timeline editor keyframe type (UI and playback)
