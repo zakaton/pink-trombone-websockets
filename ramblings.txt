@@ -32,8 +32,6 @@ NICE TO HAVES
     given a sentence, find a similar sentence using different words (the last amount of phoneme changes to make a comletely different sentence) - similar to eminem's lyrics
     phoneme placeholders, where a phoneme can be generalized (z/s, generalizing voiceness), specify a consonant or vowel, or just a blank phoneme where gaps are filled, e.g. "a_l" can be "apple" or "at all" or...you get the idea - can be interesting for alliteration... - can have consonants and it fills the blanks with vowels, e.g. "_m_n" can be "simon" or "rhymin'" or "omen"...
     regex-like phoneme patterns, generating words/utterances following the pattern, e.g. alternating vowels/consonants to avoid consonant clusters
-  pink-trombone
-    add "easing" feature to keyframes, allowing for quick changes (e.g. voiceness change)
   pronunciation
     eye-tracking to "read" words and they're spoken aloud
   knn

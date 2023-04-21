@@ -3,21 +3,8 @@
     <title>Machine Learning</title>
   </head>
 
-  <style>
-    #topPrediction {
-      font-weight: bold;
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      font-size: 100px;
-    }
-  </style>
-
   <body>
-    <span id="topPrediction"></span>
-    <button id="toggleMicrophone" disabled>enable microphone</button>
-    <br />
-    <canvas width="500" height="200" id="spectrum"></canvas>
+    <canvas id="mfcc"></canvas>
     <br />
     <input
       type="number"
@@ -37,14 +24,8 @@
     <label>load model <input type="file" multiple id="upload" /></label>
     <br />
   </body>
-
-  <script src="./../src/ml5.min.js"></script>
   <script src="./../src/utils.js"></script>
-
-  <script src="./src/script.js"></script>
-
-  <script src="./../src/essentia.js"></script>
-  <script src="./../src/ringbuf.js"></script>
   <script src="./../src/meyda.min.js"></script>
-  <script src="./../src/meyda.js"></script>
+  <script src="./../src/ml5.min.js"></script>
+  <script src="./src/script.js"></script>
 </html>

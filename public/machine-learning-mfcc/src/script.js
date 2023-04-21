@@ -1,28 +1,18 @@
+/* global setupWebsocket, autoResumeAudioContext, Meyda, ml5, throttle*/
+
 const constrictions = {
   getData() {
     if (this.hasAllConstrictions()) {
-      const classifications = {};
+      const data = {};
       for (const type in this) {
         if (typeof this[type] == "object" && "index" in this[type]) {
           for (const subtype in this[type]) {
-            classifications[`${type}.${subtype}`] = this[type][subtype];
+            data[`${type}.${subtype}`] = this[type][subtype];
           }
         }
       }
-      return classifications;
+      return data;
     }
-  },
-  tongue: {
-    index: 12.89,
-    diameter: 2.43,
-  },
-  frontConstriction: {
-    index: 43,
-    diameter: 1.8,
-  },
-  backConstriction: {
-    diameter: 1.8,
-    index: 10.5,
   },
   hasAllConstrictions() {
     return Boolean(
@@ -56,128 +46,96 @@ const { send } = setupWebsocket(
 );
 
 /** @type {HTMLCanvasElement} */
-const spectrumCanvas = document.getElementById("spectrum");
-const spectrumContext = spectrumCanvas.getContext("2d");
-
-spectrumContext.strokeStyle = "black";
+const mfccCanvas = document.getElementById("mfcc");
+const mfccContext = mfccCanvas.getContext("2d");
+let mfccDrawRange = 200;
+mfccContext.strokeStyle = "black";
 /**
- * @param {number[]} spectrum
+ * @param {number[]} mfcc
  */
-function drawSpectrum(spectrum, canvas, context, otherSpectrum) {
-  const { width: w, height: h } = canvas;
-  context.clearRect(0, 0, w, h);
-  if (otherSpectrum) {
-    _drawSpectrum(otherSpectrum, "blue", canvas, context);
-  }
-  if (spectrum) {
-    _drawSpectrum(spectrum, "black", canvas, context);
-  }
-}
-
-const spectrumRange = { min: Infinity, max: -Infinity };
-const updateSpectrum = (value) => {
-  let didUpdateRange = false;
-  if (value < spectrumRange.min) {
-    spectrumRange.min = value;
-    didUpdateRange = true;
-  } else if (value > spectrumRange.max) {
-    spectrumRange.max = value;
-    didUpdateRange = true;
-  }
-  if (didUpdateRange) {
-    spectrumRange.range = spectrumRange.max - spectrumRange.min;
-  }
-};
-const normalizeValue = (value) => {
-  return (value - spectrumRange.min) / spectrumRange.range;
-};
-function _drawSpectrum(spectrum, color = "black", canvas, context) {
-  const { width: w, height: h } = canvas;
-  const segmentLength = w / spectrum.length;
-  context.strokeStyle = color;
-  spectrum.forEach((value, index) => {
-    const normalizedValue = normalizeValue(value);
-    let height = 1 - normalizedValue;
+function drawMFCC(mfcc) {
+  const { width: w, height: h } = mfccCanvas;
+  mfccContext.clearRect(0, 0, w, h);
+  const segmentLength = w / mfcc.length;
+  mfcc.forEach((value, index) => {
+    let height = 1 - value / mfccDrawRange;
     height *= h;
-    context.beginPath();
-    context.moveTo(index * segmentLength, height);
-    context.lineTo((index + 1) * segmentLength, height);
-    context.stroke();
+    height -= h / 2;
+    mfccContext.beginPath();
+    mfccContext.moveTo(index * segmentLength, height);
+    mfccContext.lineTo((index + 1) * segmentLength, height);
+    mfccContext.stroke();
   });
 }
 
 const audioContext = new AudioContext();
-gainNode = audioContext.createGain();
+const gainNode = audioContext.createGain();
 autoResumeAudioContext(audioContext);
 
-let numberOfSpectrumsToAverage = 5;
-const lastNSpectrums = [];
-let numberOfLoudnessesToAverage = 5;
-const lastNLoudnesses = [];
+const numberOfMFCCCoefficients = 21;
+let numberOfMFCCsToAverage = 3;
+const lastNMFCCs = [];
 
-let loudnessThreshold = 0.02;
+let analyzer;
+let _mfcc;
+const audio = new Audio();
+navigator.mediaDevices
+  .getUserMedia({
+    audio: {
+      noiseSuppression: false,
+      autoGainControl: false,
+      echoCancellation: false,
+    },
+  })
+  .then((stream) => {
+    window.stream = stream;
+    const sourceNode = audioContext.createMediaStreamSource(stream);
+    sourceNode.connect(gainNode);
+    audio.srcObject = stream;
 
-let _spectrum, _loudness;
+    // Create a Meyda analyzer node to calculate MFCCs
+    analyzer = Meyda.createMeydaAnalyzer({
+      audioContext: audioContext,
+      source: gainNode,
+      featureExtractors: ["mfcc", "rms"],
+      bufferSize: 2 ** 10,
+      //hopSize: 2 ** 8,
+      numberOfMFCCCoefficients,
+      callback: ({ mfcc, rms }) => {
+        lastNMFCCs.push(mfcc);
+        while (lastNMFCCs.length > numberOfMFCCsToAverage) {
+          lastNMFCCs.shift();
+        }
+        mfcc = mfcc.map((_, index) => {
+          let sum = 0;
+          lastNMFCCs.forEach((_mfcc) => {
+            sum += _mfcc[index];
+          });
+          return sum / lastNMFCCs.length;
+        });
+        _mfcc = mfcc;
 
-const onData = ({ spectrum, loudness }) => {
-  lastNSpectrums.push(spectrum);
-  while (lastNSpectrums.length > numberOfSpectrumsToAverage) {
-    lastNSpectrums.shift();
-  }
-  spectrum = spectrum.map((_, index) => {
-    let sum = 0;
-    lastNSpectrums.forEach((_spectrum) => {
-      sum += _spectrum[index];
+        drawMFCC(mfcc);
+        if (rms > rmsThreshold) {
+          if (isCollectingData) {
+            addData(mfcc);
+            numberOfSamplesCollected++;
+            if (numberOfSamplesCollected >= numberOfSamplesToCollect) {
+              toggleDataCollection();
+            }
+          }
+          if (finishedTraining) {
+            predictThrottled(mfcc);
+          }
+        }
+      },
     });
-    return sum / lastNSpectrums.length;
+
+    // Start the analyzer to begin processing audio data
+    analyzer.start();
   });
-  spectrum.forEach((value) => updateSpectrum(value));
 
-  if (!neuralNetwork) {
-    neuralNetwork = ml5.neuralNetwork({
-      inputs: spectrum.length,
-      outputs,
-
-      task: "regression",
-      debug: "true",
-      //learningRate: 0.1,
-      //hiddenUnity: 16,
-    });
-  }
-
-  lastNLoudnesses.push(loudness);
-  while (lastNLoudnesses.length > numberOfLoudnessesToAverage) {
-    lastNLoudnesses.shift();
-  }
-  let loudnessSum = 0;
-  lastNLoudnesses.forEach((_loudness) => (loudnessSum += _loudness));
-  loudness = loudnessSum / lastNLoudnesses.length;
-
-  drawSpectrum(spectrum, spectrumCanvas, spectrumContext);
-
-  if (loudness > loudnessThreshold) {
-    if (isCollectingData) {
-      addData(spectrum);
-      numberOfSamplesCollected++;
-      if (numberOfSamplesCollected >= numberOfSamplesToCollect) {
-        toggleDataCollection();
-      }
-    }
-    if (finishedTraining) {
-      predictThrottled(spectrum);
-    }
-    _spectrum = spectrum;
-    //throttledSendToVVVV({ spectrum, to: ["vvvv"] });
-  } else {
-    if (finishedTraining) {
-      const message = {
-        intensity: Math.min(getInterpolation(0, 0.15, loudness), 1),
-      };
-      throttledSend(message);
-    }
-  }
-  _loudness = loudness;
-};
+let rmsThreshold = 0.01;
 
 let includeBackConstriction = false;
 let includeFrontConstriction = false;
@@ -193,7 +151,15 @@ if (includeVoiceness) {
   outputs.push("voiceness");
 }
 
-let neuralNetwork;
+const neuralNetwork = ml5.neuralNetwork({
+  inputs: numberOfMFCCCoefficients,
+  outputs,
+
+  task: "regression",
+  debug: "true",
+  //learningRate: 0.1,
+  //hiddenUnity: 16,
+});
 
 const addDataButton = document.getElementById("addData");
 addDataButton.addEventListener("click", (event) => {

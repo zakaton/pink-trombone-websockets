@@ -3,6 +3,8 @@ if (location.href.startsWith("http://")) {
 }
 
 const searchParams = new URLSearchParams(location.search);
+const useEssentia = searchParams.get("essentia") !== null;
+let gainNode, audio;
 
 /**
  * Resumes the audiocontext when it's suspended after a user clicks

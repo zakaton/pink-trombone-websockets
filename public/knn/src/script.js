@@ -1,5 +1,3 @@
-const useEssentia = searchParams.get("essentia") !== null;
-let gainNode, audio;
 const constrictions = {
   getData() {
     if (this.hasAllConstrictions()) {
@@ -102,8 +100,6 @@ function _drawSpectrum(spectrum, color = "black", canvas, context) {
     context.stroke();
   });
 }
-
-const numberOfSpectrumCoefficients = 30;
 
 let numberOfSpectrumsToAverage = 5;
 const lastNSpectrums = [];
