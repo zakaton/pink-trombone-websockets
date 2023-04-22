@@ -8,7 +8,13 @@ pinkTromboneElement.addEventListener("load", (event) => {
   pinkTromboneElement.setAudioContext(audioContext).then((pinkTrombone) => {
     pinkTromboneElement.enableUI();
     pinkTromboneElement.startUI();
-    pinkTromboneElement.connect(pinkTromboneElement.audioContext.destination);
+    if (location.href.includes("default")) {
+      pinkTromboneElement.pinkTrombone._pinkTromboneNode.connect(
+        pinkTromboneElement.audioContext.destination
+      );
+    } else {
+      pinkTromboneElement.connect(pinkTromboneElement.audioContext.destination);
+    }
     pinkTromboneElement.start();
     frontConstriction = pinkTromboneElement.newConstriction(43, 1.8);
     pinkTromboneElement.frontConstriction = frontConstriction;
