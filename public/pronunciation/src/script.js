@@ -1,4 +1,4 @@
-const { send } = setupWebsocket("pronunciation", (message) => {
+const { send } = setupConnection("pronunciation", (message) => {
   if (selectedPronunciation) {
     if (message.from == "knn") {
       const { results } = message;

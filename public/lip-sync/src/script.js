@@ -3,7 +3,7 @@
     interpolate voice
 */
 
-const { send } = setupWebsocket("lip-sync", (message) => {
+const { send } = setupConnection("lip-sync", (message) => {
   const { phoneme, utterance, results } = message;
   if (phoneme) {
     const keyframes = RenderKeyframes(generateKeyframes(phoneme));

@@ -31,7 +31,7 @@ const constrictions = {
   },
 };
 let voiceness = 0.7;
-const { send } = setupWebsocket(
+const { send } = setupConnection(
   "machine-learning",
   (message) => {
     if (message.from == "pink-trombone") {

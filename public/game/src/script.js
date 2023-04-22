@@ -1,11 +1,9 @@
-/* global setupWebsocket, THREE */
-
 const vectorOffset = new THREE.Vector3();
 const eulerOffset = new THREE.Euler();
 const cameraEuler = new THREE.Euler();
 let vectorScalar = 0.05;
 let eulerScalar = 0.05;
-const { send } = setupWebsocket("game", (message) => {
+const { send } = setupConnection("game", (message) => {
   const { results, loudness } = message;
   vectorOffset.set(0, 0, 0);
   eulerOffset.set(0, 0, 0);

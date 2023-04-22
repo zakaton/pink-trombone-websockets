@@ -1,5 +1,3 @@
-/* global setupWebsocket, autoResumeAudioContext, Meyda, ml5, throttle*/
-
 const constrictions = {
   getData() {
     if (this.hasAllConstrictions()) {
@@ -33,7 +31,7 @@ const constrictions = {
   },
 };
 let voiceness = 0.7;
-const { send } = setupWebsocket(
+const { send } = setupConnection(
   "mfcc",
   (message) => {
     if (message.from == "pink-trombone") {

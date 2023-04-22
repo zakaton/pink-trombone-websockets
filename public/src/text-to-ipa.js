@@ -1,5 +1,3 @@
-/* global Markov */
-
 //  text-to-ipa.js
 
 //  This file creates a global TextToIPA object containing the public loadDict

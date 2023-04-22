@@ -1,5 +1,3 @@
-/* global setupWebsocket, autoResumeAudioContext, throttle */
-
 const audioContext = new AudioContext();
 autoResumeAudioContext(audioContext);
 
@@ -163,7 +161,7 @@ function updateVoiceness(tenseness) {
   _voiceness = Math.acos(1 - tenseness) / (Math.PI * 0.5);
 }
 
-const { send } = setupWebsocket("pink-trombone", (message) => {
+const { send } = setupConnection("pink-trombone", (message) => {
   let didSetVoiceness = false;
   let canSetVoiceness = true;
   for (const key in message) {

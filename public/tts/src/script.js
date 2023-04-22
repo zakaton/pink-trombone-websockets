@@ -1,6 +1,4 @@
-/* global setupWebsocket, TextToIPA, phonemes */
-
-const { send } = setupWebsocket("tts", (message) => {
+const { send } = setupConnection("tts", (message) => {
   const { text, phonemes } = message;
   if (text) {
     textInput.value = text;

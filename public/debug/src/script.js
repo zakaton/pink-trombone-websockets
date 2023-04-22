@@ -1,6 +1,4 @@
-/* global setupWebsocket */
-
-const { send } = setupWebsocket("debug", (message) => {
+const { send } = setupConnection("debug", (message) => {
   if (message.from == "pink-trombone") {
     updateUI(message);
   }

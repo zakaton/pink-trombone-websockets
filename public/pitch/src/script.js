@@ -1,6 +1,4 @@
-/* global setupWebsocket, autoResumeAudioContext, Pitchy */
-
-const { send } = setupWebsocket("pitch", (message) => {
+const { send } = setupConnection("pitch", (message) => {
   // FILL
 });
 

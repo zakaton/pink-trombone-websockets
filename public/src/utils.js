@@ -6,13 +6,7 @@ const searchParams = new URLSearchParams(location.search);
 const useEssentia = searchParams.get("essentia") !== null;
 let gainNode, audio;
 
-/**
- * Resumes the audiocontext when it's suspended after a user clicks
- * @param {string} webpageName the name of the webpage this is called from to identify itself
- * @param {function} onMessage is called when the webpage receives websocket messages from the server
- * @returns {object} a send function to send websocket messages to the server
- */
-function setupWebsocket(webpageName, onMessage, onConnect) {
+function setupWebsocketConnection(webpageName, onMessage, onConnect) {
   // Create WebSocket connection.
   let socket;
 
@@ -41,9 +35,51 @@ function setupWebsocket(webpageName, onMessage, onConnect) {
   };
   createSocket();
 
-  function send(object) {
+  const send = (object) => {
     object.from = webpageName;
     socket.send(JSON.stringify(object));
+  };
+
+  return send;
+}
+function setupBroadcastChannel(webpageName, onMessage, onConnect) {
+  let broadcastChannel;
+  const createBroadcastChannel = () => {
+    broadcastChannel = new BroadcastChannel("pink-trombone");
+    broadcastChannel.addEventListener("message", (event) => {
+      //console.log("Message from peer ", event.data);
+      const message = event.data;
+      if (message.to?.includes(webpageName)) {
+        onMessage(message);
+      }
+    });
+    if (onConnect) {
+      onConnect();
+    }
+  };
+  createBroadcastChannel();
+
+  const send = (object) => {
+    object.from = webpageName;
+    broadcastChannel.postMessage(object);
+  };
+
+  return send;
+}
+const useWebSockets = true;
+/**
+ * Resumes the audiocontext when it's suspended after a user clicks
+ * @param {string} webpageName the name of the webpage this is called from to identify itself
+ * @param {function} onMessage is called when the webpage receives websocket messages from the server
+ * @returns {object} a send function to send websocket messages to the server
+ */
+function setupConnection(webpageName, onMessage, onConnect) {
+  let send;
+
+  if (useWebSockets) {
+    send = setupWebsocketConnection(...arguments);
+  } else {
+    send = setupBroadcastChannel(...arguments);
   }
 
   return { send };

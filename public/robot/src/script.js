@@ -1,8 +1,6 @@
-/* global setupWebsocket */
-
 let scalar = 30;
 
-const { send } = setupWebsocket("robot", (message) => {
+const { send } = setupConnection("robot", (message) => {
   if (message.from == "knn") {
     const { results, loudness } = message;
     const { name, weight } = results[0];
