@@ -1,9 +1,7 @@
-Window.message option
-Wordplay Demo
-  type word and see similar words
-  type words and see similar phrases
-  take 2 words and combine them (or 2 classes of words, picking one of each)
-  take a root word and generate prefixes/suffixes (like Wumbo...)
-  note syllables
-  speak fast (remove ending consonants)
-  string similar words (rap)
+Rhyming Dictionary
+  type words
+  get phonemes
+  split into syllables (consonants/vowels)
+  display syllables, with weights on each syllable
+  rate and sort closest words (with syllable offset)
+  display possible "covers"

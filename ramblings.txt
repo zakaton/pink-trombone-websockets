@@ -54,6 +54,7 @@ NICE TO HAVES
     can add "umms" randomly, or mix up phonemes, e.g. "downstairs" to "sound-dairs"
     find "cross-homophones", where mapping the english.txt through a phonetic substitution/accent can be interpreted as a different word in the orignal voice, e.g. "keys" can sound like "kiss" when sounding...italian?
     drop phonemes if the end of one word is the same/similar to the next, e.g. "next time" to "necks I'm"
+    customize phonemes (extra inputs for each phoneme to alter the phoneme, e.g. change voiceness or tongue position)
     pronounce things literally, e.g. "store" as "story" because it ends in "e" (like how children read stuff incorrectly because of arbitrary rules), or "th" in Thomas instead of saying it like "Tomas"
     Pronunciation like commas, which change the pitch temporarily (The ball, which is red, bounced), or a question mark can change inflection of the last word
     given multiple languages, one can map a word in one language to its phonemes, and then to another language's words (or find the closest words in the other language to see how it can be interpreted) - can be useful to see how words can be interpreted by others who don't know (or make double meaning if bilingual)
@@ -63,3 +64,5 @@ NICE TO HAVES
     slider to interpolate timeline
     play in reverse
     import keyframes
+    use web speech recognition to measure timing of spoken words (partial results), as well as loudnes and pitch to time words (and thus their phonemes), allowing for some kind of phonetic transcription
+    vowels and consonants are based on the number of constrictions (consonants usually have 2 for plosives), and vowels don't rely on the front constriction (lips) - consonants rely less on the tongue and more on the front/rear constriction - with this, you can find the closest vowel to a consonant (open mouth), and you can count syllables (mouth opening and closing, or vowel/consonant switching)
