@@ -8,9 +8,20 @@ pinkTromboneElement.addEventListener("load", (event) => {
   pinkTromboneElement.setAudioContext(audioContext).then((pinkTrombone) => {
     pinkTromboneElement.enableUI();
     pinkTromboneElement.startUI();
+    const { audioContext } = pinkTromboneElement;
     if (location.href.includes("default")) {
+      if (audioContext.destination.maxChannelCount >= 6) {
+        audioContext.destination.channelCount = 6;
+        audioContext.destination.maxChannelCount = 6;
+        audioContext.destination.channelCount = 6;
+        audioContext.destination.channelInterpretation = "discrete";
+        audioContext.destination.channelCountMode = "explicit";
+      } else {
+        audioContext.destination.channelCount = 2;
+      }
+
       pinkTromboneElement.pinkTrombone._pinkTromboneNode.connect(
-        pinkTromboneElement.audioContext.destination
+        audioContext.destination
       );
     } else {
       pinkTromboneElement.connect(pinkTromboneElement.audioContext.destination);
