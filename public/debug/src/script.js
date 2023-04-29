@@ -150,3 +150,16 @@ ptsButton.addEventListener("click", () => {
   const phonemes = ptsInput.value;
   throttledSend({ phonemes });
 });
+
+const tractLengthInputs = document.querySelectorAll(".tractLength");
+tractLengthInputs.forEach((tractLengthInput) => {
+  tractLengthInput.addEventListener("input", (event) => {
+    const tractLength = Number(event.target.value);
+    tractLengthInputs.forEach((_tractLengthInput) => {
+      if (_tractLengthInput != tractLengthInput) {
+        _tractLengthInput.value = tractLength;
+      }
+    });
+    throttledSend({ tractLength });
+  });
+});

@@ -225,6 +225,9 @@ const { send } = setupConnection("pink-trombone", (message) => {
       case "frequency":
         node = pinkTromboneElement.frequency;
         break;
+      case "tractLength":
+        node = pinkTromboneElement.tractLength;
+        break;
       case "vibrato.frequency":
         node = pinkTromboneElement.vibrato.frequency;
         break;
