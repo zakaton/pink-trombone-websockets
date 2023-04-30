@@ -24,6 +24,8 @@ NICE TO HAVES
   wordplay
     note overlapping words (the end of one word matches the beginning of another), e.g. apple+please => applease
     phonetic anagrams
+    interpolate words (phonemes from one word to another, or mix-and-match phonemes from both)
+    make up a word (markov chain), try to pronounce it (or generate pronunciations), and come up with a definition of it (or just note similar words to it), 
     freudian slip - can blend the word you were gonna say with the actual word to say, interrupting to fix yourself - can also just mix words in general with pauses to correct, adding "I mean"
     given 2 languages, one can make a sentence that means something in both languages (both are valid words) - can even type in one sentence and change the words to synonyms that mean something
     phoneme lookup (type word and it shows the phonemes) - can "type in phonemes" by typing in the word and using the number keys to select which phoneme to use
@@ -66,3 +68,5 @@ NICE TO HAVES
     import keyframes
     use web speech recognition to measure timing of spoken words (partial results), as well as loudnes and pitch to time words (and thus their phonemes), allowing for some kind of phonetic transcription
     vowels and consonants are based on the number of constrictions (consonants usually have 2 for plosives), and vowels don't rely on the front constriction (lips) - consonants rely less on the tongue and more on the front/rear constriction - with this, you can find the closest vowel to a consonant (open mouth), and you can count syllables (mouth opening and closing, or vowel/consonant switching)
+    how fast is the tongue moving? lips opening/closing? what can one do with that info? each word has a min/max speed - can replace words with slower or faster alternatives...
+
