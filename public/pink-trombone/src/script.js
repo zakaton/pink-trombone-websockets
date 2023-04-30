@@ -112,7 +112,17 @@ function setConstriction(constriction, index, diameter) {
   constriction.diameter.value = diameter;
 }
 
-let indexThreshold = 28;
+let _indexThreshold = 28;
+const getTractLength = () => {
+  return pinkTromboneElement.pinkTrombone._pinkTromboneNode.tractLength.value;
+};
+const getIndexThreshold = () => {
+  return normalizeIndex(_indexThreshold);
+};
+const normalizeIndex = (index, tractLength) => {
+  tractLength = tractLength || getTractLength();
+  return index * (tractLength / 44);
+};
 const updateConstriction = throttle(() => {
   const message = {
     to: ["machine-learning", "debug", "mfcc", "knn"],
@@ -136,7 +146,7 @@ const updateConstriction = throttle(() => {
       pinkTromboneElement.pinkTrombone._pinkTromboneNode._constrictions[2]
     );
     if (!(index == 0 && diameter == 0)) {
-      const isBackConstriction = index < indexThreshold;
+      const isBackConstriction = index < getIndexThreshold();
       const targetConstriction = isBackConstriction
         ? backConstriction
         : frontConstriction;
@@ -184,6 +194,9 @@ const { send } = setupConnection("pink-trombone", (message) => {
   for (const key in message) {
     const value = message[key];
     let valueNumber = Number(value);
+    if (key.endsWith("index")) {
+      valueNumber = normalizeIndex(valueNumber, message.tractLength);
+    }
     let node;
     let nodes = [];
     switch (key) {
@@ -271,18 +284,26 @@ const { send } = setupConnection("pink-trombone", (message) => {
             const features = ["index", "diameter"];
             if (tongue) {
               features.forEach((feature) => {
-                nodes.push({
+                const node = {
                   node: pinkTromboneElement.tongue[feature],
                   value: tongue[feature],
-                });
+                };
+                if (feature == "index") {
+                  node.value = normalizeIndex(node.value, message.tractLength);
+                }
+                nodes.push(node);
               });
             }
             if (front) {
               features.forEach((feature) => {
-                nodes.push({
+                const node = {
                   node: frontConstriction[feature],
                   value: front[feature],
-                });
+                };
+                if (feature == "index") {
+                  node.value = normalizeIndex(node.value, message.tractLength);
+                }
+                nodes.push(node);
               });
             } else {
               exponentialRampToValueAtTime(
@@ -292,10 +313,14 @@ const { send } = setupConnection("pink-trombone", (message) => {
             }
             if (back) {
               features.forEach((feature) => {
-                nodes.push({
+                const node = {
                   node: backConstriction[feature],
                   value: back[feature],
-                });
+                };
+                if (feature == "index") {
+                  node.value = normalizeIndex(node.value, message.tractLength);
+                }
+                nodes.push(node);
               });
             } else {
               exponentialRampToValueAtTime(
@@ -391,9 +416,13 @@ const keyframeStrings = [
 function playKeyframes(keyframes) {
   keyframes.forEach((keyframe) => {
     keyframeStrings.forEach((keyframeString) => {
-      const value = keyframe[keyframeString];
+      let value = keyframe[keyframeString];
       if (value == undefined) {
         return;
+      }
+      const isIndex = keyframeString.endsWith("index");
+      if (isIndex) {
+        value = normalizeIndex(value, keyframe.tractLength);
       }
       const path = keyframeString.split(".");
       let node = pinkTromboneElement;
@@ -402,7 +431,7 @@ function playKeyframes(keyframes) {
       }
       const offset = keyframe.time;
       node.linearRampToValueAtTime(
-        keyframe[keyframeString],
+        value,
         pinkTromboneElement.audioContext.currentTime + offset
       );
     });
