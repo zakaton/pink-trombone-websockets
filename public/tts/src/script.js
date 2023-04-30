@@ -25,12 +25,22 @@ initialFrequencyInput.addEventListener("input", (event) => {
   //console.log("initialFrequency", initialFrequency);
 });
 
+let initialTractLength = 44;
+const initialTractLengthInput = document.getElementById("initialTractLength");
+initialTractLengthInput.addEventListener("input", (event) => {
+  initialTractLength = Number(event.target.value);
+  //console.log("initialTractLength", initialTractLength);
+});
+
 const downloadButton = document.getElementById("download");
 downloadButton.addEventListener("click", () => {
   const utterance = getUtterance();
   utterance.keyframes.forEach((keyframe) => {
     if (!("frequency" in keyframe)) {
       keyframe.frequency = initialFrequency;
+    }
+    if (!("tractLength" in keyframe)) {
+      keyframe.tractLength = initialTractLength;
     }
   });
   downloadJSON([utterance]);
@@ -61,18 +71,29 @@ const getUtterance = () => {
   return utterance;
 };
 
-const renderKeyframes = (time = 0, frequency = initialFrequency) => {
+const renderKeyframes = (
+  time = 0,
+  frequency = initialFrequency,
+  tractLength = initialTractLength
+) => {
   const keyframes = [];
   resultsContainer.querySelectorAll(".result").forEach((resultContainer) => {
-    const _keyframes = resultContainer.renderKeyframes(time, frequency);
-    time = _keyframes[_keyframes.length - 1].time;
-    frequency = _keyframes[_keyframes.length - 1].frequency;
+    const _keyframes = resultContainer.renderKeyframes(
+      time,
+      frequency,
+      tractLength
+    );
+    const lastKeyframe = _keyframes[_keyframes.length - 1];
+    time = lastKeyframe.time;
+    frequency = lastKeyframe.frequency;
+    tractLength = lastKeyframe.tractLength;
     keyframes.push(..._keyframes);
   });
   keyframes.push({
     name: ".",
     time: time + releaseTime / speed,
     frequency,
+    tractLength,
     intensity: 0,
   });
   if (isWhispering) {
@@ -511,6 +532,15 @@ const createResultContainer = () => {
         }
       });
 
+      const tractLengthInput = phonemeContainer.querySelector(".tractLength");
+      tractLengthInput.addEventListener("input", (event) => {
+        const tractLength = Number(event.target.value);
+        const keyframe = _keyframes[0];
+        if (keyframe) {
+          keyframe.tractLength = tractLength;
+        }
+      });
+
       const intensityInput = phonemeContainer.querySelector(".intensity");
       intensityInput.addEventListener("input", (event) => {
         setIntensity(Number(event.target.value));
@@ -540,6 +570,7 @@ const createResultContainer = () => {
       offsetBetweenSubPhonemesInput.addEventListener("input", (event) => {
         setOffsetBetweenSubPhonemes(Number(event.target.value));
       });
+      setOffsetBetweenSubPhonemes(offsetBetweenSubPhonemes);
 
       if (!hasSubPhonemes) {
         offsetBetweenSubPhonemesInput.parentElement.style.display = "none";
@@ -551,7 +582,11 @@ const createResultContainer = () => {
     //console.log("keyframes", keyframes);
     updatePhonemesInput();
   };
-  const renderKeyframes = (time = 0, frequency = initialFrequency) => {
+  const renderKeyframes = (
+    time = 0,
+    frequency = initialFrequency,
+    tractLength = initialTractLength
+  ) => {
     const _keyframes = [];
     keyframes.forEach((keyframe) => {
       const _keyframe = Object.assign({}, keyframe);
@@ -563,6 +598,13 @@ const createResultContainer = () => {
           frequency *= 2 ** (semitones / 12);
         }
         _keyframe.frequency = frequency;
+        if ("tractLength" in keyframe) {
+          const { tractLength: _tractLength } = keyframe;
+          if (tractLength != 0) {
+            tractLength = _tractLength;
+          }
+        }
+        _keyframe.tractLength = tractLength;
         delete _keyframe.timeDelta;
         _keyframes.push(_keyframe);
       }

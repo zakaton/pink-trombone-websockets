@@ -190,6 +190,7 @@ const phonemes = {
     graphemes: ["g", "gg", "gh", "gu", "gue"],
     example: "gun",
     holdTime: 0.01,
+    offsetBetweenSubPhonemes: 0.02,
     constrictions: [
       {
         back: {

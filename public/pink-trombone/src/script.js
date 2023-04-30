@@ -411,6 +411,8 @@ const keyframeStrings = [
   "loudness",
 
   "intensity",
+
+  "tractLength",
 ];
 
 function playKeyframes(keyframes) {

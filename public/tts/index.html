@@ -53,7 +53,7 @@
         <input type="number" value="1" id="speed" step="0.1" min="0.1" max="5"
       /></label>
       <label
-        >initial frequency
+        >frequency
         <input
           type="number"
           value="140"
@@ -61,6 +61,16 @@
           step="1"
           min="20"
           max="990"
+      /></label>
+      <label
+        >tract length
+        <input
+          type="number"
+          value="44"
+          id="initialTractLength"
+          step="1"
+          min="15"
+          max="88"
       /></label>
       <button id="play" disabled>play all</button>
       <label
@@ -134,6 +144,17 @@
               step="1"
               max="100"
               min="-100"
+          /></label>
+
+          <label
+            >tract length
+            <input
+              class="tractLength"
+              type="number"
+              value="0"
+              step="1"
+              min="15"
+              max="88"
           /></label>
 
           <label
