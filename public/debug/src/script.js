@@ -4,12 +4,15 @@ const { send } = setupConnection("debug", (message) => {
   }
 });
 
-const throttledSend = throttle((message) => {
+const _send = (message) => {
   send({
     to: ["pink-trombone", "machine-learning", "mfcc", "knn", "tts", "lip-sync"],
     type: "message",
     ...message,
   });
+};
+const throttledSend = throttle((message) => {
+  _send(message);
 }, 100);
 
 const tongueElements = {
@@ -160,6 +163,6 @@ tractLengthInputs.forEach((tractLengthInput) => {
         _tractLengthInput.value = tractLength;
       }
     });
-    throttledSend({ tractLength });
+    _send({ tractLength });
   });
 });
