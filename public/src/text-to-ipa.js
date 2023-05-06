@@ -61,6 +61,9 @@ if (typeof TextToIPA !== "object") {
   if (typeof TextToIPA._WordDict !== "object") {
     TextToIPA._WordDict = {};
   }
+  if (typeof TextToIPA._SyllableDict !== "object") {
+    TextToIPA._SyllableDict = {};
+  }
 
   // Create a constructor for an IPAWord that makes displaying them and
   // associated errors much easier.
@@ -92,6 +95,9 @@ if (typeof TextToIPA !== "object") {
             TextToIPA._IPADict[word] = [];
           }
           TextToIPA._IPADict[word].push(pronunciation);
+          TextToIPA._SyllableDict[word] = TextToIPA._IPADict[word].map(
+            (pronunciation) => splitPhonemesIntoSyllables(pronunciation)
+          );
 
           pronunciation = pronunciation.replace("ˈ", ""); // remove ˈ
           if (!(pronunciation in TextToIPA._WordDict)) {

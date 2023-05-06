@@ -1,7 +1,5 @@
-Rhyming Dictionary
-  type words
-  get phonemes
-  split into syllables (consonants/vowels)
-  display syllables, with weights on each syllable
-  rate and sort closest words (with syllable offset)
-  display possible "covers"
+record tract length demo
+  play with tract slider
+  play different utterances in different lengths
+  make a single utterance that changes in tract length
+record Rhyming Dictionary demo

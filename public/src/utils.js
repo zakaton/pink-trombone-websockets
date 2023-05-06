@@ -304,7 +304,7 @@ const phonemes = {
     alternative: "b",
   },
   r: {
-    voiced: true,
+    //voiced: true,
     graphemes: ["r", "rr", "wr", "rh"],
     example: "run",
     constrictions: {
@@ -453,7 +453,7 @@ const phonemes = {
     ],
   },
   j: {
-    voiced: true,
+    //voiced: true,
     graphemes: ["y", "i", "j"],
     example: "you",
     constrictions: {
@@ -1221,3 +1221,86 @@ const RenderKeyframes = (keyframes, time = 0, frequency = 140, speed = 1) => {
 };
 
 const nonPhonemeIPAs = ["ˈ", "ˌ", "."];
+
+const getPhonemesAlternativesFromWords = (
+  wordsString,
+  shouldTrimPronunciation = false
+) => {
+  const wordsStrings = wordsString.split(" ");
+  const wordsPhonemesAlternatives = [];
+  const validWordStrings = [];
+
+  wordsStrings.forEach((wordString) => {
+    if (wordString.length > 0) {
+      let ipas = TextToIPA._IPADict[wordString];
+      if (ipas) {
+        validWordStrings.push(wordString);
+        ipas = ipas.slice();
+        if (shouldTrimPronunciation) {
+          ipas = ipas.map((ipa) => trimPronunciation(ipa));
+        }
+        wordsPhonemesAlternatives.push(ipas);
+      }
+    }
+  });
+
+  return { wordsPhonemesAlternatives, validWordStrings };
+};
+
+const splitPhonemesIntoSyllables = (_phonemes) => {
+  const syllables = [];
+
+  let currentSyllable;
+
+  _phonemes = trimDuplicateAdjacentCharacters(_phonemes);
+
+  _phonemes.split("").forEach((phoneme) => {
+    if (phoneme in phonemes) {
+      const { type } = phonemes[phoneme];
+      const isSemiVowel = semiVowels.includes(phoneme);
+      if (
+        currentSyllable &&
+        currentSyllable.type == type &&
+        !isSemiVowel &&
+        !currentSyllable.isSemiVowel
+      ) {
+        currentSyllable.phonemes += phoneme;
+      } else {
+        currentSyllable = { type, phonemes: phoneme, isSemiVowel };
+        syllables.push(currentSyllable);
+      }
+    }
+  });
+  return syllables;
+};
+
+let semiVowels = ["w", "ɚ", "r", "ɹ"];
+semiVowels.length = 0;
+
+const trimDuplicateAdjacentCharacters = (string) =>
+  string
+    .replace(" ", "")
+    .split("")
+    .filter((char, i) => string[i - 1] != char)
+    .join("");
+
+const consonantGroups = [
+  ["b", "p", "m", "n"],
+  ["d", "t", "s", "z", "ð", "θ"],
+  ["dʒ", "h", "tʃ", "ʃ", "ʒ", "ʤ", "ʧ"],
+  ["f", "v", "w"],
+  ["g", "k", "ŋ"],
+  ["r", "ɚ", "ɹ"],
+  ["l"],
+];
+
+const areConsonantsInSameGroup = (a, b) => {
+  let consonantsAreInSameGroup = false;
+  consonantGroups.some((consonantGroup) => {
+    if (consonantGroup.includes(a)) {
+      consonantsAreInSameGroup = consonantGroup.includes(b);
+      return true;
+    }
+  });
+  return consonantsAreInSameGroup;
+};
