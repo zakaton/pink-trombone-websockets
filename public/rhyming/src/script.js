@@ -88,7 +88,7 @@ const findRhymes = () => {
 
   rhymesGrid.innerHTML = "";
   rhymes.length = 0;
-  console.log("syllables", syllables);
+  //console.log("syllables", syllables);
   for (const word in TextToIPA._SyllableDict) {
     TextToIPA._SyllableDict[word].forEach((_syllables) => {
       if (_syllables.length >= syllables.length + 2) {
@@ -171,7 +171,7 @@ const sortRhymes = () => {
       return offsetDifference;
     }
   });
-  console.log("rhymes", rhymes);
+  //console.log("rhymes", rhymes);
   displayRhymes();
 };
 
@@ -216,7 +216,7 @@ const isOutsideRange = (a, b) => {
 let rhymeSelectionsWords = "";
 const updateRhymeSelectionsGrid = () => {
   rhymeSelectionsWords = selectedRhymes.map((rhyme) => rhyme.word).join(" ");
-  console.log("rhyme selections:", rhymeSelectionsWords);
+  //console.log("rhyme selections:", rhymeSelectionsWords);
 
   rhymeSelectionsWordsContainer.innerHTML = "";
   selectedRhymes.forEach((selectedRhyme) => {
@@ -332,7 +332,7 @@ const playSyllables = (words, name) => {
     let keyframes = generateKeyframes(pronunciation);
     keyframes = RenderKeyframes(keyframes);
     const utterance = { name, keyframes };
-    console.log(utterance);
+    //(utterance);
     throttledSend({ utterance });
   }
 };
@@ -350,7 +350,7 @@ const throttledSend = throttle((message) => {
 }, 10);
 
 const clearRhymeSelections = () => {
-  console.log("clear");
+  //console.log("clear");
   selectedRhymes.length = 0;
   updateRhymes();
   updateRhymeSelectionsGrid();
