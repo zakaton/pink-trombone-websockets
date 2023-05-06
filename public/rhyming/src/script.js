@@ -95,7 +95,7 @@ const findRhymes = () => {
         return;
       }
       for (
-        let offset = Math.max(-(_syllables.length - 1), -1);
+        let offset = Math.max(-(_syllables.length - 1), 0);
         offset < syllables.length;
         offset++
       ) {
@@ -114,9 +114,15 @@ const findRhymes = () => {
           const _syllable = _syllables[_index];
           if (
             _syllable &&
-            syllable.type == _syllable.type &&
             syllablesToCheck[index]
           ) {
+            if (syllable.type != _syllable.type) {
+              shouldAddRhyme = false;
+            }
+            if (syllable.isSemiVowel && syllable.phonemes != _syllable.phonemes) {
+              shouldAddRhyme = false;
+            }
+
             if (syllable.type == "vowel") {
               shouldAddRhyme =
                 isNotFalse(shouldAddRhyme) &&
@@ -211,7 +217,7 @@ const getRhymeRange = (rhyme) => {
   return [rhyme.offset, rhyme.offset + rhyme.syllables.length];
 };
 const isOutsideRange = (a, b) => {
-  return a[1] < b[0] || a[0] >= b[1];
+  return a[1] <= b[0] || a[0] >= b[1];
 };
 let rhymeSelectionsWords = "";
 const updateRhymeSelectionsGrid = () => {
@@ -263,6 +269,7 @@ const updateRhymes = () => {
         shouldShow = isOutsideRange(range, _range);
         return shouldShow;
       });
+
       if (shouldShow) {
         child.removeAttribute("hidden");
       } else {

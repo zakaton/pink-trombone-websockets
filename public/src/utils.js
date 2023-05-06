@@ -66,7 +66,7 @@ function setupBroadcastChannel(webpageName, onMessage, onConnect) {
 
   return send;
 }
-const useWebSockets = true;
+const useWebSockets = false;
 /**
  * Resumes the audiocontext when it's suspended after a user clicks
  * @param {string} webpageName the name of the webpage this is called from to identify itself
@@ -1274,8 +1274,8 @@ const splitPhonemesIntoSyllables = (_phonemes) => {
   return syllables;
 };
 
-let semiVowels = ["w", "ɚ", "r", "ɹ"];
-semiVowels.length = 0;
+let semiVowels = ["w", "ɚ", "r", "ɹ", 'j'];
+//semiVowels.length = 0;
 
 const trimDuplicateAdjacentCharacters = (string) =>
   string
