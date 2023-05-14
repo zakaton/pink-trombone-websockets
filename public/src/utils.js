@@ -49,7 +49,7 @@ function setupBroadcastChannel(webpageName, onMessage, onConnect) {
     broadcastChannel.addEventListener("message", (event) => {
       //console.log("Message from peer ", event.data);
       const message = event.data;
-      if (message.to?.includes(webpageName)) {
+      if (message.to && message.to.includes(webpageName)) {
         onMessage(message);
       }
     });
