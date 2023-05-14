@@ -21,6 +21,8 @@ Grapheme Algorithm
   can can start with an empty {phoneme: [...productions]}, and for each new word add all the possible partitions of the word (and link the original word it came from), looking for similar examples. after the entire dictionary is parsed trim all the productions that only appear once
 
 NICE TO HAVES
+  rhyming dictionary
+    include words that overlap by 1 common consonant or vowel, e.g. ("homicide" => "hummus side", where the "s" overlaps, merging as one), where the end of one flows into the start of the next
   wordplay
     note overlapping words (the end of one word matches the beginning of another), e.g. apple+please => applease
     phonetic anagrams
