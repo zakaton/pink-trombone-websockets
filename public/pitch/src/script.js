@@ -56,7 +56,7 @@ function update() {
 
 const audioContext = new window.AudioContext();
 const analyserNode = audioContext.createAnalyser();
-const gainNode = audioContext.createGain();
+gainNode = audioContext.createGain();
 gainNode.connect(analyserNode);
 
 let detector, pitchInput, volumeInput, stream;
