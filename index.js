@@ -28,29 +28,38 @@ httpsServer.listen(443, () => {
 const clients = {};
 
 const wss = new WebSocket.Server({ server: httpServer });
-wss.on("connection", (ws) => {
-  console.log("new ws connection");
+wss.on("connection", (client) => {
+  console.log("new client connection");
   let webpageName;
-  ws.on("message", (data) => {
-    //console.log("ws message received");
+  client.on("message", (data) => {
+    //console.log("client message received");
     const string = data.toString();
     const message = JSON.parse(string);
     const { to, type, command } = message;
     switch (type) {
       case "connection":
         webpageName = message.webpage;
+        client.pinkTromboneId = message.id;
         console.log(
-          `received initial message from the "${webpageName}" webpage`
+          `received initial message from the "${webpageName}-${client.pinkTromboneId}" webpage`
         );
         if (!clients[webpageName]) {
           clients[webpageName] = new Set();
         }
-        clients[webpageName].add(ws);
+        clients[webpageName].add(client);
         break;
       case "message":
         to.forEach((receiver) => {
-          clients[receiver]?.forEach((client) => client.send(string));
+          clients[receiver]?.forEach((_client) => {
+            if (_client.pinkTromboneId == client.pinkTromboneId) {
+              _client.send(string);
+            }
+          });
         });
+        break;
+      case "id":
+        client.pinkTromboneId = message.id;
+        console.log(`updated id "${webpageName}-${client.pinkTromboneId}"`);
         break;
       case "robot":
         const commands = Array.isArray(command) ? command : [command];
@@ -63,9 +72,9 @@ wss.on("connection", (ws) => {
         break;
     }
   });
-  ws.on("close", () => {
+  client.on("close", () => {
     console.log(`"${webpageName}" webpage left`);
-    clients[webpageName]?.delete(ws);
+    clients[webpageName]?.delete(client);
   });
 });
 

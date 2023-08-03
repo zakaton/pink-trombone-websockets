@@ -191,6 +191,10 @@ function updateVoiceness(tenseness) {
 const { send } = setupConnection("pink-trombone", (message) => {
   let didSetVoiceness = false;
   let canSetVoiceness = true;
+  const _pinkTromboneId = message.id || 0;
+  if (_pinkTromboneId != pinkTromboneId) {
+    return;
+  }
   for (const key in message) {
     const value = message[key];
     let valueNumber = Number(value);

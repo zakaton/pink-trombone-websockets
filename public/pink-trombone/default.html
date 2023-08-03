@@ -6,12 +6,19 @@
   </head>
 
   <body>
-    <button
-      id="darkMode"
-      style="position: absolute; left: 0; top: 0; z-index: 100"
-    >
-      🌗
-    </button>
+    <div style="position: absolute; left: 0; top: 0; z-index: 100">
+      <button id="darkMode">🌗</button>
+      <label
+        >index:
+        <input
+          id="pinkTromboneIdInput"
+          type="number"
+          min="0"
+          max="100"
+          step="1"
+          oninput="setPinkTromboneId(event.target.value)"
+      /></label>
+    </div>
     <pink-trombone></pink-trombone>
     <script src="./src/script.js"></script>
   </body>

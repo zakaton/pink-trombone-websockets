@@ -6,6 +6,23 @@ const searchParams = new URLSearchParams(location.search);
 const useEssentia = searchParams.get("essentia") !== null;
 let gainNode, audio;
 
+let pinkTromboneId = searchParams.get("id") || 0;
+const setPinkTromboneId = (id) => {
+  pinkTromboneId = id.toString();
+  searchParams.set("id", pinkTromboneId);
+  window.history.replaceState(null, null, `?${searchParams.toString()}`);
+  send({
+    type: "id",
+    id: pinkTromboneId,
+  });
+};
+window.addEventListener("DOMContentLoaded", () => {
+  const pinkTromboneIdInput = document.getElementById("pinkTromboneIdInput");
+  if (pinkTromboneIdInput) {
+    pinkTromboneIdInput.value = pinkTromboneId;
+  }
+});
+
 function setupWebsocketConnection(webpageName, onMessage, onConnect) {
   // Create WebSocket connection.
   let socket;
@@ -37,6 +54,7 @@ function setupWebsocketConnection(webpageName, onMessage, onConnect) {
 
   const send = (object) => {
     object.from = webpageName;
+    object.id = pinkTromboneId;
     socket.send(JSON.stringify(object));
   };
 
