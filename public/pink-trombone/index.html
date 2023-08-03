@@ -9,7 +9,7 @@
     <div style="position: absolute; left: 0; top: 0; z-index: 100">
       <button id="darkMode">🌗</button>
       <label
-        >index:
+        >id:
         <input
           id="pinkTromboneIdInput"
           type="number"
@@ -17,6 +17,13 @@
           max="100"
           step="1"
           oninput="setPinkTromboneId(event.target.value)"
+      /></label>
+      <label
+        >channel?
+        <input
+          type="checkbox"
+          id="useIdChannelInput"
+          oninput="setUseIdChannel(event.target.checked)"
       /></label>
     </div>
     <pink-trombone></pink-trombone>

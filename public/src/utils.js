@@ -6,17 +6,44 @@ const searchParams = new URLSearchParams(location.search);
 const useEssentia = searchParams.get("essentia") !== null;
 let gainNode, audio;
 
-let pinkTromboneId = searchParams.get("id") || 0;
+let pinkTromboneId = Number(searchParams.get("id")) || 0;
 const setPinkTromboneId = (id) => {
-  pinkTromboneId = id.toString();
-  searchParams.set("id", pinkTromboneId);
+  pinkTromboneId = id;
+  if (pinkTromboneId == 0) {
+    searchParams.delete("id");
+  } else {
+    searchParams.set("id", pinkTromboneId);
+  }
   window.history.replaceState(null, null, `?${searchParams.toString()}`);
-  send({
-    type: "id",
-    id: pinkTromboneId,
-  });
+  if (useIdChannel) {
+    location = location;
+  } else {
+    send({
+      type: "id",
+      id: pinkTromboneId,
+    });
+  }
 };
+
+let useIdChannel = typeof searchParams.get("use-id-channel") == "string";
+const setUseIdChannel = (_useIdChannel) => {
+  useIdChannel = _useIdChannel;
+  if (useIdChannel) {
+    searchParams.set("use-id-channel", "");
+  } else {
+    searchParams.delete("use-id-channel");
+  }
+  window.history.replaceState(null, null, `?${searchParams.toString()}`);
+
+  location = location;
+};
+
 window.addEventListener("DOMContentLoaded", () => {
+  const useIdChannelInput = document.getElementById("useIdChannelInput");
+  if (useIdChannelInput) {
+    useIdChannelInput.checked = useIdChannel;
+  }
+
   const pinkTromboneIdInput = document.getElementById("pinkTromboneIdInput");
   if (pinkTromboneIdInput) {
     pinkTromboneIdInput.value = pinkTromboneId;

@@ -13,7 +13,6 @@ pinkTromboneElement.addEventListener("load", (event) => {
       if (audioContext.destination.maxChannelCount >= 6) {
         audioContext.destination.channelCount = 6;
         audioContext.destination.maxChannelCount = 6;
-        audioContext.destination.channelCount = 6;
         audioContext.destination.channelInterpretation = "discrete";
         audioContext.destination.channelCountMode = "explicit";
       } else {
@@ -23,9 +22,26 @@ pinkTromboneElement.addEventListener("load", (event) => {
       pinkTromboneElement.pinkTrombone._pinkTromboneNode.connect(
         audioContext.destination
       );
+    } else if (
+      useIdChannel &&
+      audioContext.destination.maxChannelCount >= pinkTromboneId + 1
+    ) {
+      const channelCount = audioContext.destination.maxChannelCount;
+      const channelMerger = audioContext.createChannelMerger(channelCount);
+      audioContext.destination.channelCount = channelCount;
+      audioContext.destination.maxChannelCount = channelCount;
+      audioContext.destination.channelInterpretation = "discrete";
+      audioContext.destination.channelCountMode = "explicit";
+      pinkTromboneElement.pinkTrombone._gain.connect(
+        channelMerger,
+        0,
+        pinkTromboneId
+      );
+      channelMerger.connect(audioContext.destination);
     } else {
       pinkTromboneElement.connect(pinkTromboneElement.audioContext.destination);
     }
+
     pinkTromboneElement.start();
     frontConstriction = pinkTromboneElement.newConstriction(43, 1.8);
     pinkTromboneElement.frontConstriction = frontConstriction;
